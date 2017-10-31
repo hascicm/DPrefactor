@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Refactor</title>
+		<link rel="stylesheet" href="../Styles/menu.css">
+		<link rel="stylesheet" type="text/css" href="../Styles/main.css">
+		<script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
+   		<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+   		<script src="../Scripts/main.js"></script> 
+	</head>
+
+	<body>
+		 <div id="nav">	
+			<ul>		
+				<li>
+					<a href="javascript:home();"><span>Proces</span></a>
+				</li>
+				<li>
+					<a href="javascript:search();"><span>Vyhľadávanie</span></a>
+				</li>
+				<li>
+					<a href="javascript:refactor(0);"><span>Refaktoring</span></a>
+				</li>
+				<li>
+					<a href="javascript:rules(0);"><span>Pravidlá</span></a>
+				</li>
+				<li>
+					<a href="javascript:preferences(0);"><span>Preferencie</span></a>
+				</li>
+				<li>
+					<a href="javascript:smells();"><span>Databáza pachov</span></a>
+				</li>
+				<li>
+					<a href="javascript:about(0);"><span>O programe</span></a>
+				</li>
+			</ul>
+		</div> 
+		<section id="home">
+	        <h1>Refactor</h1>
+	       	 <form>
+				  <label for="repo">Git repozitár</label>
+				  <input type="text" name="repo" placeholder="Example: https://john@github.com/john/test.git" value="https://github.com/hascicm/refactor.git" id="repo"><p/>
+				  <label for="name">Prihlasovacie meno</label>
+				  <input type="text" name="name" id="name"><p/>
+				  <label for="password">Prihlasovacie heslo</label>
+				  <input type="text" name="password" id="password">
+			</form>
+			<p/>
+			<hr>
+			<p/>
+			<form>
+				  <label for="search">Git branch - vyhľadávanie</label>
+				  <input type="text" name="search" value="search" id="searchBranch"><p/>
+				  <label for="repair">Git branch - oprava</label>
+				  <input type="text" name="repair" value="repair" id="repairBranch"><p/>
+			</form>
+			<p/>
+			<hr>
+			<p/>
+			<form>
+				<input type="checkbox" class = 'inputcheckbox' id = "explanationSearch">Vysvetlenia do search vetvy<br>
+				<input type="checkbox" class = 'inputcheckbox' id = "explanationRepair">Vysvetlenia do repair vetvy<br>
+			</form>
+			<p/>
+			<hr>
+			<p/>
+			<div>
+				<button type="button" onclick="execute()">Vykonať</button> 
+				<button type="button" onclick="clearComments()">Vymaž komentáre</button> 
+			</div>
+	    </section>
+	    <section id="search" hidden=true>
+	    	<h1>Možnosti vyhľadávania</h1>
+	    	<table id="searchTable">
+				<tr>
+    				<th>Aktívny</th>
+    				<th>Kód</th>
+    				<th>Názov</th>
+    				<th>Editovať</th>
+  				</tr>
+			</table>
+			<button type="button" onclick="addSearch()">Pridať</button>
+	    </section>
+	    <section id="refactor" hidden=true>
+	    	<h1>Možnosti refaktorovania</h1>
+	    	<table id="repairTable">
+				<tr>
+    				<th>Aktívny</th>
+    				<th>Kód</th>
+    				<th>Názov</th>
+    				<th>Editovať</th>
+  				</tr>
+			</table>
+			<button type="button" onclick="addRepair()">Pridať</button>
+	    </section>
+	    <section id="preferences" hidden=true>
+	    	<h1>Prioritizácia problémov</h1>
+	    	<p>
+	    	Potiahnutím upravte vaše preferenicie:
+			<ol id="priorityList">
+			    <li>Bad Size</li>
+			    <li>Bad Location</li>
+			    <li>Bad Class Content</li>
+			    <li>Bad Inheritance</li>
+			    <li>Needless Part</li>
+			    <li>Attribute Problem</li>
+			    <li>Bad Communication</li>
+			</ol>
+	    </section>
+	    <section id="rules" hidden=true>
+	    	<h1>Aktualizujte pravidlá expertného systému</h1>
+	    	<textarea id="ruleDef">
+			</textarea>
+			<button type="button" onclick="saveRules()">Uložiť</button>
+	    </section>
+	    <section id="repairEdit" hidden=true>
+	    	<h1>Aktualizujte pravidlo</h1>
+	    	<p>
+	    	<input type="text" name="name" id="rEditName" placeholder="názov">
+	    	<input type="text" name="code" id="rEditCode" placeholder="kód">
+	    	<p>
+	    	<textarea id="rEditScript">
+			</textarea>
+			<button type="button" onclick="saveRepair()">Uložiť</button>
+	    </section>
+	    <section id="searchEdit" hidden=true>
+	    	<h1>Aktualizujte pravidlo</h1>
+	    	<p>
+	    	<input type="text" name="name" id="sEditName" placeholder="názov">
+	    	<input type="text" name="code" id="sEditCode" placeholder="kód">
+	    	<p>
+	    	<textarea id="sEditScript">
+			</textarea>
+			<button type="button" onclick="saveSearch()">Uložiť</button>
+	    </section>
+	    <section id="SmellDatabase" hidden=true>
+	    	<h1>Prehľad pachov</h1>
+	    </section>
+	    <section id="about" hidden=true>
+	    	<h1>O programe Refactor</h1>
+	    	<p>
+	    	Program predstavuje výstup diplomového projektu na fakulte Informatiky a Informačných Technológií.
+	    	Program je vo fáze prototypu, preto ho nemožno použiť na iné, ako vedecké účely.
+	    	<p>
+	    	Autor: Lukáš Markovič
+	    </section>
+	</body>
+</html>
