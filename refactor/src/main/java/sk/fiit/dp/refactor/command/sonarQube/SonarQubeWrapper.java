@@ -58,7 +58,11 @@ public class SonarQubeWrapper {
 		
 		StringBuilder sb = new StringBuilder();
 		String urlString = "http://localhost:9000/api/issues/search?componentRoots=" + projectKey;
-
+		//TODO - moze sa stat, ze este nie su nahrane vsetky bugy...
+		/*
+		 * IF COMPONENTS.size() < 1
+		 * opakuj
+		 * */
 		while (!this.isUploaded) {
 			try {
 				Thread.currentThread().sleep(100);

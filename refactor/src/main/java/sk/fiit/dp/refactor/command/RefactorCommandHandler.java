@@ -69,6 +69,7 @@ public class RefactorCommandHandler {
 			sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
 			sonarOutput = sonarHandler.getIssues(id);
 			sonarHandler.deleteProject(id);
+			System.out.println(sonarOutput);
 			//SONAR
 			
 			// 2. Vytvori branch pre vyhladavanie
