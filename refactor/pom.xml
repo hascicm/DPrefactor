@@ -24,7 +24,7 @@
 					<warName>refactor</warName>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
-			</plugin>
+			</plugin>	
 		</plugins>
 	</build>
 
@@ -87,6 +87,11 @@
 			<version>7.2</version>
 			<scope>system</scope>
 			<systemPath>${java.home}/lib/jsr94.jar</systemPath>
+		</dependency>
+		<dependency>
+    		<groupId>org.sonarsource.scanner.maven</groupId>
+    		<artifactId>sonar-maven-plugin</artifactId>
+    		<version>3.1.1</version>
 		</dependency>
 	</dependencies>
 

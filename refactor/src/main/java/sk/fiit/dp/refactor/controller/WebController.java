@@ -24,8 +24,6 @@ public class WebController {
 
 	private ResourceCommandHandler resourceCommand = ResourceCommandHandler.getInstance();
 	private RefactorCommandHandler refactorCommand = RefactorCommandHandler.getInstance();
-	private String name = "hascicm";
-	private String pass = "Swiftims1994";
 	@GET
 	@Path("/rulesdefinition")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -124,9 +122,8 @@ public class WebController {
 		}
 
 		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"),
-			//	json.getString("name"), json.getString("password")
-				name,pass
-				, json.getString("searchBranch"),
+				json.getString("name"), json.getString("password"),
+				json.getString("searchBranch"),
 				json.getString("repairBranch"), searchMethods, allowedRefactoring,explanationToSearch);
 
 		JSONObject response = new JSONObject();

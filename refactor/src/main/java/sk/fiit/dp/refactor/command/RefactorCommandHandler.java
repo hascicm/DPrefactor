@@ -11,6 +11,7 @@ import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.IdGenerator;
@@ -29,7 +30,10 @@ public class RefactorCommandHandler {
 	private PostgreManager postgre = PostgreManager.getInstance();
 	private RuleEngineCommandHandler ruleCommand = RuleEngineCommandHandler.getInstance();
 	private ExplanationCommandHandler explainCommand = ExplanationCommandHandler.getInstance();
+	private SonarQubeWrapper sonarHandler = SonarQubeWrapper.getInstance();
 	private String id;
+	
+	private String sonarOutput;
 
 	private RefactorCommandHandler() {
 	}
@@ -59,7 +63,14 @@ public class RefactorCommandHandler {
 		try {
 			// 1. Vytvori lokalnu kopiu Git repozitara
 			gitCommand.cloneRepository(repo, name, password, id);
-
+			
+			//TODO
+			//SONAR
+			sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
+			sonarOutput = sonarHandler.getIssues(id);
+			sonarHandler.deleteProject(id);
+			//SONAR
+			
 			// 2. Vytvori branch pre vyhladavanie
 			gitCommand.createBranch(searchBranch);
 
@@ -84,7 +95,9 @@ public class RefactorCommandHandler {
 				System.out.println("method: " + o.getRefCode());
 			}
 			System.out.println("--------------------------------------");
-
+			
+			
+			
 			// 7. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
 
