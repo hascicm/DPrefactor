@@ -11,11 +11,13 @@ import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.IdGenerator;
+import sk.fiit.dp.refactor.helper.JsonFileWriter;
 import sk.fiit.dp.refactor.model.JessInput;
 import sk.fiit.dp.refactor.model.JessOutput;
 import sk.fiit.dp.refactor.model.SearchObject;
@@ -111,7 +113,12 @@ public class RefactorCommandHandler {
 
 			// 9. Vykona sa konverzia XML suborov do Javy
 			conversionCommand.convertXmlToJava(xmlFiles);
-
+			
+			//NEW - SONAR - L.H.
+			if(sonarProps.isSonarEnabled()){
+				JsonFileWriter.writeJsonToFile(sonarOutput, gitCommand.getRepoDirectory() +"\\sonar_output.json");
+			}
+			
 			// 10. Vykona sa push search branch na git
 			gitCommand.pushBranch(searchBranch, name, password);
 

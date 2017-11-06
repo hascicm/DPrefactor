@@ -61,6 +61,7 @@ public class SonarQubeWrapper {
 		
 		StringBuilder sb = new StringBuilder();
 		String urlString = this.getSonarProps().getHostName() + "/api/issues/search?componentRoots=" + projectKey;
+		System.out.println();
 		
 		while (!this.isUploaded) {
 			try {
@@ -96,8 +97,10 @@ public class SonarQubeWrapper {
 				if(json.getJSONArray("components").length() > 0){
 					break;
 				}
+				
 				Thread.sleep(100);
 				sb = new StringBuilder();
+				System.out.print(".");
 			}
 
 		} catch (Exception e) {
