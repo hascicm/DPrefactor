@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import sk.fiit.dp.refactor.command.RefactorCommandHandler;
 import sk.fiit.dp.refactor.command.ResourceCommandHandler;
+import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 
 @Path("")
 public class WebController {
@@ -110,6 +111,16 @@ public class WebController {
 		JSONArray toRepair = json.getJSONArray("repairCodes");
 		boolean explanationToSearch = json.getBoolean("explanationSearch");
 		
+		SonarProperties sonarProps = new SonarProperties();
+		sonarProps.setSonarEnabled(json.getBoolean("isSonarEnabled"));
+		if(sonarProps.isSonarEnabled()){
+			sonarProps.setHostName(json.getString("sonarHost"));
+			sonarProps.setLoginName(json.getString("sonarLogin"));
+			sonarProps.setLoginPassword(json.getString("sonarPassword"));
+		}
+		
+		
+		
 		//TODO
 		List<String> searchMethods = new ArrayList<>();
 		for (int i = 0; i < toSearch.length(); ++i) {
@@ -124,7 +135,7 @@ public class WebController {
 		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"),
 				json.getString("name"), json.getString("password"),
 				json.getString("searchBranch"),
-				json.getString("repairBranch"), searchMethods, allowedRefactoring,explanationToSearch);
+				json.getString("repairBranch"), searchMethods, allowedRefactoring,explanationToSearch, sonarProps);
 
 		JSONObject response = new JSONObject();
 		for (String key : results.keySet()) {

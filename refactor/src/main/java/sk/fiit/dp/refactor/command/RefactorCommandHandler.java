@@ -11,6 +11,7 @@ import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
@@ -57,7 +58,7 @@ public class RefactorCommandHandler {
 	 * @return
 	 */
 	public Map<String, Integer> executeRefactoring(String repo, String name, String password, String searchBranch,
-			String repairBranch, List<String> toSearch, List<String> allowedRefactoring, boolean explanationToSearch) {
+			String repairBranch, List<String> toSearch, List<String> allowedRefactoring, boolean explanationToSearch, SonarProperties sonarProps) {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
@@ -66,10 +67,13 @@ public class RefactorCommandHandler {
 			
 			//TODO
 			//SONAR
-			sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
-			sonarOutput = sonarHandler.getIssues(id);
-			sonarHandler.deleteProject(id);
-			System.out.println(sonarOutput);
+			if(sonarProps.isSonarEnabled()){
+				sonarHandler.setSonarProps(sonarProps);
+				sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
+				sonarOutput = sonarHandler.getIssues(id);
+				sonarHandler.deleteProject(id);
+				System.out.println(sonarOutput);
+			}
 			//SONAR
 			
 			// 2. Vytvori branch pre vyhladavanie

@@ -46,9 +46,9 @@
 				  <label for="password">Prihlasovacie heslo</label>
 				  <input type="text" name="password" id="password">
 			</form>
-			<p/>
+			
 			<hr>
-			<p/>
+			
 			<form>
 				  <label for="search">Git branch - vyhľadávanie</label>
 				  <input type="text" name="search" value="search" id="searchBranch"><p/>
@@ -64,7 +64,26 @@
 			</form>
 			<p/>
 			<hr>
-			<p/>
+			<h3>SonarQube</h3>
+			<form>
+				<p>
+					<input type="checkbox" class = 'inputcheckbox' id = "sonarQubeAnalyze">Analyzovať projekt pomocou nástroja SonarQube<br>
+				</p>
+				<p>
+					<label for="sonarHost">Hostname</label>
+					<input type="text" name="sonarHost" value="http://localhost:9000" id="sonarHost">
+				</p>
+				<p>
+					<label for="sonarLogin">Prihlasovacie meno</label>
+					<input type="text" name="sonarLogin" value="admin" id="sonarLogin">
+				</p>
+				<p>
+					<label for="sonarPassword">Heslo</label>
+					<input type="password" name="sonarPassword" value="admin" id="sonarPassword">
+				</p>
+					
+			</form>
+			<hr>
 			<div>
 				<button type="button" onclick="execute()">Vykonať</button> 
 				<button type="button" onclick="clearComments()">Vymaž komentáre</button> 

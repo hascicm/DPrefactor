@@ -8,12 +8,14 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.Properties;
 
+import org.json.JSONObject;
 import org.sonarsource.scanner.api.EmbeddedScanner;
 
 public class SonarQubeWrapper {
 
 	private static final String PROJECT_BASEDIR_PROPERTY = "sonar.projectBaseDir";
 	private boolean isUploaded = false;
+	private SonarProperties sonarProps;
 
 	private static SonarQubeWrapper INSTANCE = null;
 
@@ -34,11 +36,11 @@ public class SonarQubeWrapper {
 		// allProps.put(PROJECT_BASEDIR_PROPERTY,
 		// "C:\\Users\\Lukas\\workspace_neon_ee\\SONARScanner");
 		allProps.put(PROJECT_BASEDIR_PROPERTY, repoPath);
-		allProps.put("sonar.host.url", "http://localhost:9000");
+		allProps.put("sonar.host.url", this.sonarProps.getHostName());
 		allProps.put("sonar.projectKey", projectKey);
 		// allProps.put("sonar.projectName", "MyFirstSonarProject");
-		allProps.put("sonar.login", "admin");
-		allProps.put("sonar.password", "admin");
+		allProps.put("sonar.login", this.sonarProps.getLoginName());
+		allProps.put("sonar.password", this.sonarProps.getLoginPassword());
 		allProps.put("sonar.sources", repoPath);
 
 		EmbeddedScanner runner = EmbeddedScanner.create(new Logger()).addGlobalProperties(allProps);
@@ -46,7 +48,8 @@ public class SonarQubeWrapper {
 		try {
 			runner.start();
 			runner.runAnalysis(allProps);
-
+		}catch(IllegalStateException exeption){
+			//TODO - osetrenie vynimky
 		} finally {
 			runner.stop();
 			this.isUploaded = true;
@@ -57,12 +60,8 @@ public class SonarQubeWrapper {
 	public String getIssues(String projectKey) {
 		
 		StringBuilder sb = new StringBuilder();
-		String urlString = "http://localhost:9000/api/issues/search?componentRoots=" + projectKey;
-		//TODO - moze sa stat, ze este nie su nahrane vsetky bugy...
-		/*
-		 * IF COMPONENTS.size() < 1
-		 * opakuj
-		 * */
+		String urlString = this.getSonarProps().getHostName() + "/api/issues/search?componentRoots=" + projectKey;
+		
 		while (!this.isUploaded) {
 			try {
 				Thread.currentThread().sleep(100);
@@ -73,23 +72,33 @@ public class SonarQubeWrapper {
 		}
 
 		try {
-			URL url = new URL(urlString);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept", "application/json");
-
-			if (conn.getResponseCode() != 200) {
-				throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+			while(true){
+				URL url = new URL(urlString);
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				conn.setRequestMethod("GET");
+				conn.setRequestProperty("Accept", "application/json");
+				
+				if (conn.getResponseCode() != 200) {
+					throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+				}
+	
+				BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+	
+				String response;
+				while ((response = br.readLine()) != null) {
+					sb.append(response);
+				}
+				
+				conn.disconnect();
+				JSONObject json = new JSONObject(sb.toString());
+				
+				//wait for upload on server
+				if(json.getJSONArray("components").length() > 0){
+					break;
+				}
+				Thread.sleep(100);
+				sb = new StringBuilder();
 			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-
-			String response;
-			while ((response = br.readLine()) != null) {
-				sb.append(response);
-			}
-
-			conn.disconnect();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -122,5 +131,13 @@ public class SonarQubeWrapper {
 		}
 
 		return true;
+	}
+
+	public SonarProperties getSonarProps() {
+		return sonarProps;
+	}
+
+	public void setSonarProps(SonarProperties sonarProps) {
+		this.sonarProps = sonarProps;
 	}
 }

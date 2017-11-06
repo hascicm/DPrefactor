@@ -1,9 +1,30 @@
 var add = false;
 
 window.onload = function() {
+	init();
+	
 	search();
     refactor();
     home();
+}
+
+function init(){
+	
+	$("#sonarHost").prop("disabled", true);
+	$("#sonarLogin").prop("disabled", true);
+	$("#sonarPassword").prop("disabled", true);
+	
+	$("#sonarQubeAnalyze").change(function() {
+	    if(this.checked) {
+	        $("#sonarHost").prop("disabled", false);
+	        $("#sonarLogin").prop("disabled", false);
+	    	$("#sonarPassword").prop("disabled", false);
+	    }else{
+	    	$("#sonarHost").prop("disabled", true);
+	    	$("#sonarLogin").prop("disabled", true);
+	    	$("#sonarPassword").prop("disabled", true);
+	    }
+	});
 }
 
 function execute() {
@@ -39,6 +60,10 @@ function execute() {
 		searchBranch : document.getElementById("searchBranch").value,
 		repairBranch : document.getElementById("repairBranch").value,
 		explanationSearch : document.getElementById("explanationSearch").checked,
+		isSonarEnabled : document.getElementById("sonarQubeAnalyze").checked,
+		sonarHost: document.getElementById("sonarHost").value,
+		sonarLogin: document.getElementById("sonarLogin").value,
+		sonarPassword: document.getElementById("sonarPassword").value,
 		searchCodes : searchCodes,
 		repairCodes : repairCodes,
 		prioritization : prioritization
@@ -71,7 +96,6 @@ function home() {
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
-
 }
 
 function search() {
