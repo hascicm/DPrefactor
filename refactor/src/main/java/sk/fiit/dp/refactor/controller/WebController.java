@@ -25,6 +25,7 @@ public class WebController {
 
 	private ResourceCommandHandler resourceCommand = ResourceCommandHandler.getInstance();
 	private RefactorCommandHandler refactorCommand = RefactorCommandHandler.getInstance();
+
 	@GET
 	@Path("/rulesdefinition")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -105,23 +106,24 @@ public class WebController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String execute(String input) {
-		
+
 		JSONObject json = new JSONObject(input);
 		JSONArray toSearch = json.getJSONArray("searchCodes");
 		JSONArray toRepair = json.getJSONArray("repairCodes");
 		boolean explanationToSearch = json.getBoolean("explanationSearch");
-		
+		boolean createrepairrecord = json.getBoolean("createrepairrecord");
+		String gituser = json.getString("name");
+		String gitpass = json.getString("password");
+
 		SonarProperties sonarProps = new SonarProperties();
 		sonarProps.setSonarEnabled(json.getBoolean("isSonarEnabled"));
-		if(sonarProps.isSonarEnabled()){
+		if (sonarProps.isSonarEnabled()) {
 			sonarProps.setHostName(json.getString("sonarHost"));
 			sonarProps.setLoginName(json.getString("sonarLogin"));
 			sonarProps.setLoginPassword(json.getString("sonarPassword"));
 		}
-		
-		
-		
-		//TODO
+
+		// TODO
 		List<String> searchMethods = new ArrayList<>();
 		for (int i = 0; i < toSearch.length(); ++i) {
 			searchMethods.add(toSearch.getString(i));
@@ -132,18 +134,15 @@ public class WebController {
 			allowedRefactoring.add(toRepair.getString(i));
 		}
 
-		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"),
-				json.getString("name"), json.getString("password"),
-				json.getString("searchBranch"),
-				json.getString("repairBranch"), searchMethods, allowedRefactoring,explanationToSearch, sonarProps);
+		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser, gitpass,
+				json.getString("searchBranch"), json.getString("repairBranch"), searchMethods, allowedRefactoring,
+				explanationToSearch, createrepairrecord, sonarProps);
 
 		JSONObject response = new JSONObject();
 		for (String key : results.keySet()) {
 			response.put(key, results.get(key));
 		}
 
-
-		
 		return response.toString();
 	}
 }

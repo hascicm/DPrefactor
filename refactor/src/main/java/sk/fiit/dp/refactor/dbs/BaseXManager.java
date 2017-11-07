@@ -9,6 +9,7 @@ import javax.xml.namespace.QName;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQItem;
+import javax.xml.xquery.XQResultSequence;
 
 import com.xqj2.XQConnection2;
 
@@ -98,12 +99,19 @@ public class BaseXManager {
 	 * @param value
 	 * @throws XQException
 	 */
-	public void applyXQuery(String content, String variableName, String value) throws XQException {
-		System.out.println("bind: " + variableName + "   " + value + "   " + content);
+	public void applyXQuery(String content, String variableName, String value, boolean exportNode) throws XQException {
 		expression.bindString(new QName(variableName), value, null);
-		// EXPLANATION FILE 
-		expression.bindString(new QName("explanation"),GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt" ,null);
-		expression.executeQuery(content);
+		// BIND OF EXPLANATION FILE
+		if (exportNode) {
+			System.out.println("BBBBBBBBBBBBBBBBB");
+			expression.bindString(new QName("explanation"),
+					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt", null);
+		}
+		XQResultSequence x = expression.executeQuery(content);
+		while (x.next()) {
+			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			System.out.println(x.getAtomicValue());
+		}
 	}
 
 	/**

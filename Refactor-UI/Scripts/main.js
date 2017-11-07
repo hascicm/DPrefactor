@@ -60,6 +60,7 @@ function execute() {
 		searchBranch : document.getElementById("searchBranch").value,
 		repairBranch : document.getElementById("repairBranch").value,
 		explanationSearch : document.getElementById("explanationSearch").checked,
+		createrepairrecord : document.getElementById("createrepairrecord").checked,
 		isSonarEnabled : document.getElementById("sonarQubeAnalyze").checked,
 		sonarHost: document.getElementById("sonarHost").value,
 		sonarLogin: document.getElementById("sonarLogin").value,

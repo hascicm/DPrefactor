@@ -11,7 +11,6 @@ import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
@@ -24,6 +23,8 @@ import sk.fiit.dp.refactor.model.SearchObject;
 
 public class RefactorCommandHandler {
 
+	private static final boolean OutputToSearchExplanationFile = true;
+
 	private static RefactorCommandHandler INSTANCE;
 
 	private GitCommandHandler gitCommand = GitCommandHandler.getInstance();
@@ -35,7 +36,7 @@ public class RefactorCommandHandler {
 	private ExplanationCommandHandler explainCommand = ExplanationCommandHandler.getInstance();
 	private SonarQubeWrapper sonarHandler = SonarQubeWrapper.getInstance();
 	private String id;
-	
+
 	private String sonarOutput;
 
 	private RefactorCommandHandler() {
@@ -56,55 +57,59 @@ public class RefactorCommandHandler {
 	 * @param password
 	 * @param name
 	 * @param repairBranch
-	 * @param explanationToSearch 
+	 * @param explanationToSearch
 	 * @return
 	 */
 	public Map<String, Integer> executeRefactoring(String repo, String name, String password, String searchBranch,
-			String repairBranch, List<String> toSearch, List<String> allowedRefactoring, boolean explanationToSearch, SonarProperties sonarProps) {
+			String repairBranch, List<String> toSearch, List<String> allowedRefactoring, boolean explanationToSearch,
+			boolean createRepairRecord, SonarProperties sonarProps) {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
 			// 1. Vytvori lokalnu kopiu Git repozitara
 			gitCommand.cloneRepository(repo, name, password, id);
-			
-			//TODO
-			//SONAR
-			if(sonarProps.isSonarEnabled()){
+
+			// TODO
+			// SONAR
+			if (sonarProps.isSonarEnabled()) {
 				sonarHandler.setSonarProps(sonarProps);
 				sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
 				sonarOutput = sonarHandler.getIssues(id);
 				sonarHandler.deleteProject(id);
 				System.out.println(sonarOutput);
 			}
-			//SONAR
-			
+			// SONAR
+
 			// 2. Vytvori branch pre vyhladavanie
 			gitCommand.createBranch(searchBranch);
 
 			// 3. Prevedu sa Java subory do XML reprezentacie
 			List<File> xmlFiles = conversionCommand.convertJavaToXml(gitCommand.getRepoDirectory());
 
-			// 4. Pripravi sa BaseX databaze	
+			// 4. Pripravi sa BaseX databaze
 			baseX.prepareDatabase(id);
 
 			// 5. XML subory sa importuju do databazy
 			baseX.projectToDatabase(xmlFiles);
 
-			// NEW pripravenie vyhladavacich skriptov s vysvetlenim
-			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch, explanationToSearch);
+			// NEW pripravenie vyhladavacich skriptov s vysvetlenim a exportom
+			// casti kodu
+			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch, explanationToSearch,
+					createRepairRecord);
 
 			// 6. Vykona sa vyhladavanie
-			List<JessInput> searchResults = searchCommand.search(search);
+			List<JessInput> searchResults = searchCommand.search(search, createRepairRecord);
+
+			// TODO
+			explainCommand.processSearchExplanationFile();
 
 			System.out.println("------------SEARCH--------------------------");
-			for (JessInput o : searchResults) {
-				System.out.println("tags:   " + o.getCode());
-				System.out.println("method: " + o.getRefCode());
-			}
-			System.out.println("--------------------------------------");
-			
-			
-			
+			/*
+			 * for (JessInput o : searchResults) { System.out.println("tags:   "
+			 * + o.getCode()); System.out.println("method: " + o.getRefCode());
+			 * } System.out.println("--------------------------------------");
+			 */
+
 			// 7. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
 
@@ -113,12 +118,12 @@ public class RefactorCommandHandler {
 
 			// 9. Vykona sa konverzia XML suborov do Javy
 			conversionCommand.convertXmlToJava(xmlFiles);
-			
-			//NEW - SONAR - L.H.
-			if(sonarProps.isSonarEnabled()){
-				JsonFileWriter.writeJsonToFile(sonarOutput, gitCommand.getRepoDirectory() +"\\sonar_output.json");
+
+			// NEW - SONAR - L.H.
+			if (sonarProps.isSonarEnabled()) {
+				JsonFileWriter.writeJsonToFile(sonarOutput, gitCommand.getRepoDirectory() + "\\sonar_output.json");
 			}
-			
+
 			// 10. Vykona sa push search branch na git
 			gitCommand.pushBranch(searchBranch, name, password);
 
@@ -127,16 +132,18 @@ public class RefactorCommandHandler {
 
 			// 12. Pravidlovy stroj rozhodne o pouzitom refaktorovani
 			List<JessOutput> requiredRefactoring = ruleCommand.run(searchResults);
-			
+
 			System.out.println("---------JESS-----------------------------");
-			for (JessOutput o : requiredRefactoring) {
-				System.out.println("tags:   " + o.getTag());
-				System.out.println("method: " + o.getRefactoringMethod());
-			}
-			System.out.println("--------------------------------------");
+			/*
+			 * for (JessOutput o : requiredRefactoring) {
+			 * System.out.println("tags:   " + o.getTag());
+			 * System.out.println("method: " + o.getRefactoringMethod()); }
+			 * System.out.println("--------------------------------------");
+			 */
 
 			// 13. Vykona sa refaktoring
-			applyRefactoring(requiredRefactoring, allowedRefactoring, true);
+			System.out.println("---------REFACTOR-----------------------------");
+			applyRefactoring(requiredRefactoring, allowedRefactoring, createRepairRecord);
 
 			// TODO explanation
 			explainCommand.explain();
@@ -154,7 +161,7 @@ public class RefactorCommandHandler {
 			gitCommand.pushBranch(repairBranch, name, password);
 
 			// 18. Vymaze sa docasna BaseX databaza
-			 baseX.cleanDatabase(id);
+			baseX.cleanDatabase(id);
 
 			// 19. Odstrani sa lokalna git kopia
 			gitCommand.deleteLocalDirectory();
@@ -177,22 +184,28 @@ public class RefactorCommandHandler {
 	 * @throws XQException
 	 */
 	public void applyRefactoring(List<JessOutput> requiredRefactoring, List<String> allowedRefactoring,
-			boolean explanation) throws SQLException, XQException {
+			boolean createRepairRecord) throws SQLException, XQException {
 		for (JessOutput refactoring : requiredRefactoring) {
 			if (allowedRefactoring.contains(refactoring.getRefactoringMethod())) {
 				String script = postgre.getRepairScript(refactoring.getRefactoringMethod());
+				// TODO
+				System.out.println("create repair record " + createRepairRecord);
+				if (createRepairRecord) {
+					script = prepareRepairScript(refactoring, script);
+				}
 				if (script != null && !"".equals(script)) {
-					baseX.applyXQuery(script, "tag", refactoring.getTag());
+					baseX.applyXQuery(script, "tag", refactoring.getTag(), createRepairRecord);
 				}
 			}
 		}
 	}
 
-	public List<String> prepareScrypt(JessOutput refactoring, boolean expanation) throws SQLException {
-		String script = postgre.getRepairScript(refactoring.getRefactoringMethod());
-		if (expanation) {
-			String RuleExplanation = postgre.getExpanationForScript(refactoring.getRefactoringMethod());
-		}
-		return null;
+	// TODO
+	public String prepareRepairScript(JessOutput refactoring, String script) throws SQLException {
+		String RuleExplanation = postgre.getExplanationForScript(refactoring.getRefactoringMethod());
+		String preparedScript = ExplanationHandler.getInstance().addRefactoringExplanation(script);
+
+		return preparedScript;
 	}
+
 }

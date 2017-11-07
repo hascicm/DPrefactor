@@ -44,10 +44,15 @@ public class SearchCommandHandler {
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<SearchObject> prepareSearchScripts(List<String> searchRequest, boolean withExplanation) throws SQLException {
+	public List<SearchObject> prepareSearchScripts(List<String> searchRequest, boolean withExplanation,
+			boolean exprortNode) throws SQLException {
 		List<SearchObject> preparedSearchObjects = postgre.loadActiveSearch(searchRequest);
 		if (withExplanation) {
 			ExplanationHandler.getInstance().addexplanation(preparedSearchObjects);
+		}
+		if (exprortNode) {
+			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+			ExplanationHandler.getInstance().addOutputCommand(preparedSearchObjects);
 		}
 		return preparedSearchObjects;
 	}
@@ -61,9 +66,9 @@ public class SearchCommandHandler {
 	 * @throws XQException
 	 * @throws IOException
 	 */
-	public List<JessInput> search(List<SearchObject> searchObjects) throws XQException, IOException {
-		applySearch(searchObjects);
-
+	public List<JessInput> search(List<SearchObject> searchObjects, boolean exprortNode)
+			throws XQException, IOException {
+		applySearch(searchObjects, exprortNode);
 		return processSearchResults();
 	}
 
@@ -73,10 +78,10 @@ public class SearchCommandHandler {
 	 * @param searchObjects
 	 * @throws XQException
 	 */
-	private void applySearch(List<SearchObject> searchObjects) throws XQException {
+	private void applySearch(List<SearchObject> searchObjects, boolean exprortNode) throws XQException {
 		for (SearchObject search : searchObjects) {
 			String script = search.getScript();
-			baseX.applyXQuery(script, "resultFile", git.getRepoDirectory() + "\\Result.txt");
+			baseX.applyXQuery(script, "resultFile", git.getRepoDirectory() + "\\Result.txt", exprortNode);
 		}
 	}
 
@@ -95,8 +100,6 @@ public class SearchCommandHandler {
 			if (line.startsWith("NAME: ")) {
 				if (result != null) {
 					searchResults.add(result);
-					System.out.println("search result code: " + result.getCode());
-
 				}
 				result = new JessInput();
 				result.setCode(line.substring(line.indexOf(" ") + 1));
@@ -118,9 +121,9 @@ public class SearchCommandHandler {
 			}
 
 		}
-		if (lines.get(lines.size()-1).startsWith("NAME: ")) {
+		if (lines.get(lines.size() - 1).startsWith("NAME: ")) {
 			result = new JessInput();
-			result.setCode(lines.get(lines.size()-1).substring(lines.get(lines.size()-1).indexOf(" ") + 1));
+			result.setCode(lines.get(lines.size() - 1).substring(lines.get(lines.size() - 1).indexOf(" ") + 1));
 			int i;
 			for (i = 0; i < result.getCode().length(); ++i) {
 				if (Character.isDigit(result.getCode().charAt(i))) {

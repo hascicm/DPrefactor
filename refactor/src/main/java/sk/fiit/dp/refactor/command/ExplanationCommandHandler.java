@@ -16,5 +16,9 @@ public class ExplanationCommandHandler {
 	public void explain() {
 	}
 
+	public void processSearchExplanationFile() {
+		
+	}
+
 
 }

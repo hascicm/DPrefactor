@@ -8,12 +8,6 @@
     =>
     (add (new JessOutput ?o.code "LE")
      add (new JessOutput ?o.code "RMN")))
-    
-(defrule empty-catch-clausule-varians-two
-    "Decision about refactoring for Empty Catch Clausule anti-pattern variant two"
-    ?o <-(JessInput {refCode == "ECC"})
-    =>
-    (add (new JessOutput ?o.code "RMN")))    
 
 (defrule inapropriate-intimacy
     "Decision about refactoring for Inapropriate Intimacy code smell"
