@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.xml.xquery.XQException;
 
+import sk.fiit.dp.refactor.command.explanation.XpathScriptModifier;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.model.JessInput;
@@ -48,11 +49,10 @@ public class SearchCommandHandler {
 			boolean exprortNode) throws SQLException {
 		List<SearchObject> preparedSearchObjects = postgre.loadActiveSearch(searchRequest);
 		if (withExplanation) {
-			ExplanationHandler.getInstance().addexplanation(preparedSearchObjects);
+			XpathScriptModifier.getInstance().addexplanation(preparedSearchObjects);
 		}
 		if (exprortNode) {
-			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-			ExplanationHandler.getInstance().addOutputCommand(preparedSearchObjects);
+			XpathScriptModifier.getInstance().addOutputCommand(preparedSearchObjects);
 		}
 		return preparedSearchObjects;
 	}
@@ -81,7 +81,7 @@ public class SearchCommandHandler {
 	private void applySearch(List<SearchObject> searchObjects, boolean exprortNode) throws XQException {
 		for (SearchObject search : searchObjects) {
 			String script = search.getScript();
-			baseX.applyXQuery(script, "resultFile", git.getRepoDirectory() + "\\Result.txt", exprortNode);
+			baseX.applySearchXQuery(script, "resultFile", git.getRepoDirectory() + "\\Result.txt", exprortNode);
 		}
 	}
 

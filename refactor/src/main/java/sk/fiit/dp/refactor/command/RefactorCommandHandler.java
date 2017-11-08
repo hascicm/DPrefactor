@@ -11,6 +11,8 @@ import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
+import sk.fiit.dp.refactor.command.explanation.XpathScriptModifier;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
@@ -100,9 +102,6 @@ public class RefactorCommandHandler {
 			// 6. Vykona sa vyhladavanie
 			List<JessInput> searchResults = searchCommand.search(search, createRepairRecord);
 
-			// TODO
-			explainCommand.processSearchExplanationFile();
-
 			System.out.println("------------SEARCH--------------------------");
 			/*
 			 * for (JessInput o : searchResults) { System.out.println("tags:   "
@@ -146,8 +145,9 @@ public class RefactorCommandHandler {
 			applyRefactoring(requiredRefactoring, allowedRefactoring, createRepairRecord);
 
 			// TODO explanation
-			explainCommand.explain();
-
+			if (createRepairRecord) {
+				explainCommand.createRepairRecord();
+			}
 			// 14. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
 
@@ -188,13 +188,11 @@ public class RefactorCommandHandler {
 		for (JessOutput refactoring : requiredRefactoring) {
 			if (allowedRefactoring.contains(refactoring.getRefactoringMethod())) {
 				String script = postgre.getRepairScript(refactoring.getRefactoringMethod());
-				// TODO
-				System.out.println("create repair record " + createRepairRecord);
 				if (createRepairRecord) {
 					script = prepareRepairScript(refactoring, script);
 				}
 				if (script != null && !"".equals(script)) {
-					baseX.applyXQuery(script, "tag", refactoring.getTag(), createRepairRecord);
+					baseX.applyRepairXQuery(script, "tag", refactoring.getTag(), createRepairRecord);
 				}
 			}
 		}
@@ -203,7 +201,7 @@ public class RefactorCommandHandler {
 	// TODO
 	public String prepareRepairScript(JessOutput refactoring, String script) throws SQLException {
 		String RuleExplanation = postgre.getExplanationForScript(refactoring.getRefactoringMethod());
-		String preparedScript = ExplanationHandler.getInstance().addRefactoringExplanation(script);
+		String preparedScript = XpathScriptModifier.getInstance().addRefactoringExplanation(script);
 
 		return preparedScript;
 	}

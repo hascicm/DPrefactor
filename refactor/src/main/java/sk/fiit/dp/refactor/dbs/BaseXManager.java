@@ -90,6 +90,27 @@ public class BaseXManager {
 	public void applyXQuery(String content) throws XQException {
 		expression.executeQuery(content);
 	}
+	/**
+	 * Aplikovanie XQuery search skriptu s viazanim premennej na skript
+	 * 
+	 * @param content
+	 * @param variableName
+	 * @param value
+	 * @throws XQException
+	 */
+	public void applySearchXQuery(String content, String variableName, String value, boolean exportNode) throws XQException {
+		expression.bindString(new QName(variableName), value, null);
+		// BIND OF EXPLANATION FILE
+		if (exportNode) {
+			expression.bindString(new QName("explanation"),
+					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt", null);
+		}
+		XQResultSequence x = expression.executeQuery(content);
+		while (x.next()) {
+			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			System.out.println(x.getAtomicValue());
+		}
+	}
 
 	/**
 	 * Aplikovanie XQuery skriptu s viazanim premennej na skript
@@ -99,13 +120,12 @@ public class BaseXManager {
 	 * @param value
 	 * @throws XQException
 	 */
-	public void applyXQuery(String content, String variableName, String value, boolean exportNode) throws XQException {
+	public void applyRepairXQuery(String content, String variableName, String value, boolean exportNode) throws XQException {
 		expression.bindString(new QName(variableName), value, null);
 		// BIND OF EXPLANATION FILE
 		if (exportNode) {
-			System.out.println("BBBBBBBBBBBBBBBBB");
 			expression.bindString(new QName("explanation"),
-					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt", null);
+					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanationRepair.txt", null);
 		}
 		XQResultSequence x = expression.executeQuery(content);
 		while (x.next()) {

@@ -1,4 +1,4 @@
-package sk.fiit.dp.refactor.command;
+package sk.fiit.dp.refactor.command.explanation;
 
 public class ExplanationCommandHandler {
 	private static ExplanationCommandHandler INSTANCE;
@@ -13,12 +13,20 @@ public class ExplanationCommandHandler {
 		return INSTANCE;
 	}
 
-	public void explain() {
+	// TODO
+	public void createRepairRecord() {
+	}
+	
+	// TODO
+	private void processSearchExplanationFile() {
 	}
 
-	public void processSearchExplanationFile() {
-		
+	// TODO
+	private void processRepairExplanationFile() {
 	}
 
+	// TODO
+	private void processJessListenerOutput() {
+	}
 
 }

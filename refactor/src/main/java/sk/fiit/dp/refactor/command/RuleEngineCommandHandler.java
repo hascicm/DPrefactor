@@ -8,6 +8,7 @@ import jess.Filter;
 import jess.JessEvent;
 import jess.JessException;
 import jess.Rete;
+import sk.fiit.dp.refactor.command.explanation.RuleEngineEventHandler;
 import sk.fiit.dp.refactor.helper.Resources;
 import sk.fiit.dp.refactor.helper.Str;
 import sk.fiit.dp.refactor.model.JessInput;

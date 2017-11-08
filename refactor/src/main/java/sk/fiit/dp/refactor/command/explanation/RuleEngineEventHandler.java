@@ -1,4 +1,4 @@
-package sk.fiit.dp.refactor.command;
+package sk.fiit.dp.refactor.command.explanation;
 
 import java.util.ArrayList;
 import java.util.List;

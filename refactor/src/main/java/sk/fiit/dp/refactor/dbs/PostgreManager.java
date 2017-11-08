@@ -83,7 +83,6 @@ public class PostgreManager {
 		while (rs.next()) {
 			RepairObject result = new RepairObject(rs.getString("code"), rs.getString("name"), rs.getString("script"),
 					rs.getString("explanation"));
-			System.out.println(result.getExplanation());
 			results.add(result);
 		}
 

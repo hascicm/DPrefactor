@@ -1,19 +1,19 @@
-package sk.fiit.dp.refactor.command;
+package sk.fiit.dp.refactor.command.explanation;
 
 import java.util.List;
 import java.util.Scanner;
 
 import sk.fiit.dp.refactor.model.SearchObject;
 
-public class ExplanationHandler {
-	private static ExplanationHandler INSTANCE;
+public class XpathScriptModifier {
+	private static XpathScriptModifier INSTANCE;
 
-	private ExplanationHandler() {
+	private XpathScriptModifier() {
 	}
 
-	public static ExplanationHandler getInstance() {
+	public static XpathScriptModifier getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new ExplanationHandler();
+			INSTANCE = new XpathScriptModifier();
 		}
 
 		return INSTANCE;
@@ -72,7 +72,7 @@ public class ExplanationHandler {
 			String line = scanner.nextLine();
 			scriptWithOutput += line + "\n";
 		}
-
+		scanner.close();
 		return scriptWithOutput;
 	}
 
