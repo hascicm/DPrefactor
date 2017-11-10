@@ -134,7 +134,7 @@ public class WebController {
 			allowedRefactoring.add(toRepair.getString(i));
 		}
 
-		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), "hascicm", "Swiftims1994",
+		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser, gitpass,
 				json.getString("searchBranch"), json.getString("repairBranch"), searchMethods, allowedRefactoring,
 				explanationToSearch, createrepairrecord, sonarProps);
 

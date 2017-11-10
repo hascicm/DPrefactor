@@ -9,6 +9,7 @@ import java.util.List;
 import sk.fiit.dp.refactor.dbs.connector.PotgreConnector;
 import sk.fiit.dp.refactor.model.RepairObject;
 import sk.fiit.dp.refactor.model.SearchObject;
+import sk.fiit.dp.refactor.model.explanation.RepairRecord;
 
 public class PostgreManager {
 
@@ -210,5 +211,30 @@ public class PostgreManager {
 		}
 
 		return results;
+	}
+
+	/**
+	 * vlozenie zaznamu o oprave
+	 * 
+	 * @param RepairRecord
+	 * @return
+	 * @throws SQLException
+	 */
+	public void AddRepairRecord(RepairRecord record) throws SQLException {
+		String query = "select * from smelltype where code = '" + record.getRefcode() + "'";
+		ResultSet rs = statement.executeQuery(query);
+		int smelltypeid = 0;
+		while (rs.next()) {
+			smelltypeid = rs.getInt("id");
+			System.out.println("pgtest  " + record.getRefactoringCode() + "  " + smelltypeid);
+		}
+		String jessObject = "ROW('" + record.getUsedJessRule().getRuleName() + "','"
+				+ record.getUsedJessRule().getDocString() + "')";
+		String columns = "(gitreponame, refactoringcode, path, beforerepair,afterrepair,jessdecision,smelltype_id)";
+		query = "INSERT INTO records " + columns + "  VALUES('" + record.getGitRepository() + "','"
+				+ record.getRefactoringCode() + "','" + record.getPath() + "','" + record.getCodeBeforeRepair() + "','"
+				+ record.getCodeAfterRepair() + "'," + jessObject + ",'" + smelltypeid + "')";
+		statement.executeUpdate(query);
+
 	}
 }

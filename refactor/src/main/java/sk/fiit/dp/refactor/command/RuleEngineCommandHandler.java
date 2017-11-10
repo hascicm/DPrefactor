@@ -74,11 +74,6 @@ public class RuleEngineCommandHandler {
 			}
 		}
 
-		List<String> explanation = RuleEngineEventHandler.getInstance().getExpanation();
-		
-		for (String string : explanation) {
-			System.out.println(string);
-		}
 		return refactoringRules;
 	}
 }

@@ -127,6 +127,7 @@ public class BaseXManager {
 			expression.bindString(new QName("explanation"),
 					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanationRepair.txt", null);
 		}
+		// TODO process output  
 		XQResultSequence x = expression.executeQuery(content);
 		while (x.next()) {
 			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");

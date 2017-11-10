@@ -121,6 +121,10 @@ public class SearchCommandHandler {
 			}
 
 		}
+		//TODO ?????
+		if (result != null) {
+			searchResults.add(result);
+		}
 		if (lines.get(lines.size() - 1).startsWith("NAME: ")) {
 			result = new JessInput();
 			result.setCode(lines.get(lines.size() - 1).substring(lines.get(lines.size() - 1).indexOf(" ") + 1));

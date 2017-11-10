@@ -10,16 +10,18 @@ import jess.JessEvent;
 import jess.JessListener;
 
 import sk.fiit.dp.refactor.model.JessInput;
+import sk.fiit.dp.refactor.model.explanation.JessListenerOutput;
 
 public class RuleEngineEventHandler implements JessListener {
 
 	final static Logger logger = LoggerFactory.getLogger(RuleEngineEventHandler.class);
 	private static RuleEngineEventHandler INSTANCE = null;
-	private List<String> firedRules;
 	private JessInput current;
+	private List<JessListenerOutput> firedRulesList;
 
-	RuleEngineEventHandler() {
-		firedRules = new ArrayList<String>();
+	public RuleEngineEventHandler() {
+		firedRulesList = new ArrayList<JessListenerOutput>();
+
 	}
 
 	public static RuleEngineEventHandler getInstance() {
@@ -28,6 +30,7 @@ public class RuleEngineEventHandler implements JessListener {
 		}
 		return INSTANCE;
 	}
+
 	@Override
 	public void eventHappened(JessEvent je) {
 		int type = je.getType();
@@ -38,9 +41,12 @@ public class RuleEngineEventHandler implements JessListener {
 		case JessEvent.DEFRULE_FIRED:
 
 			logger.info(((Activation) je.getObject()).getRule().getName());
-			firedRules.add("for:   " + current.getCode() + "    " + current.getRefCode() + " rule was used: "
-					+ ((Activation) je.getObject()).getRule().getName() + "   "
-					+ ((Activation) je.getObject()).getRule().getDocstring());
+
+			JessListenerOutput outputObject = new JessListenerOutput(current.getCode(), current.getRefCode(),
+					((Activation) je.getObject()).getRule().getName(),
+					((Activation) je.getObject()).getRule().getDocstring());
+
+			firedRulesList.add(outputObject);
 			break;
 		default:
 			// ignore
@@ -52,14 +58,12 @@ public class RuleEngineEventHandler implements JessListener {
 	}
 
 	public void reset() {
-		firedRules = new ArrayList<String>();
+		firedRulesList = new ArrayList<JessListenerOutput>();
 		current = null;
 	}
 
-	public List<String> getExpanation() {
-		return firedRules;
+	public List<JessListenerOutput> getListenerOutputObjects() {
+		return firedRulesList;
 	}
-
-
 
 }

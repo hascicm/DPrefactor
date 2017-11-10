@@ -103,11 +103,12 @@ public class RefactorCommandHandler {
 			List<JessInput> searchResults = searchCommand.search(search, createRepairRecord);
 
 			System.out.println("------------SEARCH--------------------------");
-			/*
-			 * for (JessInput o : searchResults) { System.out.println("tags:   "
-			 * + o.getCode()); System.out.println("method: " + o.getRefCode());
-			 * } System.out.println("--------------------------------------");
-			 */
+
+			for (JessInput o : searchResults) {
+				System.out.println("tags:   " + o.getCode());
+				System.out.println("method: " + o.getRefCode());
+			}
+			System.out.println("--------------------------------------");
 
 			// 7. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
@@ -146,7 +147,7 @@ public class RefactorCommandHandler {
 
 			// TODO explanation
 			if (createRepairRecord) {
-				explainCommand.createRepairRecord();
+				explainCommand.createRepairRecord(repo);
 			}
 			// 14. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());

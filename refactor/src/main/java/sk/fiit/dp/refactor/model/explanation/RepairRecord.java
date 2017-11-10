@@ -2,9 +2,13 @@ package sk.fiit.dp.refactor.model.explanation;
 
 //TODO
 public class RepairRecord {
+	private String refactoringCode; // with number
+	private String refcode; // without number
+	private String path;
+	private String gitRepository;
 	private String codeBeforeRepair;
 	private String codeAfterRepair;
-	private String usedJessRule;
+	private JessListenerOutput usedJessRule;
 	private String SmellDescription;
 
 	public String getCodeBeforeRepair() {
@@ -23,11 +27,11 @@ public class RepairRecord {
 		this.codeAfterRepair = codeAfterRepair;
 	}
 
-	public String getUsedJessRule() {
+	public JessListenerOutput getUsedJessRule() {
 		return usedJessRule;
 	}
 
-	public void setUsedJessRule(String usedJessRule) {
+	public void setUsedJessRule(JessListenerOutput usedJessRule) {
 		this.usedJessRule = usedJessRule;
 	}
 
@@ -37,6 +41,38 @@ public class RepairRecord {
 
 	public void setSmellDescription(String smellDescription) {
 		SmellDescription = smellDescription;
+	}
+
+	public String getGitRepository() {
+		return gitRepository;
+	}
+
+	public void setGitRepository(String gitRepository) {
+		this.gitRepository = gitRepository;
+	}
+
+	public String getRefactoringCode() {
+		return refactoringCode;
+	}
+
+	public void setRefactoringCode(String refactoringCode) {
+		this.refactoringCode = refactoringCode;
+	}
+
+	public String getRefcode() {
+		return refcode;
+	}
+
+	public void setRefcode(String refcode) {
+		this.refcode = refcode;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 }
