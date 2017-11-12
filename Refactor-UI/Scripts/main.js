@@ -97,6 +97,7 @@ function home() {
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("records").hidden = true;
 }
 
 function search() {
@@ -126,6 +127,7 @@ function search() {
     document.getElementById("about").hidden = true;
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
+    document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
 
 }
@@ -157,7 +159,9 @@ function refactor() {
     document.getElementById("about").hidden = true;
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
+    document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
 }
 
@@ -170,7 +174,9 @@ function preferences() {
     document.getElementById("about").hidden = true;
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
+    document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
     prioritization();
 }
@@ -188,7 +194,9 @@ function rules() {
     document.getElementById("about").hidden = true;
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
+    document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
 }
 
@@ -201,7 +209,9 @@ function about() {
     document.getElementById("about").hidden = false;
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
+    document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
 }
 
@@ -214,7 +224,74 @@ function smells() {
     document.getElementById("about").hidden = true;
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = true;
+    document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = false;
+    document.getElementById("recordDetail").hidden = true;
+
+}
+
+function records() {
+
+		jQuery.get("http://localhost:8080/refactor/records", function(response) {
+		var table = document.getElementById("recordstable");
+		var length = table.rows.length
+		for(var i = length; i > 1 ; --i) {
+			table.deleteRow(i - 1);
+		}
+
+		var i = 1;
+		response.forEach(function(value) {
+			var row = table.insertRow(i);
+			row.insertCell(0).innerHTML = value.id
+			row.insertCell(1).innerHTML = value.gitRepository;
+			row.insertCell(2).innerHTML = value.refactoringCode;
+			row.insertCell(3).innerHTML = value.smellDescription;
+			row.insertCell(4).innerHTML = '<a href="javascript:recordDetail(' + value.id + ');"><span>podrobnosti</span></a>';
+			i++;
+		})
+	});
+    document.getElementById("home").hidden = true;
+    document.getElementById("search").hidden = true;
+    document.getElementById("refactor").hidden = true;
+    document.getElementById("rules").hidden = true;
+    document.getElementById("preferences").hidden = true;
+    document.getElementById("about").hidden = true;
+    document.getElementById("repairEdit").hidden = true;
+    document.getElementById("searchEdit").hidden = true;
+    document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("records").hidden = false;
+    document.getElementById("recordDetail").hidden = true;
+
+
+}
+
+function recordDetail(i) {
+	jQuery.get("http://localhost:8080/refactor/records/" + i, function(response) {
+		    document.getElementById("recordDetailGit").value = response.gitRepository
+    		document.getElementById("recordDetailrefcode").value = response.refactoringCode
+    		document.getElementById("recordDetailpath").value = response.path
+   			document.getElementById("recordDetailcodebefore").value = response.codeBeforeRepair
+   			document.getElementById("recordDetailcodeafter").value = response.codeAfterRepair
+   			document.getElementById("recordDetailsmell").value = response.smellDescription
+   			//TODO
+ 			document.getElementById("recordDetailsmelldesc").value = response.smellDescription
+	});
+    document.getElementById("home").hidden = true;
+    document.getElementById("search").hidden = true;
+    document.getElementById("refactor").hidden = true;
+    document.getElementById("rules").hidden = true;
+    document.getElementById("preferences").hidden = true;
+    document.getElementById("about").hidden = true;
+    document.getElementById("repairEdit").hidden = true;
+    document.getElementById("searchEdit").hidden = true;
+    document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("records").hidden = true;
+    document.getElementById("recordDetail").hidden = false;
+}
+
+function backToRecords(){
+	    document.getElementById("records").hidden = false;
+    document.getElementById("recordDetail").hidden = true;
 }
 
 function repairEdit(i) {
@@ -235,7 +312,9 @@ function repairEdit(i) {
     document.getElementById("about").hidden = true;
     document.getElementById("repairEdit").hidden = false;
     document.getElementById("searchEdit").hidden = true;
-    
+    document.getElementById("records").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
+
     document.getElementById("rEditName").value = name;
     document.getElementById("rEditCode").value = code;
 }
@@ -259,6 +338,8 @@ function searchEdit(i) {
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = false;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("records").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
     
     document.getElementById("sEditName").value = name;
@@ -346,6 +427,8 @@ function addSearch() {
     document.getElementById("repairEdit").hidden = true;
     document.getElementById("searchEdit").hidden = false;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("records").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
     
     document.getElementById("sEditScript").value = "";
@@ -365,6 +448,8 @@ function addRepair() {
     document.getElementById("repairEdit").hidden = false;
     document.getElementById("searchEdit").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("records").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
     
     document.getElementById("rEditScript").value = "";

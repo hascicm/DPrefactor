@@ -237,4 +237,42 @@ public class PostgreManager {
 		statement.executeUpdate(query);
 
 	}
+
+	public List<RepairRecord> getRepairRecords() throws SQLException {
+		List<RepairRecord> records = new ArrayList<>();
+
+		String query = "select * from records r join smelltype s on s.id=r.smelltype_id";
+		ResultSet rs = statement.executeQuery(query);
+		while (rs.next()) {
+			RepairRecord act = new RepairRecord();
+			act.setGitRepository(rs.getString("gitreponame"));
+			act.setPath(rs.getString("path"));
+			act.setRefactoringCode(rs.getString("refactoringcode"));
+			act.setCodeBeforeRepair(rs.getString("beforerepair"));
+			act.setCodeAfterRepair(rs.getString("afterrepair"));
+			act.setSmellDescription(rs.getString("name"));
+			act.setId(rs.getInt("id"));
+			records.add(act);
+		}
+		return records;
+	}
+
+	public RepairRecord getRepairRecord(int id) throws SQLException {
+		String query = "select * from records r join smelltype s on s.id=r.smelltype_id where r.id = " + id;
+		ResultSet rs = statement.executeQuery(query);
+
+		RepairRecord act = new RepairRecord();
+		rs.next();
+		act.setGitRepository(rs.getString("gitreponame"));
+		act.setPath(rs.getString("path"));
+		act.setRefactoringCode(rs.getString("refactoringcode"));
+		act.setCodeBeforeRepair(rs.getString("beforerepair"));
+		act.setCodeAfterRepair(rs.getString("afterrepair"));
+		act.setSmellDescription(rs.getString("name"));
+		System.out.println("test: " + rs.getString("name"));
+		System.out.println("test : " + act.getSmellDescription());
+		act.setId(rs.getInt("id"));
+
+		return act;
+	}
 }

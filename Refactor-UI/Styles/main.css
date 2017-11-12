@@ -76,3 +76,13 @@ textarea {
 	margin-bottom:5px 0;
 	padding:3px;
 }
+
+.recdetail {
+	padding: 5px;
+	width: 200px;
+	float: left;
+}
+
+.detail {
+	width: 100%;
+}

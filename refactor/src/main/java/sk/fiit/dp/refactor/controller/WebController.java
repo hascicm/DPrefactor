@@ -73,6 +73,20 @@ public class WebController {
 		return resourceCommand.getRepairScript(code);
 	}
 
+	@GET
+	@Path("/records")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getRefactoringRecords() {
+		return resourceCommand.getRefactoringRecords();
+	}
+
+	@GET
+	@Path("/records/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getRefactoringRecord(@PathParam("id") int id) {
+		return resourceCommand.getRefactoringRecord(id);
+	}
+
 	@POST
 	@Path("/repair/{code}")
 	@Consumes(MediaType.APPLICATION_JSON)

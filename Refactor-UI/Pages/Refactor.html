@@ -29,6 +29,9 @@
 					<a href="javascript:preferences(0);"><span>Preferencie</span></a>
 				</li>
 				<li>
+					<a href="javascript:records();"><span>zaznamy o opravach</span></a>
+				</li>
+				<li>
 					<a href="javascript:smells();"><span>Databáza pachov</span></a>
 				</li>
 				<li>
@@ -135,6 +138,7 @@
 			</textarea>
 			<button type="button" onclick="saveRules()">Uložiť</button>
 	    </section>
+
 	    <section id="repairEdit" hidden=true>
 	    	<h1>Aktualizujte pravidlo</h1>
 	    	<p>
@@ -145,6 +149,7 @@
 			</textarea>
 			<button type="button" onclick="saveRepair()">Uložiť</button>
 	    </section>
+
 	    <section id="searchEdit" hidden=true>
 	    	<h1>Aktualizujte pravidlo</h1>
 	    	<p>
@@ -157,6 +162,54 @@
 	    </section>
 	    <section id="SmellDatabase" hidden=true>
 	    	<h1>Prehľad pachov</h1>
+	    </section>
+
+	    <section id = "records">
+	    	<h1>najdene zaznamy o opravach</h1>
+	    	<table id="recordstable">
+				<tr>
+					<th>id</th>
+    				<th>git repo</th>
+    				<th>ref code</th>
+    				<th>podrobnosti</th>
+  				</tr>
+			</table>	    	
+
+	    </section>
+
+	    <section id="recordDetail" hidden=true>
+	    	<h2>záznam o oprave</h2>
+	    	<p/>
+			<hr>
+			<p/>
+			<p>
+				<div class="recdetail">
+					<input class ="detail" type="text" id="recordDetailGit" name="git repo" value="" readonly><br>
+				</div>
+				<div class="recdetail">	    	
+					<input class ="detail" type="text" id="recordDetailrefcode" name="ref code" value="" readonly><br>
+				</div>
+				<div class="recdetail">
+			    	<input class ="detail" type="text" id="recordDetailpath" name="path" value="" readonly><br>
+				</div>
+				<div class="recdetail">
+					<input class ="detail" type="text" id="recordDetailcodebefore" name="code before " value="" readonly><br>
+				</div>
+				<div class="recdetail">
+					<input class ="detail" type="text" id="recordDetailcodeafter" name="code after " value="" readonly><br>
+				</div>
+				<div class="recdetail">
+					<input class ="detail" type="text" id="recordDetailsmell" name="smell " value="" readonly><br>
+				</div>
+				<div class="recdetail">
+					<input class ="detail" type="text" id="recordDetailsmelldesc" name="smell desc " value="" readonly><br>
+				</div >
+	    	</p>
+	    	<p/>
+			<hr>
+			<p/>
+			<button type="button" onclick="backToRecords()">Speť</button>
+
 	    </section>
 	    <section id="about" hidden=true>
 	    	<h1>O programe Refactor</h1>
