@@ -98,6 +98,7 @@ function home() {
     document.getElementById("searchEdit").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
     document.getElementById("records").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 }
 
 function search() {
@@ -129,6 +130,7 @@ function search() {
     document.getElementById("searchEdit").hidden = true;
     document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
 }
 
@@ -177,6 +179,7 @@ function preferences() {
     document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
     document.getElementById("recordDetail").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
     prioritization();
 }
@@ -197,6 +200,8 @@ function rules() {
     document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
     document.getElementById("recordDetail").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
+
 
 }
 
@@ -211,6 +216,7 @@ function about() {
     document.getElementById("searchEdit").hidden = true;
     document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
     document.getElementById("recordDetail").hidden = true;
 
 }
@@ -227,27 +233,30 @@ function smells() {
     document.getElementById("records").hidden = true;
     document.getElementById("SmellDatabase").hidden = false;
     document.getElementById("recordDetail").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
 
 }
 
 function records() {
 
 		jQuery.get("http://localhost:8080/refactor/records", function(response) {
-		var table = document.getElementById("recordstable");
+		var table = document.getElementById("tabletbody");
+		console.log(table);
 		var length = table.rows.length
 		for(var i = length; i > 1 ; --i) {
 			table.deleteRow(i - 1);
 		}
 
-		var i = 1;
 		response.forEach(function(value) {
-			var row = table.insertRow(i);
-			row.insertCell(0).innerHTML = value.id
-			row.insertCell(1).innerHTML = value.gitRepository;
-			row.insertCell(2).innerHTML = value.refactoringCode;
-			row.insertCell(3).innerHTML = value.smellDescription;
-			row.insertCell(4).innerHTML = '<a href="javascript:recordDetail(' + value.id + ');"><span>podrobnosti</span></a>';
-			i++;
+			//var row = table.insertRow(i);
+			$(table).append("<tr><td>"+value.id+"</td>><td>"+value.gitRepository+"</td><td>"
+				+value.refactoringCode+"</td><td>"+value.smellName+"</td><td>"+
+				'<a href="javascript:recordDetail(' + value.id + ');"><span>podrobnosti</span></a>'+"</td></tr>");
+	//		row.insertCell(0).innerHTML = value.id
+	//		row.insertCell(1).innerHTML = value.gitRepository;
+	//		row.insertCell(2).innerHTML = value.refactoringCode;
+	//		row.insertCell(3).innerHTML = value.smellDescription;
+	//		row.insertCell(4).innerHTML = '<a href="javascript:recordDetail(' + value.id + ');"><span>podrobnosti</span></a>';
 		})
 	});
     document.getElementById("home").hidden = true;
@@ -272,8 +281,7 @@ function recordDetail(i) {
     		document.getElementById("recordDetailpath").value = response.path
    			document.getElementById("recordDetailcodebefore").value = response.codeBeforeRepair
    			document.getElementById("recordDetailcodeafter").value = response.codeAfterRepair
-   			document.getElementById("recordDetailsmell").value = response.smellDescription
-   			//TODO
+   			document.getElementById("recordDetailsmell").value = response.smellName
  			document.getElementById("recordDetailsmelldesc").value = response.smellDescription
 	});
     document.getElementById("home").hidden = true;
@@ -314,6 +322,7 @@ function repairEdit(i) {
     document.getElementById("searchEdit").hidden = true;
     document.getElementById("records").hidden = true;
     document.getElementById("recordDetail").hidden = true;
+
 
     document.getElementById("rEditName").value = name;
     document.getElementById("rEditCode").value = code;

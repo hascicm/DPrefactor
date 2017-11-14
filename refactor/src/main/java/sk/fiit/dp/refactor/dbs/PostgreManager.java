@@ -226,10 +226,13 @@ public class PostgreManager {
 		int smelltypeid = 0;
 		while (rs.next()) {
 			smelltypeid = rs.getInt("id");
-			System.out.println("pgtest  " + record.getRefactoringCode() + "  " + smelltypeid);
 		}
-		String jessObject = "ROW('" + record.getUsedJessRule().getRuleName() + "','"
-				+ record.getUsedJessRule().getDocString() + "')";
+		String jessObject = "ROW('','')";
+		if (record.getUsedJessRule() != null) {
+			jessObject = "ROW('" + record.getUsedJessRule().getRuleName() + "','"
+					+ record.getUsedJessRule().getDocString() + "')";
+		} else {
+		}
 		String columns = "(gitreponame, refactoringcode, path, beforerepair,afterrepair,jessdecision,smelltype_id)";
 		query = "INSERT INTO records " + columns + "  VALUES('" + record.getGitRepository() + "','"
 				+ record.getRefactoringCode() + "','" + record.getPath() + "','" + record.getCodeBeforeRepair() + "','"
@@ -251,6 +254,8 @@ public class PostgreManager {
 			act.setCodeBeforeRepair(rs.getString("beforerepair"));
 			act.setCodeAfterRepair(rs.getString("afterrepair"));
 			act.setSmellDescription(rs.getString("name"));
+			act.setSmellDescription(rs.getString("description"));
+			act.setSmellName(rs.getString("name"));
 			act.setId(rs.getInt("id"));
 			records.add(act);
 		}
@@ -269,6 +274,10 @@ public class PostgreManager {
 		act.setCodeBeforeRepair(rs.getString("beforerepair"));
 		act.setCodeAfterRepair(rs.getString("afterrepair"));
 		act.setSmellDescription(rs.getString("name"));
+		act.setSmellDescription(rs.getString("description"));
+		act.setSmellName(rs.getString("name"));
+
+
 		System.out.println("test: " + rs.getString("name"));
 		System.out.println("test : " + act.getSmellDescription());
 		act.setId(rs.getInt("id"));

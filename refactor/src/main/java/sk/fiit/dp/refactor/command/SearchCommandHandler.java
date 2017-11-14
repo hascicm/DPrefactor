@@ -118,10 +118,15 @@ public class SearchCommandHandler {
 				result.setParents(Arrays.asList(parents));
 			} else if (line.startsWith("SIZE: ")) {
 				result.setSize(Integer.valueOf(line.substring(line.indexOf(" ") + 1)));
-			}
+			} else if (line.startsWith("POSITION CLASS:")) {
+				result.setPosition(result.getPosition() + "::" + line.replace("POSITION CLASS:", ""));
+			} else if (line.startsWith("POSITION METHOD:")) {
+				result.setPosition(result.getPosition() + "::" + line.replace("POSITION METHOD:", ""));
+			} else if (line.startsWith("POSITION PACKAGE:")) {
+				result.setPosition(line.replace("POSITION PACKAGE:", ""));
 
+			}
 		}
-		//TODO ?????
 		if (result != null) {
 			searchResults.add(result);
 		}

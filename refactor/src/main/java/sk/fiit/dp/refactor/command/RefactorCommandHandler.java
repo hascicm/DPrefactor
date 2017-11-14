@@ -105,8 +105,9 @@ public class RefactorCommandHandler {
 			System.out.println("------------SEARCH--------------------------");
 
 			for (JessInput o : searchResults) {
-				System.out.println("tags:   " + o.getCode());
-				System.out.println("method: " + o.getRefCode());
+				System.out.println("tags:    " + o.getCode());
+				System.out.println("method:  " + o.getRefCode());
+				System.out.println("position " + o.getPosition());
 			}
 			System.out.println("--------------------------------------");
 
@@ -134,12 +135,12 @@ public class RefactorCommandHandler {
 			List<JessOutput> requiredRefactoring = ruleCommand.run(searchResults);
 
 			System.out.println("---------JESS-----------------------------");
-			/*
-			 * for (JessOutput o : requiredRefactoring) {
-			 * System.out.println("tags:   " + o.getTag());
-			 * System.out.println("method: " + o.getRefactoringMethod()); }
-			 * System.out.println("--------------------------------------");
-			 */
+
+			for (JessOutput o : requiredRefactoring) {
+				System.out.println("tags:   " + o.getTag());
+				System.out.println("method: " + o.getRefactoringMethod());
+			}
+			System.out.println("--------------------------------------");
 
 			// 13. Vykona sa refaktoring
 			System.out.println("---------REFACTOR-----------------------------");
@@ -147,7 +148,7 @@ public class RefactorCommandHandler {
 
 			// TODO explanation
 			if (createRepairRecord) {
-				explainCommand.createRepairRecord(repo);
+				explainCommand.createRepairRecord(repo, searchResults);
 			}
 			// 14. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
@@ -161,8 +162,8 @@ public class RefactorCommandHandler {
 			// 17. Vykona sa push repair branch na git
 			gitCommand.pushBranch(repairBranch, name, password);
 
-			// 18. Vymaze sa docasna BaseX databaza
-			baseX.cleanDatabase(id);
+			// 18. Vymaze sa docasna BaseX databaza TODO
+			// baseX.cleanDatabase(id);
 
 			// 19. Odstrani sa lokalna git kopia
 			gitCommand.deleteLocalDirectory();

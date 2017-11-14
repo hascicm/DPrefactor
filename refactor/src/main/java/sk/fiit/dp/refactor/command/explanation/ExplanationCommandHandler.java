@@ -9,6 +9,7 @@ import java.util.List;
 
 import sk.fiit.dp.refactor.command.GitCommandHandler;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
+import sk.fiit.dp.refactor.model.JessInput;
 import sk.fiit.dp.refactor.model.explanation.JessListenerOutput;
 import sk.fiit.dp.refactor.model.explanation.RepairExplanationTempObject;
 import sk.fiit.dp.refactor.model.explanation.RepairRecord;
@@ -29,7 +30,7 @@ public class ExplanationCommandHandler {
 		return INSTANCE;
 	}
 
-	public void createRepairRecord(String repo) {
+	public void createRepairRecord(String repo, List<JessInput> searchResults) {
 
 		// initialize all records based on serach results
 		records = processSearchExplanationFile();
@@ -41,10 +42,21 @@ public class ExplanationCommandHandler {
 		processJessListenerOutput();
 		// proces repair file and link it to records
 		processRepairExplanationFile();
+		linkToResultFile(searchResults);
 		printrecords();
 
 		pushRecordsToPostgres();
 
+	}
+
+	private void linkToResultFile(List<JessInput> searchResults) {
+		for (RepairRecord record : records) {
+			for (JessInput curr : searchResults) {
+				if (record.getRefactoringCode().equals(curr.getCode())) {
+					record.setPath(curr.getPosition());
+				}
+			}
+		}
 	}
 
 	private void pushRecordsToPostgres() {
@@ -62,6 +74,7 @@ public class ExplanationCommandHandler {
 		for (RepairRecord record : records) {
 			System.out.println("refcode : " + record.getRefactoringCode());
 			System.out.println("git     : " + record.getGitRepository());
+			System.out.println("position: " + record.getPath());
 			if (record.getUsedJessRule() != null) {
 				System.out.println("jess ---------------------");
 				System.out.println("code       : " + record.getUsedJessRule().getCode());
@@ -90,12 +103,12 @@ public class ExplanationCommandHandler {
 				if (l.startsWith("NAME: ")) {
 					if (curent != null) {
 						curent.setCodeBeforeRepair(codeFromFile);
-						// TODO update path when complete 
 						curent.setPath("");
 						records.add(curent);
 					}
 					curent = new RepairRecord();
 					curent.setRefactoringCode(l.replace("NAME: ", ""));
+					curent.setRefcode(l.replace("NAME: ", "").replaceAll("[0-9]", ""));
 					codeFromFile = "";
 				} else {
 					codeFromFile += l + "\n";
@@ -103,7 +116,6 @@ public class ExplanationCommandHandler {
 			}
 			if (curent != null) {
 				curent.setCodeBeforeRepair(codeFromFile);
-				// TODO update path when complete 
 				curent.setPath("");
 				records.add(curent);
 			}
@@ -160,19 +172,10 @@ public class ExplanationCommandHandler {
 	}
 
 	private void processJessListenerOutput() {
-		System.out.println("jess listener");
-		for (JessListenerOutput curr : RuleEngineEventHandler.getInstance().getListenerOutputObjects()) {
-			System.out.println("code      " + curr.getCode());
-			System.out.println("refcode   " + curr.getRefCode());
-			System.out.println("rulename  " + curr.getRuleName());
-			System.out.println("docstring " + curr.getDocString());
-		}
-
 		for (RepairRecord record : records) {
 			for (JessListenerOutput curr : RuleEngineEventHandler.getInstance().getListenerOutputObjects()) {
 				if (record.getRefactoringCode().equals(curr.getCode())) {
 					record.setUsedJessRule(curr);
-					record.setRefcode(curr.getRefCode());
 				}
 			}
 		}

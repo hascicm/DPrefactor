@@ -4,17 +4,20 @@ import java.util.List;
 
 /**
  * Vstup pre expertny system
+ * 
  * @author Lukas
  *
  */
 public class JessInput {
 	private String code;
-	
+
 	private String refCode;
-	
+
 	private List<String> parents;
-	
+
 	private int size;
+
+	private String position;
 
 	public String getCode() {
 		return code;
@@ -46,5 +49,13 @@ public class JessInput {
 
 	public void setSize(int size) {
 		this.size = size;
+	}
+
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
 	}
 }

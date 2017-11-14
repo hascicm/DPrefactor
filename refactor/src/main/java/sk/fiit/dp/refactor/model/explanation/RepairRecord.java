@@ -2,9 +2,8 @@ package sk.fiit.dp.refactor.model.explanation;
 
 import org.json.JSONObject;
 
-//TODO
 public class RepairRecord {
-	private int id; 
+	private int id;
 	private String refactoringCode; // with number
 	private String refcode; // without number
 	private String path;
@@ -12,6 +11,7 @@ public class RepairRecord {
 	private String codeBeforeRepair;
 	private String codeAfterRepair;
 	private JessListenerOutput usedJessRule;
+	private String smellName;
 	private String smellDescription;
 
 	public JSONObject asJson() {
@@ -21,9 +21,18 @@ public class RepairRecord {
 		json.put("gitRepository", gitRepository);
 		json.put("codeBeforeRepair", codeBeforeRepair);
 		json.put("codeAfterRepair", codeAfterRepair);
+		json.put("smellName", smellName);
 		json.put("smellDescription", smellDescription);
-		json.put("id",id);
+		json.put("id", id);
 		return json;
+	}
+
+	public String getSmellName() {
+		return smellName;
+	}
+
+	public void setSmellName(String smellName) {
+		this.smellName = smellName;
 	}
 
 	public String getCodeBeforeRepair() {

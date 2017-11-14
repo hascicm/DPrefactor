@@ -106,9 +106,10 @@ public class BaseXManager {
 					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt", null);
 		}
 		XQResultSequence x = expression.executeQuery(content);
+		//TODO process output
 		while (x.next()) {
-			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			System.out.println(x.getAtomicValue());
+	//		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	//		System.out.println(x.getAtomicValue());
 		}
 	}
 
@@ -130,8 +131,8 @@ public class BaseXManager {
 		// TODO process output  
 		XQResultSequence x = expression.executeQuery(content);
 		while (x.next()) {
-			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			System.out.println(x.getAtomicValue());
+	//		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	//		System.out.println(x.getAtomicValue());
 		}
 	}
 
