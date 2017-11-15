@@ -19,13 +19,12 @@ import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.IdGenerator;
 import sk.fiit.dp.refactor.helper.JsonFileWriter;
+import sk.fiit.dp.refactor.helper.TimeStampGenerator;
 import sk.fiit.dp.refactor.model.JessInput;
 import sk.fiit.dp.refactor.model.JessOutput;
 import sk.fiit.dp.refactor.model.SearchObject;
 
 public class RefactorCommandHandler {
-
-	private static final boolean OutputToSearchExplanationFile = true;
 
 	private static RefactorCommandHandler INSTANCE;
 
@@ -37,6 +36,7 @@ public class RefactorCommandHandler {
 	private RuleEngineCommandHandler ruleCommand = RuleEngineCommandHandler.getInstance();
 	private ExplanationCommandHandler explainCommand = ExplanationCommandHandler.getInstance();
 	private SonarQubeWrapper sonarHandler = SonarQubeWrapper.getInstance();
+	private TimeStampGenerator timeGenerator = TimeStampGenerator.getInstance();
 	private String id;
 
 	private String sonarOutput;
@@ -68,6 +68,10 @@ public class RefactorCommandHandler {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
+
+			// 0. time generator reset
+			timeGenerator.resetTimeStamp();
+
 			// 1. Vytvori lokalnu kopiu Git repozitara
 			gitCommand.cloneRepository(repo, name, password, id);
 

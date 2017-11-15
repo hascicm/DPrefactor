@@ -249,7 +249,7 @@ function records() {
 
 		response.forEach(function(value) {
 			//var row = table.insertRow(i);
-			$(table).append("<tr><td>"+value.id+"</td>><td>"+value.gitRepository+"</td><td>"
+			$(table).append("<tr><td>"+value.id+"</td><td>"+value.time+"</td><td>"+value.gitRepository+"</td><td>"
 				+value.refactoringCode+"</td><td>"+value.smellName+"</td><td>"+
 				'<a href="javascript:recordDetail(' + value.id + ');"><span>podrobnosti</span></a>'+"</td></tr>");
 	//		row.insertCell(0).innerHTML = value.id

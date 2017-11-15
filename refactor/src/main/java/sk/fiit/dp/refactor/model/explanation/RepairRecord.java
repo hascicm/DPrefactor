@@ -1,5 +1,8 @@
 package sk.fiit.dp.refactor.model.explanation;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+
 import org.json.JSONObject;
 
 public class RepairRecord {
@@ -14,6 +17,7 @@ public class RepairRecord {
 	private String smellName;
 	private String smellDescription;
 	private String possibleRepairs;
+	private long timeStamp;
 
 	public JSONObject asJson() {
 		JSONObject json = new JSONObject();
@@ -25,6 +29,10 @@ public class RepairRecord {
 		json.put("smellName", smellName);
 		json.put("smellDescription", smellDescription);
 		json.put("possibleRepairs", possibleRepairs);
+
+		Date date = new Date(timeStamp);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		json.put("time", sdf.format(date));
 		if (usedJessRule != null) {
 			json.put("jessname", usedJessRule.getRuleName());
 			json.put("jessdesc", usedJessRule.getDocString());
@@ -122,6 +130,14 @@ public class RepairRecord {
 
 	public void setPossibleRepairs(String possibleRepairs) {
 		this.possibleRepairs = possibleRepairs;
+	}
+
+	public long getTimeStamp() {
+		return timeStamp;
+	}
+
+	public void setTimeStamp(long timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import sk.fiit.dp.refactor.command.GitCommandHandler;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
+import sk.fiit.dp.refactor.helper.TimeStampGenerator;
 import sk.fiit.dp.refactor.model.JessInput;
 import sk.fiit.dp.refactor.model.explanation.JessListenerOutput;
 import sk.fiit.dp.refactor.model.explanation.RepairExplanationTempObject;
@@ -19,7 +20,7 @@ public class ExplanationCommandHandler {
 	private GitCommandHandler git = GitCommandHandler.getInstance();
 	private PostgreManager pg = PostgreManager.getInstance();
 	private List<RepairRecord> records;
-
+	private TimeStampGenerator timeStampGenerator = TimeStampGenerator.getInstance();
 	private ExplanationCommandHandler() {
 	}
 
@@ -108,6 +109,7 @@ public class ExplanationCommandHandler {
 					}
 					curent = new RepairRecord();
 					curent.setRefactoringCode(l.replace("NAME: ", ""));
+					curent.setTimeStamp(timeStampGenerator.getTime());
 					curent.setRefcode(l.replace("NAME: ", "").replaceAll("[0-9]", ""));
 					codeFromFile = "";
 				} else {

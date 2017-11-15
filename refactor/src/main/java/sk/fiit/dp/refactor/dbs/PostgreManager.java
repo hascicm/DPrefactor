@@ -234,10 +234,11 @@ public class PostgreManager {
 					+ record.getUsedJessRule().getDocString() + "')";
 		} else {
 		}
-		String columns = "(gitreponame, refactoringcode, path, beforerepair,afterrepair,jessdecision,smelltype_id)";
+		String columns = "(gitreponame, refactoringcode, path, beforerepair,afterrepair,jessdecision,smelltype_id,timestamp)";
 		query = "INSERT INTO records " + columns + "  VALUES('" + record.getGitRepository() + "','"
 				+ record.getRefactoringCode() + "','" + record.getPath() + "','" + record.getCodeBeforeRepair() + "','"
-				+ record.getCodeAfterRepair() + "'," + jessObject + ",'" + smelltypeid + "')";
+				+ record.getCodeAfterRepair() + "'," + jessObject + ",'" + smelltypeid + "','" + record.getTimeStamp()
+				+ "')";
 		statement.executeUpdate(query);
 
 	}
@@ -249,6 +250,7 @@ public class PostgreManager {
 		ResultSet rs = statement.executeQuery(query);
 		while (rs.next()) {
 			RepairRecord act = new RepairRecord();
+			act.setId(rs.getInt("id"));
 			act.setGitRepository(rs.getString("gitreponame"));
 			act.setPath(rs.getString("path"));
 			act.setRefactoringCode(rs.getString("refactoringcode"));
@@ -256,7 +258,7 @@ public class PostgreManager {
 			act.setCodeAfterRepair(rs.getString("afterrepair"));
 			act.setSmellDescription(rs.getString("description"));
 			act.setSmellName(rs.getString("name"));
-			act.setId(rs.getInt("id"));
+			act.setTimeStamp(rs.getLong("timestamp"));
 			records.add(act);
 		}
 		return records;
@@ -278,6 +280,8 @@ public class PostgreManager {
 		act.setCodeAfterRepair(rs.getString("afterrepair"));
 		act.setSmellDescription(rs.getString("description"));
 		act.setSmellName(rs.getString("name"));
+		act.setTimeStamp(rs.getLong("timestamp"));
+
 		act.setUsedJessRule(new JessListenerOutput(rs.getString("jessname"), rs.getString("jessdesc")));
 
 		act.setPossibleRepairs(getPossibleRepairForSmellbyRecordId(id));
