@@ -9,6 +9,7 @@ import java.util.List;
 import sk.fiit.dp.refactor.dbs.connector.PotgreConnector;
 import sk.fiit.dp.refactor.model.RepairObject;
 import sk.fiit.dp.refactor.model.SearchObject;
+import sk.fiit.dp.refactor.model.explanation.JessListenerOutput;
 import sk.fiit.dp.refactor.model.explanation.RepairRecord;
 
 public class PostgreManager {
@@ -253,7 +254,6 @@ public class PostgreManager {
 			act.setRefactoringCode(rs.getString("refactoringcode"));
 			act.setCodeBeforeRepair(rs.getString("beforerepair"));
 			act.setCodeAfterRepair(rs.getString("afterrepair"));
-			act.setSmellDescription(rs.getString("name"));
 			act.setSmellDescription(rs.getString("description"));
 			act.setSmellName(rs.getString("name"));
 			act.setId(rs.getInt("id"));
@@ -263,25 +263,70 @@ public class PostgreManager {
 	}
 
 	public RepairRecord getRepairRecord(int id) throws SQLException {
-		String query = "select * from records r join smelltype s on s.id=r.smelltype_id where r.id = " + id;
+		String query = "select "
+				+ "r.id,gitreponame,path,refactoringcode,beforerepair,afterrepair,name,description,(jessdecision).rulename as jessname, (jessdecision).docstring as jessdesc"
+				+ " from records r join smelltype s on s.id=r.smelltype_id where r.id = " + id;
 		ResultSet rs = statement.executeQuery(query);
 
 		RepairRecord act = new RepairRecord();
 		rs.next();
+		act.setId(rs.getInt("id"));
 		act.setGitRepository(rs.getString("gitreponame"));
 		act.setPath(rs.getString("path"));
 		act.setRefactoringCode(rs.getString("refactoringcode"));
 		act.setCodeBeforeRepair(rs.getString("beforerepair"));
 		act.setCodeAfterRepair(rs.getString("afterrepair"));
-		act.setSmellDescription(rs.getString("name"));
 		act.setSmellDescription(rs.getString("description"));
 		act.setSmellName(rs.getString("name"));
+		act.setUsedJessRule(new JessListenerOutput(rs.getString("jessname"), rs.getString("jessdesc")));
 
-
-		System.out.println("test: " + rs.getString("name"));
-		System.out.println("test : " + act.getSmellDescription());
-		act.setId(rs.getInt("id"));
+		act.setPossibleRepairs(getPossibleRepairForSmellbyRecordId(id));
 
 		return act;
+	}
+
+	public String getPossibleRepairForSmellbyRecordId(int id) throws SQLException {
+		String possibleRepairs = "";
+		String query = "select re.name from records r join smelltype s on s.id=r.smelltype_id "
+				+ "join repairsmelltype rs on s.id = rs.smell_id join repair re on re.id = rs.repair_id "
+				+ "where r.id = " + id;
+		ResultSet rs = statement.executeQuery(query);
+		while (rs.next()) {
+			possibleRepairs += rs.getString("name").trim() + ", ";
+		}
+		rs.close();
+
+		return possibleRepairs;
+	}
+
+	public String getPossibleRepairForSmellbySmellId(int id) throws SQLException {
+		String possibleRepairs = "";
+		String query = "select r.name from smelltype s join repairsmelltype rs on s.id = rs.smell_id "
+				+ "join repair r on r.id = rs.repair_id where s.id = " + id;
+		ResultSet rs = statement.executeQuery(query);
+		while (rs.next()) {
+			possibleRepairs += rs.getString("name").trim() + ", ";
+		}
+		rs.close();
+
+		return possibleRepairs;
+	}
+
+	public String getExplanationForSearchScript(String code) throws SQLException {
+		String result = "";
+		String query = "select * from smelltype where code = '" + code + "'";
+		System.out.println("PGmanager " + query);
+		ResultSet rs = statement.executeQuery(query);
+		int id = 0;
+		while (rs.next()) {
+			id = rs.getInt("id");
+			result += ("//EXPLANATION smellname : " + rs.getString("name"));
+			result += ("\n//EXPLANATION description :" + rs.getString("description"));
+		}
+		rs.close();
+		if (id != 0)
+			result += ("\n//EXPLANATION possible repairs :" + getPossibleRepairForSmellbySmellId(id));
+
+		return result;
 	}
 }

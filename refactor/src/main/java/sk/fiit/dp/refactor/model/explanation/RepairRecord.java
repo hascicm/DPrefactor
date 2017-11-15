@@ -13,6 +13,7 @@ public class RepairRecord {
 	private JessListenerOutput usedJessRule;
 	private String smellName;
 	private String smellDescription;
+	private String possibleRepairs;
 
 	public JSONObject asJson() {
 		JSONObject json = new JSONObject();
@@ -23,6 +24,14 @@ public class RepairRecord {
 		json.put("codeAfterRepair", codeAfterRepair);
 		json.put("smellName", smellName);
 		json.put("smellDescription", smellDescription);
+		json.put("possibleRepairs", possibleRepairs);
+		if (usedJessRule != null) {
+			json.put("jessname", usedJessRule.getRuleName());
+			json.put("jessdesc", usedJessRule.getDocString());
+		} else {
+			json.put("jessname", "nenašlo sa žiadne pravidlo");
+			json.put("jessdesc", "nenašlo sa žiadne pravidlo");
+		}
 		json.put("id", id);
 		return json;
 	}
@@ -105,6 +114,14 @@ public class RepairRecord {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getPossibleRepairs() {
+		return possibleRepairs;
+	}
+
+	public void setPossibleRepairs(String possibleRepairs) {
+		this.possibleRepairs = possibleRepairs;
 	}
 
 }

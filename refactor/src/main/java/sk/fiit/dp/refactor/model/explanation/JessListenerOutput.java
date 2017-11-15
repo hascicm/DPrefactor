@@ -13,6 +13,11 @@ public class JessListenerOutput {
 		this.docString = docString;
 	}
 
+	public JessListenerOutput(String ruleName, String docString) {
+		this.ruleName = ruleName;
+		this.docString = docString;
+	}
+
 	public String getCode() {
 		return code;
 	}

@@ -283,6 +283,9 @@ function recordDetail(i) {
    			document.getElementById("recordDetailcodeafter").value = response.codeAfterRepair
    			document.getElementById("recordDetailsmell").value = response.smellName
  			document.getElementById("recordDetailsmelldesc").value = response.smellDescription
+ 			document.getElementById("recordDetailRepairs").value = response.possibleRepairs
+ 			document.getElementById("recordDetailJessName").value = response.jessname
+ 			document.getElementById("recordDetailJessDesc").value = response.jessdesc
 	});
     document.getElementById("home").hidden = true;
     document.getElementById("search").hidden = true;

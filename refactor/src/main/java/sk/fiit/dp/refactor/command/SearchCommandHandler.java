@@ -119,11 +119,11 @@ public class SearchCommandHandler {
 			} else if (line.startsWith("SIZE: ")) {
 				result.setSize(Integer.valueOf(line.substring(line.indexOf(" ") + 1)));
 			} else if (line.startsWith("POSITION CLASS:")) {
-				result.setPosition(result.getPosition() + "::" + line.replace("POSITION CLASS:", ""));
+				result.setPosition(result.getPosition() + "::C:" + line.replace("POSITION CLASS:", ""));
 			} else if (line.startsWith("POSITION METHOD:")) {
-				result.setPosition(result.getPosition() + "::" + line.replace("POSITION METHOD:", ""));
+				result.setPosition(result.getPosition() + "::M:" + line.replace("POSITION METHOD:", ""));
 			} else if (line.startsWith("POSITION PACKAGE:")) {
-				result.setPosition(line.replace("POSITION PACKAGE:", ""));
+				result.setPosition("CC:" +line.replace("POSITION PACKAGE:", ""));
 
 			}
 		}

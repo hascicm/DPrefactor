@@ -192,46 +192,62 @@
 							<h2>záznam o oprave</h2>
 
 							<hr>
-								<div>
-									<div class="recdetail left"  >
-										<label for="recordDetailGit">repozitar</label>
-										<input class ="detail" type="text" id="recordDetailGit" name="git repo" value="" readonly><br>
-									</div>
-									<div class="recdetail right">	    	
-										<label for="recordDetailrefcode">značka v zdrojovom kóde</label>
-										<input class ="detail" type="text" id="recordDetailrefcode" name="ref code" value="" readonly><br>
-									</div>
+							<div>
+								<div class="recdetail left"  >
+									<label for="recordDetailGit">repozitar</label>
+									<input class ="detail" type="text" id="recordDetailGit" name="git repo" value="" readonly><br>
 								</div>
+								<div class="recdetail right">	    	
+									<label for="recordDetailrefcode">značka v zdrojovom kóde</label>
+									<input class ="detail" type="text" id="recordDetailrefcode" name="ref code" value="" readonly><br>
+								</div>
+							</div>
+							<div class="recdetail left">
+								<div >
+									<label for="recordDetailpath">pozícia pachu</label>
+									<input class ="detail" type="text" id="recordDetailpath" name="path" value="" readonly><br>
+								</div>
+
+								<div style="padding-top: 8px">
+									<label for="recordDetailsmell">názov pachu</label>
+									<input class ="detail" type="text" id="recordDetailsmell" name="smell " value="" readonly><br>
+								</div>
+							</div>
+
+							<div>
+
+								<div class="recdetail right">
+									<label for="recordDetailsmelldesc">popis pachu</label>
+									<textarea class ="detail" type="text" id="recordDetailsmelldesc" name="smell desc " value="" readonly rows="5"></textarea>
+								</div >
+							</div>
+							<div class="recdetail">
+								<label for="recordDetailRepairs">možné opravy</label>
+								<textarea class ="detail" type="text" id="recordDetailRepairs" name="repairs " value="" readonly rows="1"></textarea>
+								
+							</div>
+							<div style="clear: both;"></div>
+
+							<div class="recdetail left">
+								<label for="recordDetailJessName">použité pravidlo</label>
+								<textarea class ="detail" type="text" id="recordDetailJessName" name="Jess name " value="" readonly rows="1"></textarea>								
+							</div>
+							<div class="recdetail right">
+								<label for="recordDetailJessDesc">popis pravidla</label>
+								<textarea class ="detail" type="text" id="recordDetailJessDesc" name="Jess desc " value="" readonly rows="4"></textarea>								
+							</div>
+							<div style="clear: both;"></div>
+
+							<div>
 								<div class="recdetail left">
-									<div >
-										<label for="recordDetailpath">pozícia pachu</label>
-										<input class ="detail" type="text" id="recordDetailpath" name="path" value="" readonly><br>
-									</div>
-
-									<div style="padding-top: 8px">
-										<label for="recordDetailsmell">názov pachu</label>
-										<input class ="detail" type="text" id="recordDetailsmell" name="smell " value="" readonly><br>
-									</div>
+									<label for="recordDetailcodebefore">zdrojový kód pred úpraavou</label>
+									<textarea class ="detail" type="text" id="recordDetailcodebefore" name="code before " value="" readonly rows="25"></textarea>
 								</div>
-
-								<div>
-
-									<div class="recdetail right">
-										<label for="recordDetailsmelldesc">popis pachu</label>
-										<textarea class ="detail" type="text" id="recordDetailsmelldesc" name="smell desc " value="" readonly rows="5"></textarea>
-									</div >
+								<div class="recdetail right">
+									<label for="recordDetailcodeafter">zdrojový kód po úprave</label>
+									<textarea class ="detail" type="text" id="recordDetailcodeafter" name="code after " value="" readonly rows="25"></textarea>
 								</div>
-								<div style="clear: both;"></div>
-								<div>
-									<div class="recdetail left">
-										<label for="recordDetailcodebefore">zdrojový kód pred úpraavou</label>
-										<textarea class ="detail" type="text" id="recordDetailcodebefore" name="code before " value="" readonly rows="25"></textarea>
-									</div>
-									<div class="recdetail right">
-										<label for="recordDetailcodeafter">zdrojový kód po úprave</label>
-										<textarea class ="detail" type="text" id="recordDetailcodeafter" name="code after " value="" readonly rows="25"></textarea>
-									</div>
-								</div>
+							</div>
 							<button type="button" onclick="backToRecords()">Späť</button>
 
 						</section>
