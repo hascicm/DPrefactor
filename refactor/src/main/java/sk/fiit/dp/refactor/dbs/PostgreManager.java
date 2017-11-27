@@ -48,7 +48,7 @@ public class PostgreManager {
 
 		while (rs.next()) {
 			SearchObject result = new SearchObject(rs.getString("code"), rs.getString("name"), rs.getString("script"),
-					rs.getString("explanation"));
+					rs.getString("explanation"), rs.getString("position"));
 			results.add(result);
 		}
 
@@ -207,7 +207,7 @@ public class PostgreManager {
 
 		while (rs.next()) {
 			SearchObject result = new SearchObject(rs.getString("code"), rs.getString("name"), rs.getString("script"),
-					rs.getString("explanation"));
+					rs.getString("explanation"), rs.getString("position"));
 			results.add(result);
 		}
 
@@ -266,7 +266,7 @@ public class PostgreManager {
 
 	public RepairRecord getRepairRecord(int id) throws SQLException {
 		String query = "select "
-				+ "r.id,gitreponame,path,refactoringcode,beforerepair,afterrepair,name,description,(jessdecision).rulename as jessname, (jessdecision).docstring as jessdesc"
+				+ "r.id,timestamp,gitreponame,path,refactoringcode,beforerepair,afterrepair,name,description,(jessdecision).rulename as jessname, (jessdecision).docstring as jessdesc"
 				+ " from records r join smelltype s on s.id=r.smelltype_id where r.id = " + id;
 		ResultSet rs = statement.executeQuery(query);
 
@@ -333,4 +333,15 @@ public class PostgreManager {
 
 		return result;
 	}
+
+	public String getSmellLocalisatorScript(String code) throws SQLException {
+		String query = "select code,sl.script from search s join smelllocalisator sl on sl.scope=s.position where code = '"
+				+ code + "'";
+		ResultSet rs = statement.executeQuery(query);
+		rs.next();
+		String script = rs.getString("script");
+		return script;
+
+	}
+
 }

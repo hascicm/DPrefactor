@@ -3,6 +3,7 @@ package sk.fiit.dp.refactor.dbs;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -90,6 +91,7 @@ public class BaseXManager {
 	public void applyXQuery(String content) throws XQException {
 		expression.executeQuery(content);
 	}
+
 	/**
 	 * Aplikovanie XQuery search skriptu s viazanim premennej na skript
 	 * 
@@ -98,18 +100,20 @@ public class BaseXManager {
 	 * @param value
 	 * @throws XQException
 	 */
-	public void applySearchXQuery(String content, String variableName, String value, boolean exportNode) throws XQException {
+	public void applySearchXQuery(String content, String variableName, String value, boolean exportNode)
+			throws XQException {
 		expression.bindString(new QName(variableName), value, null);
 		// BIND OF EXPLANATION FILE
 		if (exportNode) {
 			expression.bindString(new QName("explanation"),
 					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt", null);
 		}
+		System.out.println(content);
 		XQResultSequence x = expression.executeQuery(content);
-		//TODO process output
+		// TODO process output
 		while (x.next()) {
-	//		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	//		System.out.println(x.getAtomicValue());
+			// System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			// System.out.println(x.getAtomicValue());
 		}
 	}
 
@@ -121,19 +125,37 @@ public class BaseXManager {
 	 * @param value
 	 * @throws XQException
 	 */
-	public void applyRepairXQuery(String content, String variableName, String value, boolean exportNode) throws XQException {
+	public void applyRepairXQuery(String content, String variableName, String value, boolean exportNode)
+			throws XQException {
 		expression.bindString(new QName(variableName), value, null);
 		// BIND OF EXPLANATION FILE
 		if (exportNode) {
 			expression.bindString(new QName("explanation"),
 					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanationRepair.txt", null);
 		}
-		// TODO process output  
+		// TODO process output
 		XQResultSequence x = expression.executeQuery(content);
 		while (x.next()) {
-	//		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	//		System.out.println(x.getAtomicValue());
+			// System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			// System.out.println(x.getAtomicValue());
 		}
+	}
+	/**
+	 * 
+	 * @param script
+	 * @param variableName
+	 * @param value
+	 * @return positions
+	 * @throws XQException
+	 */
+	public List<String> applyPositionXQuery(String script, String variableName, String value) throws XQException {
+		expression.bindString(new QName(variableName), value, null);
+		List<String> out = new ArrayList<String>();
+		XQResultSequence x = expression.executeQuery(script);
+		while (x.next()) {
+			out.add(x.getAtomicValue());
+		}
+		return out;
 	}
 
 	/**

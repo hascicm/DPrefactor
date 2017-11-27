@@ -87,8 +87,64 @@ function execute() {
 	});
 }
 
+function executePathFinder() {
+	var searchCodes = [];
+	var table = document.getElementById("searchTable");
+	var length = table.rows.length;
+	for(var i = length; i > 1 ; --i) {
+		if(table.rows[i - 1].cells[0].getElementsByTagName("input")[0].checked) {
+			searchCodes.push(table.rows[i - 1].cells[1].innerHTML);
+		}
+	}
+			
+	var request = {
+		repo : document.getElementById("repo-pathfiner").value,
+		name : document.getElementById("name-pathfiner").value,
+		password : document.getElementById("password-pathfiner").value,
+		searchBranch : document.getElementById("searchBranch-pathfiner").value,
+		explanationSearch : document.getElementById("explanationSearch-pathfiner").checked,
+		createrepairrecord : document.getElementById("createrepairrecord-pathfiner").checked,
+		isSonarEnabled : document.getElementById("sonarQubeAnalyze-pathfiner").checked,
+		sonarHost: document.getElementById("sonarHost-pathfiner").value,
+		sonarLogin: document.getElementById("sonarLogin-pathfiner").value,
+		sonarPassword: document.getElementById("sonarPassword-pathfiner").value,
+		searchCodes : searchCodes,
+	}
+	
+	$.ajax({
+		type: "PUT",
+		url: "http://localhost:8080/refactor/executePathFinder/",
+		data: JSON.stringify(request),
+		contentType:"application/json; charset=utf-8",
+		dataType: "json",
+		success: function(response) {
+			var string = "Boli nájdené nasledujúce problémy: \n\n";
+			for(var i in response) {
+				string += i + ":		" + response[i] + "\n";
+			}
+			
+			window.alert(string);
+		}
+	});
+}
+function pathFinder(){
+	document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = false;
+    document.getElementById("search").hidden = true;
+    document.getElementById("refactor").hidden = true;
+    document.getElementById("rules").hidden = true;
+    document.getElementById("preferences").hidden = true;
+    document.getElementById("about").hidden = true;
+    document.getElementById("repairEdit").hidden = true;
+    document.getElementById("searchEdit").hidden = true;
+    document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("records").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
+}
+
 function home() {
 	document.getElementById("home").hidden = false;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -121,6 +177,7 @@ function search() {
 	});
 	
     document.getElementById("home").hidden = true;
+   	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = false;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -154,6 +211,7 @@ function refactor() {
 	});
 	
     document.getElementById("home").hidden = true;
+ 	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = false;
     document.getElementById("rules").hidden = true;
@@ -169,6 +227,7 @@ function refactor() {
 
 function preferences() {
     document.getElementById("home").hidden = true;
+ 	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -190,6 +249,7 @@ function rules() {
 	});
 	
     document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = false;
@@ -207,6 +267,7 @@ function rules() {
 
 function about() {
     document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -223,6 +284,7 @@ function about() {
 
 function smells() {
     document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -260,6 +322,7 @@ function records() {
 		})
 	});
     document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -288,6 +351,7 @@ function recordDetail(i) {
  			document.getElementById("recordDetailJessDesc").value = response.jessdesc
 	});
     document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -316,6 +380,7 @@ function repairEdit(i) {
 	});
 	
     document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -342,6 +407,7 @@ function searchEdit(i) {
 	});
 	
     document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -431,6 +497,7 @@ function addSearch() {
 	add = true;
 	
 	document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;
@@ -452,6 +519,7 @@ function addRepair() {
 	add = true;
 	
 	document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
     document.getElementById("search").hidden = true;
     document.getElementById("refactor").hidden = true;
     document.getElementById("rules").hidden = true;

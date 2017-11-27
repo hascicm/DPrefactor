@@ -24,9 +24,9 @@ import sk.fiit.dp.refactor.model.JessInput;
 import sk.fiit.dp.refactor.model.JessOutput;
 import sk.fiit.dp.refactor.model.SearchObject;
 
-public class RefactorCommandHandler {
+public class PathFinderCommandHandler {
 
-	private static RefactorCommandHandler INSTANCE;
+	private static PathFinderCommandHandler INSTANCE;
 
 	private GitCommandHandler gitCommand = GitCommandHandler.getInstance();
 	private ConversionCommandHandler conversionCommand = ConversionCommandHandler.getInstance();
@@ -42,12 +42,12 @@ public class RefactorCommandHandler {
 
 	private String sonarOutput;
 
-	private RefactorCommandHandler() {
+	private PathFinderCommandHandler() {
 	}
 
-	public static RefactorCommandHandler getInstance() {
+	public static PathFinderCommandHandler getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new RefactorCommandHandler();
+			INSTANCE = new PathFinderCommandHandler();
 		}
 
 		return INSTANCE;
@@ -63,13 +63,13 @@ public class RefactorCommandHandler {
 	 * @param explanationToSearch
 	 * @return
 	 */
-	public Map<String, Integer> executeRefactoring(String repo, String name, String password, String searchBranch,
-			String repairBranch, List<String> toSearch, List<String> allowedRefactoring, boolean explanationToSearch,
-			boolean createRepairRecord, SonarProperties sonarProps) {
+	public Map<String, Integer> executePathFinder(String repo, String name, String password, String searchBranch,
+			List<String> toSearch, boolean explanationToSearch, boolean createRepairRecord,
+			SonarProperties sonarProps) {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
-
+			System.out.println("pathFinder");
 			// 0. time generator reset
 			timeGenerator.resetTimeStamp();
 
@@ -106,16 +106,15 @@ public class RefactorCommandHandler {
 
 			// 6. Vykona sa vyhladavanie
 			List<JessInput> searchResults = searchCommand.search(search, createRepairRecord);
-			
-			// NEW vratenie ciest z databazy
+
+			// NEW vratenie polohy pachov
 			smellPathFinder.findPathsToSmells(searchResults);
-			
-		
+
 			System.out.println("------------SEARCH--------------------------");
 
 			for (JessInput o : searchResults) {
 				System.out.println("tags:    " + o.getCode());
-				System.out.println("method:  " + o.getRefCode());
+				System.out.println("refcode: " + o.getRefCode());
 				System.out.println("position " + o.getPosition());
 				System.out.println("xpathpos " + o.getXpatPosition());
 			}
@@ -138,39 +137,10 @@ public class RefactorCommandHandler {
 			// 10. Vykona sa push search branch na git
 			gitCommand.pushBranch(searchBranch, name, password);
 
-			// 11. Pripravi sa branch pre vykonanie opravy
-			gitCommand.createBranch(repairBranch);
-
-			// 12. Pravidlovy stroj rozhodne o pouzitom refaktorovani
-			List<JessOutput> requiredRefactoring = ruleCommand.run(searchResults);
-
-			System.out.println("---------JESS-----------------------------");
-
-			for (JessOutput o : requiredRefactoring) {
-				System.out.println("tags:   " + o.getTag());
-				System.out.println("method: " + o.getRefactoringMethod());
-			}
-			System.out.println("--------------------------------------");
-
-			// 13. Vykona sa refaktoring
-			System.out.println("---------REFACTOR-----------------------------");
-			applyRefactoring(requiredRefactoring, allowedRefactoring, createRepairRecord);
-
 			// TODO explanation
-			if (createRepairRecord) {
-				explainCommand.createRepairRecord(repo, searchResults);
-			}
-			// 14. Exportuje sa databaza
-			baseX.exportDatabase(gitCommand.getRepoDirectory());
-
-			// 15. Exportovane subory sa presunu na povodnu poziciu
-			conversionCommand.moveFilesToOriginalLocation(xmlFiles, gitCommand.getRepoDirectory());
-
-			// 16. Vykona sa konverzia XML suborov do Javy
-			conversionCommand.convertXmlToJava(xmlFiles);
-
-			// 17. Vykona sa push repair branch na git
-			gitCommand.pushBranch(repairBranch, name, password);
+			//if (createRepairRecord) {
+			//	explainCommand.createRepairRecord(repo, searchResults);
+			//}
 
 			// 18. Vymaze sa docasna BaseX databaza TODO
 			// baseX.cleanDatabase(id);
@@ -184,39 +154,6 @@ public class RefactorCommandHandler {
 		}
 
 		return new HashMap<String, Integer>();
-			
+
 	}
-
-	/**
-	 * Aplikuju sa povolene refaktorovacie operacie podla vystupu z Jess
-	 * expertneho systemu
-	 * 
-	 * @param requiredRefactoring
-	 * @param allowedRefactoring
-	 * @throws SQLException
-	 * @throws XQException
-	 */
-	public void applyRefactoring(List<JessOutput> requiredRefactoring, List<String> allowedRefactoring,
-			boolean createRepairRecord) throws SQLException, XQException {
-		for (JessOutput refactoring : requiredRefactoring) {
-			if (allowedRefactoring.contains(refactoring.getRefactoringMethod())) {
-				String script = postgre.getRepairScript(refactoring.getRefactoringMethod());
-				if (createRepairRecord) {
-					script = prepareRepairScript(refactoring, script);
-				}
-				if (script != null && !"".equals(script)) {
-					baseX.applyRepairXQuery(script, "tag", refactoring.getTag(), createRepairRecord);
-				}
-			}
-		}
-	}
-
-	// TODO
-	public String prepareRepairScript(JessOutput refactoring, String script) throws SQLException {
-		String RuleExplanation = postgre.getExplanationForScript(refactoring.getRefactoringMethod());
-		String preparedScript = XpathScriptModifier.getInstance().addRefactoringExplanation(script);
-
-		return preparedScript;
-	}
-
 }

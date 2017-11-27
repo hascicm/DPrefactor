@@ -17,6 +17,9 @@
 				<a href="javascript:home();"><span>Proces</span></a>
 			</li>
 			<li>
+				<a href="javascript:pathFinder();"><span>Optimálny proces</span></a>
+			</li>
+			<li>
 				<a href="javascript:search();"><span>Vyhľadávanie</span></a>
 			</li>
 			<li>
@@ -94,6 +97,60 @@
 			<button type="button" onclick="clearComments()">Vymaž komentáre</button> 
 		</div>
 	</section>
+	<section id="pathFinder">
+		<h1>Path Finder</h1>
+		<form>
+			<label for="repo-pathfiner">Git repozitár</label>
+			<input type="text" name="repo-pathfiner" placeholder="Example: https://john@github.com/john/test.git" value="https://github.com/hascicm/refactor.git" id="repo-pathfiner"><p/>
+			<label for="name-pathfiner">Prihlasovacie meno</label>
+			<input type="text" name="name-pathfiner" id="name-pathfiner"><p/>
+			<label for="password-pathfiner">Prihlasovacie heslo</label>
+			<input type="text" name="password-pathfiner" id="password-pathfiner">
+		</form>
+
+		<hr>
+
+		<form>
+			<label for="search-pathfiner">Git branch - vyhľadávanie</label>
+			<input type="text" name="search-pathfiner" value="search-pathfinder" id="searchBranch-pathfiner"><p/>
+		</form>
+		<p/>
+		<hr>
+		<p/>
+		<form>
+			<input type="checkbox" class = 'inputcheckbox' id = "explanationSearch-pathfiner">Vysvetlenia do search vetvy<br>
+	<!--		<input type="checkbox" class = 'inputcheckbox' id = "explanationRepair">Vysvetlenia do repair vetvy<br>-->
+			<input type="checkbox" class = 'inputcheckbox' id = "createrepairrecord-pathfiner">vytvorit zaznam o oprave<br>
+
+		</form>
+		<p/>
+		<hr>
+		<h3>SonarQube</h3>
+		<form>
+			<p>
+				<input type="checkbox" class = 'inputcheckbox' id = "sonarQubeAnalyze-pathfiner">Analyzovať projekt pomocou nástroja SonarQube<br>
+			</p>
+			<p>
+				<label for="sonarHost-pathfiner">Hostname</label>
+				<input type="text" name="sonarHost-pathfiner" value="http://localhost:9000" id="sonarHost-pathfiner">
+			</p>
+			<p>
+				<label for="sonarLogin-pathfiner">Prihlasovacie meno</label>
+				<input type="text" name="sonarLogin-pathfiner" value="admin" id="sonarLogin-pathfiner">
+			</p>
+			<p>
+				<label for="sonarPassword-pathfiner">Heslo</label>
+				<input type="password" name="sonarPassword-pathfiner" value="admin" id="sonarPassword-pathfiner">
+			</p>
+
+		</form>
+		<hr>
+		<div>
+			<button type="button" onclick="executePathFinder()">Vykonať</button> 
+			<button type="button" onclick="clearComments()">Vymaž komentáre</button> 
+		</div>
+	</section>
+
 	<section id="search" hidden=true>
 		<h1>Možnosti vyhľadávania</h1>
 		<table id="searchTable">

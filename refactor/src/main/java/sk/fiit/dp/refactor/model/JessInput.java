@@ -18,6 +18,8 @@ public class JessInput {
 	private int size;
 
 	private String position;
+	
+	private String xpatPosition;
 
 	public String getCode() {
 		return code;
@@ -57,5 +59,13 @@ public class JessInput {
 
 	public void setPosition(String position) {
 		this.position = position;
+	}
+
+	public String getXpatPosition() {
+		return xpatPosition;
+	}
+
+	public void setXpatPosition(String xpatPosition) {
+		this.xpatPosition = xpatPosition;
 	}
 }

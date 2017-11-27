@@ -54,7 +54,7 @@ public class XpathScriptModifier {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("xpathmodifier prepared string " + explanationString);
+		//System.out.println("xpathmodifier prepared string " + explanationString);
 		return explanationString;
 
 	}
@@ -65,7 +65,7 @@ public class XpathScriptModifier {
 			String scriptExplanation = new String();
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
-				if (line.contains("declare variable")) {
+				if (line.startsWith("declare variable")) {
 					scriptExplanation += "declare variable $explanation external;\n";
 					scriptExplanation += line + "\n";
 				} else if (line.equals(")")) {
