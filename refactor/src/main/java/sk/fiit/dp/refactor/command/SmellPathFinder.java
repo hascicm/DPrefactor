@@ -41,16 +41,16 @@ public class SmellPathFinder {
 					+ "else (for $x in $node/ancestor-or-self::class "
 					+ "return ( db:output(concat(\"C:\" ,$x/name))))," + "for $x in $node/ancestor-or-self::function "
 					+ "return (db:output(concat(\"M:\" ,$x/name))))";
-			//System.out.println(query);
+			// System.out.println(query);
 
 			try {
 				String localisationsScript = pgmanager.getSmellLocalisatorScript(ocurence.getRefCode());
 				System.out.println("---------------------code " + ocurence.getCode());
 				List<String> path = basex.applyPositionXQuery(localisationsScript, "tag", ocurence.getCode());
-				for (String p : path){
-					System.out.println("path "+(p));
+				for (String p : path) {
+					System.out.println("path " + (p));
 				}
-				//System.out.println("path "+ProcesOutput(path));
+				// System.out.println("path "+ProcesOutput(path));
 				// TODO - parse to pathFinder Input
 				ocurence.setXpatPosition(ProcesOutput(path));
 			} catch (SQLException | XQException e) {
@@ -60,7 +60,7 @@ public class SmellPathFinder {
 	}
 
 	private String ProcesOutput(List<String> xpathOut) {
-		String processedPath="";
+		String processedPath = "";
 		String path = "";
 		for (int i = 0; i < xpathOut.size(); i++) {
 			if (xpathOut.get(i).startsWith("CC:")) {
@@ -72,14 +72,14 @@ public class SmellPathFinder {
 				path += xpathOut.get(i) + "::";
 			} else if (xpathOut.get(i).startsWith("M:")) {
 				path += xpathOut.get(i) + "::";
-			} else {	
-			processedPath = xpathOut.get(i);
+			} else {
+				processedPath = xpathOut.get(i);
 
 			}
 		}
 		processedPath = processedPath.replaceAll("[a-z]+/|[a-z]+_[a-z]+/", "");
 		processedPath = processedPath.replaceAll("/", "::");
-		System.out.println(path + processedPath);
+		System.out.println("processed path: " + path + processedPath);
 		return path + processedPath;
 	}
 

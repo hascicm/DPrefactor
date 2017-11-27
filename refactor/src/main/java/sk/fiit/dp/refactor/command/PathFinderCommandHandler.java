@@ -12,7 +12,6 @@ import javax.xml.xquery.XQException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
-import sk.fiit.dp.refactor.command.explanation.XpathScriptModifier;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
@@ -21,7 +20,6 @@ import sk.fiit.dp.refactor.helper.IdGenerator;
 import sk.fiit.dp.refactor.helper.JsonFileWriter;
 import sk.fiit.dp.refactor.helper.TimeStampGenerator;
 import sk.fiit.dp.refactor.model.JessInput;
-import sk.fiit.dp.refactor.model.JessOutput;
 import sk.fiit.dp.refactor.model.SearchObject;
 
 public class PathFinderCommandHandler {
@@ -64,8 +62,7 @@ public class PathFinderCommandHandler {
 	 * @return
 	 */
 	public Map<String, Integer> executePathFinder(String repo, String name, String password, String searchBranch,
-			List<String> toSearch, boolean explanationToSearch, boolean createRepairRecord,
-			SonarProperties sonarProps) {
+			List<String> toSearch, boolean explanationToSearch, SonarProperties sonarProps) {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
@@ -99,13 +96,11 @@ public class PathFinderCommandHandler {
 			// 5. XML subory sa importuju do databazy
 			baseX.projectToDatabase(xmlFiles);
 
-			// NEW pripravenie vyhladavacich skriptov s vysvetlenim a exportom
-			// casti kodu
-			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch, explanationToSearch,
-					createRepairRecord);
+			// NEW pripravenie vyhladavacich skriptov s vysvetlenim 
+			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch, explanationToSearch, false);
 
 			// 6. Vykona sa vyhladavanie
-			List<JessInput> searchResults = searchCommand.search(search, createRepairRecord);
+			List<JessInput> searchResults = searchCommand.search(search, false);
 
 			// NEW vratenie polohy pachov
 			smellPathFinder.findPathsToSmells(searchResults);
@@ -138,9 +133,9 @@ public class PathFinderCommandHandler {
 			gitCommand.pushBranch(searchBranch, name, password);
 
 			// TODO explanation
-			//if (createRepairRecord) {
-			//	explainCommand.createRepairRecord(repo, searchResults);
-			//}
+			// if (createRepairRecord) {
+			// explainCommand.createRepairRecord(repo, searchResults);
+			// }
 
 			// 18. Vymaze sa docasna BaseX databaza TODO
 			// baseX.cleanDatabase(id);

@@ -97,7 +97,6 @@ public class GitCommandHandler {
 	 * @throws GitAPIException
 	 */
 	public void pushBranch(String branchName, String name, String password) throws GitAPIException {
-		System.out.println("pushing to " + branchName);
 		checkoutBranch(branchName);
 		repo.add().addFilepattern(".").call();
 		repo.commit().setMessage("RafactorFix").call();

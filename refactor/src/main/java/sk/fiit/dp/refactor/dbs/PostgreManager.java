@@ -319,7 +319,7 @@ public class PostgreManager {
 	public String getExplanationForSearchScript(String code) throws SQLException {
 		String result = "";
 		String query = "select * from smelltype where code = '" + code + "'";
-		System.out.println("PGmanager " + query);
+	//	System.out.println("PGmanager " + query);
 		ResultSet rs = statement.executeQuery(query);
 		int id = 0;
 		while (rs.next()) {

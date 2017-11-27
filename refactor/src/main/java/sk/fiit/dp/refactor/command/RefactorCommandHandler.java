@@ -106,7 +106,7 @@ public class RefactorCommandHandler {
 
 			// 6. Vykona sa vyhladavanie
 			List<JessInput> searchResults = searchCommand.search(search, createRepairRecord);
-			
+			System.out.println("------------paths Xquerry-------------------");
 			// NEW vratenie ciest z databazy
 			smellPathFinder.findPathsToSmells(searchResults);
 			

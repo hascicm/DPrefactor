@@ -103,7 +103,7 @@ function executePathFinder() {
 		password : document.getElementById("password-pathfiner").value,
 		searchBranch : document.getElementById("searchBranch-pathfiner").value,
 		explanationSearch : document.getElementById("explanationSearch-pathfiner").checked,
-		createrepairrecord : document.getElementById("createrepairrecord-pathfiner").checked,
+//		createrepairrecord : document.getElementById("createrepairrecord-pathfiner").checked,
 		isSonarEnabled : document.getElementById("sonarQubeAnalyze-pathfiner").checked,
 		sonarHost: document.getElementById("sonarHost-pathfiner").value,
 		sonarLogin: document.getElementById("sonarLogin-pathfiner").value,

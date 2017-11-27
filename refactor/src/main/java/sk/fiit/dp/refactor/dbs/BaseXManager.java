@@ -103,12 +103,11 @@ public class BaseXManager {
 	public void applySearchXQuery(String content, String variableName, String value, boolean exportNode)
 			throws XQException {
 		expression.bindString(new QName(variableName), value, null);
-		// BIND OF EXPLANATION FILE
 		if (exportNode) {
 			expression.bindString(new QName("explanation"),
 					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt", null);
 		}
-		System.out.println(content);
+		//System.out.println(content);
 		XQResultSequence x = expression.executeQuery(content);
 		// TODO process output
 		while (x.next()) {
