@@ -13,9 +13,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.io.comparator.PathFileComparator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import sk.fiit.dp.refactor.command.PathFinderCommandHandler;
 import sk.fiit.dp.refactor.command.RefactorCommandHandler;
 import sk.fiit.dp.refactor.command.ResourceCommandHandler;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
@@ -25,6 +27,7 @@ public class WebController {
 
 	private ResourceCommandHandler resourceCommand = ResourceCommandHandler.getInstance();
 	private RefactorCommandHandler refactorCommand = RefactorCommandHandler.getInstance();
+	private PathFinderCommandHandler pathFinderCommand = PathFinderCommandHandler.getInstance();
 
 	@GET
 	@Path("/rulesdefinition")
@@ -116,6 +119,43 @@ public class WebController {
 	}
 
 	@PUT
+	@Path("/executePathFinder/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String executePathFinder(String input) {
+
+		JSONObject json = new JSONObject(input);
+		JSONArray toSearch = json.getJSONArray("searchCodes");
+		boolean explanationToSearch = json.getBoolean("explanationSearch");
+		// boolean createrepairrecord = json.getBoolean("createrepairrecord");
+		String gituser = json.getString("name");
+		String gitpass = json.getString("password");
+
+		SonarProperties sonarProps = new SonarProperties();
+		sonarProps.setSonarEnabled(json.getBoolean("isSonarEnabled"));
+		if (sonarProps.isSonarEnabled()) {
+			sonarProps.setHostName(json.getString("sonarHost"));
+			sonarProps.setLoginName(json.getString("sonarLogin"));
+			sonarProps.setLoginPassword(json.getString("sonarPassword"));
+		}
+
+		List<String> searchMethods = new ArrayList<>();
+		for (int i = 0; i < toSearch.length(); ++i) {
+			searchMethods.add(toSearch.getString(i));
+		}
+
+		Map<String, Integer> results = pathFinderCommand.executePathFinder(json.getString("repo"), gituser,
+				gitpass, json.getString("searchBranch"), searchMethods, explanationToSearch, sonarProps);
+
+		JSONObject response = new JSONObject();
+		for (String key : results.keySet()) {
+			response.put(key, results.get(key));
+		}
+
+		return response.toString();
+	}
+
+	@PUT
 	@Path("/execute/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -148,9 +188,9 @@ public class WebController {
 			allowedRefactoring.add(toRepair.getString(i));
 		}
 
-		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser, gitpass,
-				json.getString("searchBranch"), json.getString("repairBranch"), searchMethods, allowedRefactoring,
-				explanationToSearch, createrepairrecord, sonarProps);
+		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser,
+				gitpass, json.getString("searchBranch"), json.getString("repairBranch"), searchMethods,
+				allowedRefactoring, explanationToSearch, createrepairrecord, sonarProps);
 
 		JSONObject response = new JSONObject();
 		for (String key : results.keySet()) {
