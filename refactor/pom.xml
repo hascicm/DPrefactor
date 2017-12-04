@@ -25,7 +25,7 @@
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
-   		</plugins>
+		</plugins>
 	</build>
 
 	<repositories>
@@ -80,7 +80,7 @@
 			<version>7.2</version>
 			<scope>system</scope>
 			<systemPath>${java.home}/lib/jess.jar</systemPath>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>jsr94</groupId>
 			<artifactId>jsr94</artifactId>
@@ -89,9 +89,15 @@
 			<systemPath>${java.home}/lib/jsr94.jar</systemPath>
 		</dependency>
 		<dependency>
-    		<groupId>org.sonarsource.scanner.maven</groupId>
-    		<artifactId>sonar-maven-plugin</artifactId>
-    		<version>3.1.1</version>
+			<groupId>org.sonarsource.scanner.maven</groupId>
+			<artifactId>sonar-maven-plugin</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
 		</dependency>
 	</dependencies>
 
