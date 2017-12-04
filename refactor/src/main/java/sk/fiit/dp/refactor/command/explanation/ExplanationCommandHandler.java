@@ -38,13 +38,16 @@ public class ExplanationCommandHandler {
 		// set repo for all initialized records
 		for (RepairRecord record : records) {
 			record.setGitRepository(repo);
+			record.setTimeStamp(timeStampGenerator.getTime());
+
 		}
 		// link results from jess
 		processJessListenerOutput();
-		// proces repair file and link it to records
+		// process repair file and link it to records
 		processRepairExplanationFile();
+		// link to search result. Used for identification of path to smell
 		linkToResultFile(searchResults);
-		printrecords();
+		//printrecords();
 
 		pushRecordsToPostgres();
 
@@ -109,7 +112,6 @@ public class ExplanationCommandHandler {
 					}
 					curent = new RepairRecord();
 					curent.setRefactoringCode(l.replace("NAME: ", ""));
-					curent.setTimeStamp(timeStampGenerator.getTime());
 					curent.setRefcode(l.replace("NAME: ", "").replaceAll("[0-9]", ""));
 					codeFromFile = "";
 				} else {
