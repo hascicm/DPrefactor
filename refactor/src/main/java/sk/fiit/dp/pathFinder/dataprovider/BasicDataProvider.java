@@ -14,6 +14,7 @@ import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.refactor.model.JessInput;
 
 public class BasicDataProvider implements DataProvider{
 
@@ -211,6 +212,13 @@ public class BasicDataProvider implements DataProvider{
 		this.root.getSmells().add(new SmellOccurance(smell_dataClass));
 		this.root.getSmells().add(new SmellOccurance(smell_largeClass));*/
 		//this.root.getSmells().add(new SmellOccurance(smell_temporaryField));
+		
+	}
+	
+	// used only in Database Data Provider
+	@Override
+	public void initializeRootState(List<JessInput> searchResults) {
+		// TODO Auto-generated method stub
 		
 	}
 	

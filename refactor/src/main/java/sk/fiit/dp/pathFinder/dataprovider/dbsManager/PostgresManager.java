@@ -47,7 +47,8 @@ public class PostgresManager {
 		try {
 			rs = statement.executeQuery(query);
 			while (rs.next()) {
-				SmellType smell = new SmellType(rs.getInt("id"), rs.getString("name"), rs.getInt("weight"));
+				SmellType smell = new SmellType(rs.getInt("id"), rs.getString("name"), rs.getInt("weight"),
+						rs.getString("code"));
 				smells.add(smell);
 			}
 		} catch (SQLException e) {
@@ -137,7 +138,7 @@ public class PostgresManager {
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-		
+
 		return repairs;
 	}
 

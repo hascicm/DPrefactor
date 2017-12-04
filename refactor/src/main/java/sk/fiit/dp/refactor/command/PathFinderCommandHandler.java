@@ -11,6 +11,8 @@ import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import sk.fiit.dp.pathFinder.configuration.PathFinderHandler;
+import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
@@ -96,7 +98,7 @@ public class PathFinderCommandHandler {
 			// 5. XML subory sa importuju do databazy
 			baseX.projectToDatabase(xmlFiles);
 
-			// NEW pripravenie vyhladavacich skriptov s vysvetlenim 
+			// NEW pripravenie vyhladavacich skriptov s vysvetlenim
 			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch, explanationToSearch, false);
 
 			// 6. Vykona sa vyhladavanie
@@ -143,6 +145,15 @@ public class PathFinderCommandHandler {
 			// 19. Odstrani sa lokalna git kopia
 			gitCommand.deleteLocalDirectory();
 
+			// vykoná sa hľadanie optimálnej cesty
+			System.out.println("\n\nStrating execution of pathFinder\n\n");
+			List<Relation> optimalPath = PathFinderHandler.executePathFinder(searchResults);
+			if (optimalPath != null) {
+				for (Relation r : optimalPath) {
+					System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
+							+ r.getFixedSmellOccurance().getSmell().getName());
+				}
+			}
 			return searchCommand.processResults(searchResults);
 		} catch (IOException | GitAPIException | InterruptedException | XQException | SQLException e) {
 			e.printStackTrace();

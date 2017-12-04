@@ -65,7 +65,7 @@ public class JessInput {
 		return xpatPosition;
 	}
 
-	public void setXpatPosition(String xpatPosition) {
+	public void setXpathPosition(String xpatPosition) {
 		this.xpatPosition = xpatPosition;
 	}
 }

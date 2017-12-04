@@ -6,10 +6,14 @@ import java.util.List;
 import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.pathFinder.entities.Dependency;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
+import sk.fiit.dp.pathFinder.entities.Location;
+import sk.fiit.dp.pathFinder.entities.LocationPart;
+import sk.fiit.dp.pathFinder.entities.LocationPartType;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.refactor.model.JessInput;
 
 public class DatabaseDataProvider implements DataProvider {
 
@@ -20,7 +24,7 @@ public class DatabaseDataProvider implements DataProvider {
 	public DatabaseDataProvider() {
 		smells = PostgresManager.getInstance().getSmellTypes();
 		repairs = PostgresManager.getInstance().getRepairs(smells);
-		initRoot();
+		// initRoot();
 	}
 
 	@Override
@@ -36,6 +40,59 @@ public class DatabaseDataProvider implements DataProvider {
 	@Override
 	public State getRootState() {
 		return root;
+	}
+
+	@Override
+	public void initializeRootState(List<JessInput> searchResults) {
+		// TODO Auto-generated method stub
+		this.root = new State();
+		List<SmellOccurance> smellOccurances = new ArrayList<SmellOccurance>();
+
+		System.out.println("------------adapter---------------");
+		for (JessInput searchResult : searchResults) {
+			System.out.println(searchResult.getCode());
+			System.out.println(searchResult.getXpatPosition());
+
+			SmellType smell = this.getSmellType(searchResult.getRefCode());
+
+			List<Location> locationList = new ArrayList<Location>();
+			List<LocationPart> locationParts = new ArrayList<LocationPart>();
+
+			String[] strLocations = searchResult.getXpatPosition().split("::");
+			for (String str : strLocations) {
+				System.out.println("locationpart: " + str);
+				locationParts.add(processStringToLocationPart(str));
+			}
+			locationList.add(new Location(locationParts));
+
+			SmellOccurance ocurance = new SmellOccurance(smell, locationList);
+			smellOccurances.add(ocurance);
+		}
+		this.root.setSmells(smellOccurances);
+	}
+
+	LocationPart processStringToLocationPart(String s) {
+		String[] strParts = s.split(":");
+		String type = strParts[0];
+		String id = strParts[1];
+		LocationPartType locationPartType = null;
+		if (type.equals("CC")) {
+			locationPartType = LocationPartType.PACKAGE;
+		} else if (type.equals("C")) {
+			locationPartType = LocationPartType.CLASS;
+		} else if (type.equals("M")) {
+			locationPartType = LocationPartType.METHOD;
+		} else if (type.equals("NODE")) {
+			locationPartType = LocationPartType.NODE;
+		} else if (type.equals("A")) {
+			locationPartType = LocationPartType.ATTRIBUTE;
+		} else if (type.equals("P")) {
+			locationPartType = LocationPartType.PARAMETER;
+		} else if (type.equals("POS")) {
+			locationPartType = LocationPartType.POSITION;
+		}
+
+		return new LocationPart(locationPartType, id);
 	}
 
 	private void initRoot() {
@@ -138,6 +195,17 @@ public class DatabaseDataProvider implements DataProvider {
 		}
 
 		return result;
+	}
+
+	private SmellType getSmellType(String code) {
+		for (SmellType st : this.smells) {
+			if (st.getCode() != null) {
+				if (st.getCode().equals(code)) {
+					return st;
+				}
+			}
+		}
+		return null;
 	}
 
 	public void printRepairs() {
