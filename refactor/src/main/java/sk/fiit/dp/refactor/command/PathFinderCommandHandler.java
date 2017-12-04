@@ -148,6 +148,7 @@ public class PathFinderCommandHandler {
 			// vykoná sa hľadanie optimálnej cesty
 			System.out.println("\n\nStrating execution of pathFinder\n\n");
 			List<Relation> optimalPath = PathFinderHandler.executePathFinder(searchResults);
+			
 			if (optimalPath != null) {
 				for (Relation r : optimalPath) {
 					System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
