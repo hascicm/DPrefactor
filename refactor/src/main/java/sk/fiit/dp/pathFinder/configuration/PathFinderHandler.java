@@ -30,7 +30,7 @@ public class PathFinderHandler {
 				}
 			}
 		}
-		// model.findRefactoringPath();
+		model.findRefactoringPath();
 
 		return model.getOptimalPath();
 	}
