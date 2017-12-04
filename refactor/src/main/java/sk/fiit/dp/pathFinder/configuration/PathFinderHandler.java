@@ -12,8 +12,8 @@ import sk.fiit.dp.refactor.model.JessInput;
 
 public class PathFinderHandler {
 
-	public static List<Relation> executePathFinder(List<JessInput> searchResults) {
-		RefactorProcessOptimizer model = new RefactorProcessOptimizer();
+	public static List<Relation> executePathFinder(List<JessInput> searchResults,String method) {
+		RefactorProcessOptimizer model = new RefactorProcessOptimizer(method);
 		DataProvider dp = model.getDataProvider();
 
 		// TODO add parameter containing smells

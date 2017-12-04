@@ -118,3 +118,8 @@ table.scroll tbody {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+#labelPathFinder {
+	width:auto;
+	margin-right:25px;
+}

@@ -64,11 +64,11 @@ public class PathFinderCommandHandler {
 	 * @return
 	 */
 	public Map<String, Integer> executePathFinder(String repo, String name, String password, String searchBranch,
-			List<String> toSearch, boolean explanationToSearch, SonarProperties sonarProps) {
+			List<String> toSearch, boolean explanationToSearch, SonarProperties sonarProps,String method) {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
-			System.out.println("pathFinder");
+			System.out.println("pathFinder "+ method);
 			// 0. time generator reset
 			timeGenerator.resetTimeStamp();
 
@@ -147,7 +147,7 @@ public class PathFinderCommandHandler {
 
 			// vykoná sa hľadanie optimálnej cesty
 			System.out.println("\n\nStrating execution of pathFinder\n\n");
-			List<Relation> optimalPath = PathFinderHandler.executePathFinder(searchResults);
+			List<Relation> optimalPath = PathFinderHandler.executePathFinder(searchResults,method);
 			
 			if (optimalPath != null) {
 				for (Relation r : optimalPath) {

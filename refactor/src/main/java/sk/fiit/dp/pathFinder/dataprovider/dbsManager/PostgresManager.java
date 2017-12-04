@@ -75,7 +75,7 @@ public class PostgresManager {
 				+ "select repair.id,name,'0' as weight,smell_id,dependencytype, rd.actionField,rd.locationparttype, probability  "
 				+ "from repair  " + "join repairdependencies rd on repair.id=rd.repair_id "
 				+ "order by id,dependencytype desc,smell_id )   as result";
-		System.out.println(query);
+		//System.out.println(query);
 		ResultSet rs;
 		try {
 			rs = statement.executeQuery(query);

@@ -97,12 +97,17 @@ function executePathFinder() {
 		}
 	}
 			
+	var methodSelect = document.getElementById("pathFindingMethod");
+
+	var method = methodSelect.options[methodSelect.selectedIndex].value;
+	alert(method)
 	var request = {
 		repo : document.getElementById("repo-pathfiner").value,
 		name : document.getElementById("name-pathfiner").value,
 		password : document.getElementById("password-pathfiner").value,
 		searchBranch : document.getElementById("searchBranch-pathfiner").value,
 		explanationSearch : document.getElementById("explanationSearch-pathfiner").checked,
+		selectedMethod : method,
 //		createrepairrecord : document.getElementById("createrepairrecord-pathfiner").checked,
 		isSonarEnabled : document.getElementById("sonarQubeAnalyze-pathfiner").checked,
 		sonarHost: document.getElementById("sonarHost-pathfiner").value,

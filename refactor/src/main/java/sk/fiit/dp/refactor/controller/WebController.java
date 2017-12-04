@@ -127,10 +127,9 @@ public class WebController {
 		JSONObject json = new JSONObject(input);
 		JSONArray toSearch = json.getJSONArray("searchCodes");
 		boolean explanationToSearch = json.getBoolean("explanationSearch");
-		// boolean createrepairrecord = json.getBoolean("createrepairrecord");
 		String gituser = json.getString("name");
 		String gitpass = json.getString("password");
-
+		String method = json.getString("selectedMethod");
 		SonarProperties sonarProps = new SonarProperties();
 		sonarProps.setSonarEnabled(json.getBoolean("isSonarEnabled"));
 		if (sonarProps.isSonarEnabled()) {
@@ -145,7 +144,7 @@ public class WebController {
 		}
 
 		Map<String, Integer> results = pathFinderCommand.executePathFinder(json.getString("repo"), gituser,
-				gitpass, json.getString("searchBranch"), searchMethods, explanationToSearch, sonarProps);
+				gitpass, json.getString("searchBranch"), searchMethods, explanationToSearch, sonarProps,method);
 
 		JSONObject response = new JSONObject();
 		for (String key : results.keySet()) {

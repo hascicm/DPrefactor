@@ -1,12 +1,17 @@
 package sk.fiit.dp.pathFinder.entities;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import sk.fiit.dp.pathFinder.dataprovider.DataProvider;
 import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
+import sk.fiit.dp.pathFinder.usecases.AntColonyPathSearchMultithreded;
+import sk.fiit.dp.pathFinder.usecases.BeePathSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.DefaultPathSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.MinMaxProbabilityCalculationStrategy;
+import sk.fiit.dp.pathFinder.usecases.MonteCarloSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.PathSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.RelationCreator;
 
@@ -16,15 +21,30 @@ public class RefactorProcessOptimizer {
 	private PathSearchStrategy pathSearchStrategy;
 	private List<Relation> optimalPath; 	
 
-	public RefactorProcessOptimizer(){
-		init();	
+	public RefactorProcessOptimizer(String method){
+		init(method);	
 	}
 
-	private void init() {
+	private void init(String method) {
 		//this.dataProvider = new DatabaseDataProvider();
 		this.dataProvider = new DatabaseDataProvider(); 
-		this.pathSearchStrategy = new DefaultPathSearchStrategy(new RelationCreator(this.dataProvider.getSmellTypes(), this.dataProvider.getRepairs()));
-		//this.pathSearchStrategy = new BeePathSearchStrategy(new RelationCreator(this.dataProvider.getSmellTypes(), this.dataProvider.getRepairs()));
+		if (method.equals("A*")){
+			Logger.getLogger("pathfinter").log(Level.INFO, "starting pathfinding using A*");
+			this.pathSearchStrategy = new DefaultPathSearchStrategy(new RelationCreator(this.dataProvider.getSmellTypes(), this.dataProvider.getRepairs()));
+		}
+		else if (method.equals("bee")){
+			Logger.getLogger("pathfinter").log(Level.INFO, "starting pathfinding using bee hive colony");
+			this.pathSearchStrategy = new BeePathSearchStrategy(new RelationCreator(this.dataProvider.getSmellTypes(), this.dataProvider.getRepairs()));
+		}
+		else if (method.equals("ant")){
+			Logger.getLogger("pathfinter").log(Level.INFO, "starting pathfinding using atificial ant colony");
+			this.pathSearchStrategy = new AntColonyPathSearchMultithreded(new RelationCreator(this.dataProvider.getSmellTypes(), this.dataProvider.getRepairs()));
+		}
+		else if (method.equals("mc")){
+			Logger.getLogger("pathfinter").log(Level.INFO, "starting pathfinding using monte carlo");
+			this.pathSearchStrategy = new MonteCarloSearchStrategy(new RelationCreator(this.dataProvider.getSmellTypes(), this.dataProvider.getRepairs()));
+		}
+		//
 	
 		//Probability Calculation Strategy
 		this.pathSearchStrategy.setProbabolityCalculationStrategy(new MinMaxProbabilityCalculationStrategy());
