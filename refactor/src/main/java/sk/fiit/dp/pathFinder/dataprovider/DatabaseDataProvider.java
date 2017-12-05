@@ -10,6 +10,7 @@ import sk.fiit.dp.pathFinder.entities.Location;
 import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
 import sk.fiit.dp.pathFinder.entities.Repair;
+import sk.fiit.dp.pathFinder.entities.Repair.RepairUse;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
@@ -219,9 +220,20 @@ public class DatabaseDataProvider implements DataProvider {
 		return null;
 	}
 
+	public void printSmells() {
+		for (SmellType s : smells) {
+			System.out.println(s.getName());
+			System.out.println(s.getCode());
+			System.out.println(s.getWeight());
+			System.out.println("-------------------------------");
+		}
+	}
+
 	public void printRepairs() {
 		for (Repair r : repairs) {
 			System.out.println("repair  :" + r.getName());
+			System.out.println("id         " + r.getId());
+
 			for (SmellType s : r.getSmells()) {
 				System.out.println("used for " + s.getName());
 			}
@@ -236,9 +248,38 @@ public class DatabaseDataProvider implements DataProvider {
 					System.out.println("prob       " + dep.getProbability());
 				}
 			}
-
+			System.out.println("-------------------------------");
 		}
 
+	}
+
+	public void reduceDBdata(int[] selectedSmells, int[] selectedRepairs) {
+		List<SmellType> reducedSmells = new ArrayList<>();
+		List<Repair> reducedRepairs = new ArrayList<>();
+
+		for (int smellId : selectedSmells) {
+			for (SmellType s : this.smells) {
+				if (s.getId() == smellId)
+					reducedSmells.add(s);
+			}
+		}
+
+		for (int repairId : selectedRepairs) {
+			for (Repair r : this.repairs) {
+				if (r.getId() == repairId) {
+					reducedRepairs.add(r);
+					List<RepairUse> repUseList = new ArrayList<>();
+					for (RepairUse ru : r.getRepairUses()){
+						if (reducedSmells.contains(ru.getSmell())){
+							repUseList.add(ru);
+						}
+					}
+					r.setRepairUses(repUseList);
+				}
+			}
+		}
+		this.smells = reducedSmells;
+		this.repairs = reducedRepairs;
 	}
 
 }

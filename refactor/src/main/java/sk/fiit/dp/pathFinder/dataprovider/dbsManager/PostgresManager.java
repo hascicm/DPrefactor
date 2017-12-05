@@ -1,6 +1,5 @@
 package sk.fiit.dp.pathFinder.dataprovider.dbsManager;
 
-import java.awt.RadialGradientPaint;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import sk.fiit.dp.pathFinder.entities.Dependency;
 import sk.fiit.dp.pathFinder.entities.DependencyPlaceType;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
 import sk.fiit.dp.pathFinder.entities.DependencyType;
@@ -69,12 +67,12 @@ public class PostgresManager {
 	public List<Repair> getRepairs(List<SmellType> smells) {
 
 		List<Repair> repairs = new ArrayList<>();
-		String query = "select * from (select repair.id,name,weight,repairsmelltype.smell_id, '' as dependencytype,'' as actionfield,"
+		String query = "select * from (select repair.id as rapairid,name,weight,repairsmelltype.smell_id, '' as dependencytype,'' as actionfield,"
 				+ "'' as locationparttype, 0 as probability " + "from repair  "
 				+ "left join repairsmelltype on repair.id=repairsmelltype.repair_id  " + "union all  "
-				+ "select repair.id,name,'0' as weight,smell_id,dependencytype, rd.actionField,rd.locationparttype, probability  "
+				+ "select repair.id as rapairid,name,'0' as weight,smell_id,dependencytype, rd.actionField,rd.locationparttype, probability  "
 				+ "from repair  " + "join repairdependencies rd on repair.id=rd.repair_id "
-				+ "order by id,dependencytype desc,smell_id )   as result";
+				+ "order by rapairid,dependencytype desc,smell_id )   as result";
 		//System.out.println(query);
 		ResultSet rs;
 		try {
@@ -94,6 +92,7 @@ public class PostgresManager {
 					if (rs.getString("dependencytype").equals("")) {
 						repair = true;
 						r = new Repair(rs.getString("name"));
+						r.setId(rs.getInt("rapairid"));
 						name = r.getName();
 						if (rs.getInt("smell_id") != 0) {
 							r.addSmellCoverage(getSmellById(rs.getInt("smell_id"), smells), (rs.getInt("weight")));
@@ -101,6 +100,7 @@ public class PostgresManager {
 					} else if (!rs.getString("dependencytype").equals("")) {
 						repair = false;
 						dr = new DependencyRepair(rs.getString("name"));
+						dr.setId(rs.getInt("rapairid"));
 						name = dr.getName();
 						DependencyType type;
 						if (rs.getString("dependencytype").equals("solve"))

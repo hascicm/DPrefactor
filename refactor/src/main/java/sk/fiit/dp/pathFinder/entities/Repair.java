@@ -6,6 +6,7 @@ import java.util.List;
 
 
 public class Repair {
+	private int id; 
 	private String name;
 	private List<RepairUse> repairUses; 
 	
@@ -70,7 +71,17 @@ public class Repair {
 
 
 
-	protected class RepairUse{
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+
+
+	public class RepairUse{
 		private SmellType smell;
 		private int weight;
 		
@@ -78,6 +89,10 @@ public class Repair {
 			super();
 			this.smell = smell;
 			this.weight = weight;
+		}
+		
+		public SmellType getSmell(){
+			return smell;
 		}
 			
 	}
