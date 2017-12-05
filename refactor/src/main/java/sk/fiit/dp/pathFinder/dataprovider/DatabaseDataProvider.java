@@ -61,7 +61,7 @@ public class DatabaseDataProvider implements DataProvider {
 			String[] strLocations = searchResult.getXpatPosition().split("::");
 			for (String str : strLocations) {
 				System.out.println("locationpart: " + str);
-				locationParts.add(processStringToLocationPart(str));
+				locationParts.addAll(processStringToLocationPart(str));
 			}
 			locationList.add(new Location(locationParts));
 
@@ -71,13 +71,13 @@ public class DatabaseDataProvider implements DataProvider {
 		this.root.setSmells(smellOccurances);
 	}
 
-	LocationPart processStringToLocationPart(String s) {
+	List<LocationPart> processStringToLocationPart(String s) {
 		String[] strParts = s.split(":");
 		String type = strParts[0];
 		String id = strParts[1];
 		LocationPartType locationPartType = null;
 		if (type.equals("CC")) {
-			locationPartType = LocationPartType.PACKAGE;
+			return ProcessPackageString(id);
 		} else if (type.equals("C")) {
 			locationPartType = LocationPartType.CLASS;
 		} else if (type.equals("M")) {
@@ -92,7 +92,18 @@ public class DatabaseDataProvider implements DataProvider {
 			locationPartType = LocationPartType.POSITION;
 		}
 
-		return new LocationPart(locationPartType, id);
+		List<LocationPart> list = new ArrayList<LocationPart>();
+		list.add(new LocationPart(locationPartType, id));
+		return list;
+	}
+
+	List<LocationPart> ProcessPackageString(String packageStr) {
+		List<LocationPart> list = new ArrayList<LocationPart>();
+		String[] packages = packageStr.split("\\.");
+		for (String s : packages) {
+			list.add(new LocationPart(LocationPartType.PACKAGE, s));
+		}
+		return list;
 	}
 
 	private void initRoot() {

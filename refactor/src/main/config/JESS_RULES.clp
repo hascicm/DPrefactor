@@ -6,9 +6,8 @@
     "Decision about refactoring for Empty Catch Clausule anti-pattern"
     ?o <-(JessInput {refCode == "ECC"})
     =>
-    (add (new JessOutput ?o.code "LE")
-     add (new JessOutput ?o.code "RMN")))
-
+    (add (new JessOutput ?o.code "LE")))
+    
 (defrule inapropriate-intimacy
     "Decision about refactoring for Inapropriate Intimacy code smell"
     ?o <-(JessInput {refCode == "II"})
@@ -37,3 +36,9 @@
     (JessInput {size == 1})
     =>
     (add (new JessOutput ?o.code "RTC")))
+
+(defrule magic-numbers
+    "Magic numbers refactoring decision"
+    ?o <-(JessInput {refCode == "MAGIC"})
+    =>
+    (add (new JessOutput ?o.code "RMN")))
