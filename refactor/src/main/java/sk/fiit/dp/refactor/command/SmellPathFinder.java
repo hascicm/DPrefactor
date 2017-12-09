@@ -60,10 +60,10 @@ public class SmellPathFinder {
 
 			}
 		}
-		System.out.println("smellpathfinder:" + processedPath);
+//		System.out.println("smellpathfinder:" + processedPath);
 		if (processedPath.contains("function")) {
 			processedPath = processedPath.substring(processedPath.lastIndexOf("function"));
-			System.out.println("smellpathfinder:" + processedPath);
+//			System.out.println("smellpathfinder:" + processedPath);
 		}
 		processedPath = processedPath.replaceAll("[a-z]+/|[a-z]+_[a-z]+/", "");
 		System.out.println("smellpathfinder:" + processedPath);
@@ -74,8 +74,8 @@ public class SmellPathFinder {
 		if (processedPath.length()>0){
 			processedPath += "::";
 		}
-		System.out.println("smellpathfinder:" + processedPath);
-		System.out.println("processed path: " + path + processedPath);
+//		System.out.println("smellpathfinder:" + processedPath);
+//		System.out.println("processed path: " + path + processedPath);
 		return path + processedPath;
 	}
 
