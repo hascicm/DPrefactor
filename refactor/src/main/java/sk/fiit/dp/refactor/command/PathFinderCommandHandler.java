@@ -68,7 +68,7 @@ public class PathFinderCommandHandler {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
-			System.out.println("pathFinder "+ method);
+//			System.out.println("pathFinder "+ method);
 			// 0. time generator reset
 			timeGenerator.resetTimeStamp();
 
@@ -107,15 +107,15 @@ public class PathFinderCommandHandler {
 			// NEW vratenie polohy pachov
 			smellPathFinder.findPathsToSmells(searchResults);
 
-			System.out.println("------------SEARCH--------------------------");
-
-			for (JessInput o : searchResults) {
-				System.out.println("tags:    " + o.getCode());
-				System.out.println("refcode: " + o.getRefCode());
-				System.out.println("position " + o.getPosition());
-				System.out.println("xpathpos " + o.getXpatPosition());
-			}
-			System.out.println("--------------------------------------");
+//			System.out.println("------------SEARCH--------------------------");
+//
+//			for (JessInput o : searchResults) {
+//				System.out.println("tags:    " + o.getCode());
+//				System.out.println("refcode: " + o.getRefCode());
+//				System.out.println("position " + o.getPosition());
+//				System.out.println("xpathpos " + o.getXpatPosition());
+//			}
+//			System.out.println("--------------------------------------");
 
 			// 7. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
@@ -146,15 +146,15 @@ public class PathFinderCommandHandler {
 			//gitCommand.deleteLocalDirectory();
 
 			// vykoná sa hľadanie optimálnej cesty
-			System.out.println("\n\nStrating execution of pathFinder\n\n");
+//			System.out.println("\n\nStrating execution of pathFinder\n\n");
 			List<Relation> optimalPath = PathFinderHandler.executePathFinder(searchResults,method);
 			
-			if (optimalPath != null) {
-				for (Relation r : optimalPath) {
-					System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
-							+ r.getFixedSmellOccurance().getSmell().getName());
-				}
-			}
+//			if (optimalPath != null) {
+//				for (Relation r : optimalPath) {
+//					System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
+//							+ r.getFixedSmellOccurance().getSmell().getName());
+//				}
+//			}
 			return searchCommand.processResults(searchResults);
 		} catch (IOException | GitAPIException | InterruptedException | XQException | SQLException e) {
 			e.printStackTrace();

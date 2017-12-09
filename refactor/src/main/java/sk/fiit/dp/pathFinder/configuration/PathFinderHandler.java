@@ -22,21 +22,21 @@ public class PathFinderHandler {
 		((DatabaseDataProvider) dp).reduceDBdata(selectedSmells, selectedRepairs);
 		// TODO add parameter containing smells
 		dp.initializeRootState(searchResults);
-		System.out.println("-----------initialization done ------------");
-		for (SmellOccurance x : dp.getRootState().getSmells()) {
-			System.out.println(x.getSmell().getName());
-			for (Location l : x.getLocations()) {
-				System.out.println("-------location------");
-				for (LocationPart lo : l.getLocation()) {
-					System.out.println("-------part------");
-					System.out.println(lo.getLocationPartType());
-					System.out.println(lo.getId());
-				}
-			}
-		}
-		// model.findRefactoringPath();
-		((DatabaseDataProvider)dp).printSmells();
-		((DatabaseDataProvider) dp).printRepairs();
+//		System.out.println("-----------initialization done ------------");
+//		for (SmellOccurance x : dp.getRootState().getSmells()) {
+//			System.out.println(x.getSmell().getName());
+//			for (Location l : x.getLocations()) {
+//				System.out.println("-------location------");
+//				for (LocationPart lo : l.getLocation()) {
+//					System.out.println("-------part------");
+//					System.out.println(lo.getLocationPartType());
+//					System.out.println(lo.getId());
+//				}
+//			}
+//		}
+		 model.findRefactoringPath();
+//		((DatabaseDataProvider)dp).printSmells();
+//		((DatabaseDataProvider) dp).printRepairs();
 
 		return model.getOptimalPath();
 	}

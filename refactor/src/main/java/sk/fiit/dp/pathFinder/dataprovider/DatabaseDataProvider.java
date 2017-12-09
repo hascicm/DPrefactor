@@ -49,7 +49,7 @@ public class DatabaseDataProvider implements DataProvider {
 		this.root = new State();
 		List<SmellOccurance> smellOccurances = new ArrayList<SmellOccurance>();
 
-		System.out.println("------------adapter---------------");
+//		System.out.println("------------adapter---------------");
 		for (JessInput searchResult : searchResults) {
 			System.out.println(searchResult.getCode());
 			System.out.println(searchResult.getXpatPosition());
@@ -61,7 +61,7 @@ public class DatabaseDataProvider implements DataProvider {
 
 			String[] strLocations = searchResult.getXpatPosition().split("::");
 			for (String str : strLocations) {
-				System.out.println("locationpart: " + str);
+//				System.out.println("locationpart: " + str);
 				locationParts.addAll(processStringToLocationPart(str));
 			}
 			locationList.add(new Location(locationParts));

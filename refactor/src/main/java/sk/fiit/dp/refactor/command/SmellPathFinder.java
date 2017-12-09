@@ -34,13 +34,7 @@ public class SmellPathFinder {
 
 			try {
 				String localisationsScript = pgmanager.getSmellLocalisatorScript(ocurence.getRefCode());
-				System.out.println("---------------------code " + ocurence.getCode());
 				List<String> path = basex.applyPositionXQuery(localisationsScript, "tag", ocurence.getCode());
-				for (String p : path) {
-					System.out.println("path " + (p));
-				}
-				// System.out.println("path "+ProcesOutput(path));
-				// TODO - parse to pathFinder Input
 				ocurence.setXpathPosition(ProcesOutput(path));
 			} catch (SQLException | XQException e) {
 				e.printStackTrace();
