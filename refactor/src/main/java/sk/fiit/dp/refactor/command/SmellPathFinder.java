@@ -66,7 +66,7 @@ public class SmellPathFinder {
 //			System.out.println("smellpathfinder:" + processedPath);
 		}
 		processedPath = processedPath.replaceAll("[a-z]+/|[a-z]+_[a-z]+/", "");
-		System.out.println("smellpathfinder:" + processedPath);
+//		System.out.println("smellpathfinder:" + processedPath);
 		if (processedPath.length() > 0) {
 			processedPath = "NODE:" + processedPath;
 		}
