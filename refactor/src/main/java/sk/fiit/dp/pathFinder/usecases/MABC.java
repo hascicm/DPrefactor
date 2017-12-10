@@ -20,7 +20,7 @@ public class MABC extends BeePathSearchStrategy implements Runnable {
 		
 		for(BeeSpace bs : this.bees){
 			exploreSpace(bs.b, bs.s, bs.depth);
-			}
+		}
 	}
 	
 	public void addBee(Bee b, State s, Integer depth){
