@@ -18,12 +18,12 @@ public abstract class PathSearchStrategy {
 	protected int lastStateId = 0;
 	
 	
-	private static double PROBABILITY_THRASHOLD = 0.30;
+	private static double PROBABILITY_THRASHOLD = 0.00;
 	private long rootStateSmellsWeight = 0;
 	private ProbabilityCalculationStrategy probabolityCalculationStrategy = new AndOrProbabilityCalculationStrategy(); 
 	
 	public PathSearchStrategy(RelationCreator relationCreator){
-		this.relationCreator = relationCreator;
+		this.relationCreator = new RelationCreator(relationCreator);
 	}
 	
 	//GETTERS AND SETTERS
@@ -65,7 +65,8 @@ public abstract class PathSearchStrategy {
 	protected boolean isVisited(State s){	
 		return this.visitedStates.contains(StateProcessor.createHash(s)) ? true : false; 			
 	}
-		
+	
+	
 	protected boolean isLowProbability(State s){
 		
 		boolean result = false;
@@ -97,6 +98,7 @@ public abstract class PathSearchStrategy {
 		}	
 	}
 	
+	//nemam
 	protected void calculateProbabilityOfRelations(List<Relation> relations){
 		for(Relation rel : relations){
 			rel.calculateProbability(this.probabolityCalculationStrategy);

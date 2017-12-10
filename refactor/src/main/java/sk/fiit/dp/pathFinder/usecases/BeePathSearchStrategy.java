@@ -5,19 +5,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.collect.Lists;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class BeePathSearchStrategy extends PathSearchStrategy {
 	
-	private static int NUM_ITER = 200;
+	private static int NUM_ITER = 300;
 	private static int NUM_BEES = 80; 
 	private static int NUM_EMPLOYED_BEES = 40;
 	private static int NUM_ONLOOKER_BEES = 40;
-	private static int SCOUT_MAX_DEPTH = 45;
+	private static int SCOUT_MAX_DEPTH = 15;
 	private static int PATCH_SIZE = 3;
 	private List<Bee> bees;
+	
+	private static int NUM_AGENT = 1;
 	
 	public BeePathSearchStrategy(RelationCreator relationCreator) {
 		super(relationCreator);
@@ -31,6 +38,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 		List<Bee> onlookerBees = new ArrayList<Bee>();
 		List<Bee> fittestBees = new ArrayList<Bee>();
 		List<Bee> remainingBees = new ArrayList<Bee>();
+		List<Bee> recruitedBees = new ArrayList<Bee>();
 		
 		this.init(rootState, depth);
 		
@@ -64,17 +72,38 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 			//calculate the probability for each employed bee - je to nevynutne? 
 			this.calculateProbabilityForRecruit(employeeBees);
 			
-			//Recruit Bees for selected space exploit the employed bees (with the onlookers)
+			//Recruit Bees for selected space exploit the employed bees (with the onlookers)	
+			List<MABC> agents = new ArrayList<MABC>();
+			
+			for(int j = 0; j < NUM_AGENT; j++){
+				agents.add(new MABC(relationCreator));
+			}
+			
+			recruitedBees.clear();
 			int numOfRecruitBees = 0;
 			for(Bee b : employeeBees){
 				b.getRecruitedBees().clear();
 								
 				Bee tempBee = null;
 				for(int j = 0; j < b.getNumForRecruit(); j++){
-					tempBee = onlookerBees.get(numOfRecruitBees++);
-					exploreSpace(tempBee, b.visitedState, PATCH_SIZE);
+					tempBee = onlookerBees.get(numOfRecruitBees);
 					b.getRecruitedBees().add(tempBee);
+					
+					agents.get(numOfRecruitBees % NUM_AGENT).addBee(tempBee, new State(b.visitedState), PATCH_SIZE);
+			
+					numOfRecruitBees++;
 				}
+			}
+			
+			ExecutorService taskExecutor = Executors.newFixedThreadPool(NUM_AGENT);
+			for (MABC a : agents) {
+				taskExecutor.execute(a);
+			}
+			taskExecutor.shutdown();
+			try {
+				taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 			
 			//select the fittes Bee form Each State
@@ -94,11 +123,31 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 				}
 			}
 			
-			//Remaining bees are scouts and create random explore
-			for(Bee b : remainingBees){
-				exploreSpace(b, rootState, SCOUT_MAX_DEPTH);
+			
+			
+			agents.clear();
+			for(int j = 0; j < NUM_AGENT; j++){
+				agents.add(new MABC(relationCreator));
 			}
 			
+			Bee tempBee = null;
+			//Remaining bees are scouts and create random explore
+			for(int j=0; j < remainingBees.size(); j++){
+				tempBee = remainingBees.get(j);
+				agents.get(j % NUM_AGENT).addBee(tempBee, new State(rootState), SCOUT_MAX_DEPTH);
+			}
+			
+			taskExecutor = Executors.newFixedThreadPool(NUM_AGENT);
+			for (MABC a : agents) {
+				taskExecutor.execute(a);
+			}
+			taskExecutor.shutdown();
+			try {
+				taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+				
 			//assign new population
 			this.bees.clear();
 			
@@ -177,17 +226,35 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 		}	
 	}
 	
-	private void initPopulation(State rootState) {	
+	private void initPopulation(State rootState) {
 		
-		//init of one bee which find the local maximum
-		Bee bee = new Bee();
-		/*this.initSuperBee(bee, rootState);
-		this.bees.add(bee);*/ 
-				
-		for(int i = 0; i < NUM_BEES; i++){	
-			bee = new Bee();
-			exploreSpace(bee, rootState, SCOUT_MAX_DEPTH);
-			this.bees.add(bee);
+		for (int i = 0; i < NUM_BEES; i++) {
+			this.bees.add(new Bee());
+		}
+
+		List<MABC> agents = new ArrayList<MABC>();
+
+		int subListSize = this.bees.size() / NUM_AGENT;
+		List<List<Bee>> subListsOfBees = Lists.partition(this.bees, subListSize);
+
+		ExecutorService taskExecutor = Executors.newFixedThreadPool(NUM_AGENT);
+		for (int i = 0; i < NUM_AGENT; i++) {
+			MABC m = new MABC(relationCreator);
+
+			for (Bee b : subListsOfBees.get(i)) {
+				m.addBee(b, new State(rootState), SCOUT_MAX_DEPTH);
+			}
+
+			taskExecutor.execute(m);
+
+			agents.add(m);
+		}
+		taskExecutor.shutdown();
+		
+		try {
+			taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -228,7 +295,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 		b.setVisitedState(localMaximum);
 	}
 	
-	private void exploreSpace(Bee bee, State state, int depth){
+	protected void exploreSpace(Bee bee, State state, int depth){
 		
 		Random random = new Random();
 		State bestFoundState = state;
@@ -325,7 +392,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 		*/
 	}
 		
-	private class Bee implements Comparable<Bee>{
+	protected class Bee implements Comparable<Bee>{
 		
 		State visitedState;
 		double heuristic;

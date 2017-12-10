@@ -1,5 +1,6 @@
 package sk.fiit.dp.pathFinder.entities.stateSpace;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import sk.fiit.dp.pathFinder.entities.Location;
@@ -12,6 +13,17 @@ public class State {
 	private Relation sourceRelation = null;
 	private int depth;
 
+	public State(){
+		
+	}
+	
+	public State(State s){
+		
+		this.smells = new ArrayList<SmellOccurance>(s.getSmells());
+		this.fitness = s.fitness;
+		this.depth = s.depth;
+	}
+	
 	public List<Relation> getRelations() {
 		return relations;
 	}

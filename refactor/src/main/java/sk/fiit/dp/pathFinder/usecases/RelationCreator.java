@@ -26,6 +26,11 @@ public class RelationCreator {
 		initRepairMap(smellTypes, repairs); 
 	}
 	
+	public RelationCreator(RelationCreator relCreator) {
+		super();
+		this.repairsMap = new HashMap<SmellType, List<Repair>>(relCreator.repairsMap); 
+	}
+	
 	public void addRelationsToState(State state){
 		
 		List<Relation> newRelations = new LinkedList<Relation>();	

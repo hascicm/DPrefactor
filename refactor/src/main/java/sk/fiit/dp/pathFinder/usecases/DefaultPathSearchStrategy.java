@@ -15,7 +15,7 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		
-	private final int MAX_DEPTH = 20;
+	private final int MAX_DEPTH = 10;
 	
 	public DefaultPathSearchStrategy(RelationCreator relationCreator) {
 		super(relationCreator);
@@ -66,10 +66,10 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		Relation currentRelation = null;
 		State currentState = null;
 		
-		long count = 1;
+		
 		
 		while(!this.queue.isEmpty()){
-			count++;			
+					
 			//get next state for visiting
 			currentRelation = this.queue.remove().getRelation();
 			currentState = currentRelation.getToState();
@@ -94,10 +94,15 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 				expandCurrentState(currentState);
 			}
 			
+			//DEBUG
+				if(this.localMaximum.getSmells().size() == 0){
+					break;
+				}
+			//DEBUG
 			
 		}
-		System.out.println(count);
-		System.out.println(lastStateId);
+		//System.out.println(count);
+		//System.out.println(lastStateId);
 	}	
 
 	protected void init(State rootState, int depth) {
@@ -112,7 +117,7 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		this.localMaximum = rootState;
 		
 		//DEBUG
-			printAllRelation(rootState);
+			//printAllRelation(rootState);
 		//DEBUG
 		
 	}
@@ -127,7 +132,7 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		this.addRelationsToQueue(currentState.getRelations());
 		
 		//DEBUG
-		printAllRelation(currentState);
+		//printAllRelation(currentState);
 		//DEBUG
 		
 	}
