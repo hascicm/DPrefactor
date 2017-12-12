@@ -139,11 +139,11 @@ public class PathFinderCommandHandler {
 			// explainCommand.createRepairRecord(repo, searchResults);
 			// }
 
-			// 18. Vymaze sa docasna BaseX databaza TODO
-			// baseX.cleanDatabase(id);
+			//18. Vymaze sa docasna BaseX databaza TODO
+			baseX.cleanDatabase(id);
 			//TODO
 			// 19. Odstrani sa lokalna git kopia
-			//gitCommand.deleteLocalDirectory();
+			gitCommand.deleteLocalDirectory();
 
 			// vykoná sa hľadanie optimálnej cesty
 //			System.out.println("\n\nStrating execution of pathFinder\n\n");
