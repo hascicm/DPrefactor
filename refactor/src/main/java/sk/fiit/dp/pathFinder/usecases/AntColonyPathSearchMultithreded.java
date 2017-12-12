@@ -142,20 +142,15 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				if (iterations > maxNonupdatingIterations)
 					end = true;
 				if (finalState == null) {
-					System.out.println("move");
 					makeAntMove();
 				} else {
 					if (currentState == rootState) {
 						iterations++;
-						System.out.println("reinit");
 						reinitializeAnt(rootState);
-						// evaporatePheromoneFromTrails(exploredrelations);
 					} else {
-						System.out.println("backtrack " + currentState);
 						backtrackAnt(rootState);
 					}
 				}
-
 			}
 		}
 

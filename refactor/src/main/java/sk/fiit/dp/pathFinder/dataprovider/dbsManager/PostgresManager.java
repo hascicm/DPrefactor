@@ -67,11 +67,12 @@ public class PostgresManager {
 	public List<Repair> getRepairs(List<SmellType> smells) {
 
 		List<Repair> repairs = new ArrayList<>();
-		String query = "select * from (select repair.id as rapairid,name,weight,repairsmelltype.smell_id, '' as dependencytype,'' as actionfield,"
-				+ "'' as locationparttype, 0 as probability " + "from repair  "
-				+ "left join repairsmelltype on repair.id=repairsmelltype.repair_id  " + "union all  "
-				+ "select repair.id as rapairid,name,'0' as weight,smell_id,dependencytype, rd.actionField,rd.locationparttype, probability  "
-				+ "from repair  " + "join repairdependencies rd on repair.id=rd.repair_id "
+		String query = "select * from (select repair.id as rapairid,name,weight,repairsmelltype.smell_id, "
+				+ "'' as dependencytype,'' as actionfield,'' as locationparttype, 0 as probability " + "from repair  "
+				+ "left join repairsmelltype on repair.id=repairsmelltype.repair_id union all  "
+				+ "select repair.id as rapairid,name,'0' as weight,smell_id,"
+				+ "dependencytype, rd.actionField,rd.locationparttype, probability  "
+				+ "from repair  join repairdependencies rd on repair.id=rd.repair_id "
 				+ "order by rapairid,dependencytype desc,smell_id )   as result";
 		//System.out.println(query);
 		ResultSet rs;

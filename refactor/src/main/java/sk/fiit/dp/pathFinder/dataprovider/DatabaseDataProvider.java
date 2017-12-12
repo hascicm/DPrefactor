@@ -45,15 +45,9 @@ public class DatabaseDataProvider implements DataProvider {
 
 	@Override
 	public void initializeRootState(List<JessInput> searchResults) {
-		// TODO Auto-generated method stub
 		this.root = new State();
 		List<SmellOccurance> smellOccurances = new ArrayList<SmellOccurance>();
-
-//		System.out.println("------------adapter---------------");
 		for (JessInput searchResult : searchResults) {
-			System.out.println(searchResult.getCode());
-			System.out.println(searchResult.getXpatPosition());
-
 			SmellType smell = this.getSmellType(searchResult.getRefCode());
 
 			List<Location> locationList = new ArrayList<Location>();
@@ -61,11 +55,9 @@ public class DatabaseDataProvider implements DataProvider {
 
 			String[] strLocations = searchResult.getXpatPosition().split("::");
 			for (String str : strLocations) {
-//				System.out.println("locationpart: " + str);
 				locationParts.addAll(processStringToLocationPart(str));
 			}
 			locationList.add(new Location(locationParts));
-
 			SmellOccurance ocurance = new SmellOccurance(smell, locationList);
 			smellOccurances.add(ocurance);
 		}
