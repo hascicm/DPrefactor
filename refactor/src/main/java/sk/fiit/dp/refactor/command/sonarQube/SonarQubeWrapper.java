@@ -42,6 +42,7 @@ public class SonarQubeWrapper {
 		allProps.put("sonar.login", this.sonarProps.getLoginName());
 		allProps.put("sonar.password", this.sonarProps.getLoginPassword());
 		allProps.put("sonar.sources", repoPath);
+		allProps.put("sonar.java.binaries", repoPath + "\\bin");
 
 		EmbeddedScanner runner = EmbeddedScanner.create(new Logger()).addGlobalProperties(allProps);
 
