@@ -27,7 +27,7 @@ public class StateProcessor {
 		SmellOccurance smellOccurance = rel.getFixedSmellOccurance();
 		State resultState = null;
 		
-		if(rel instanceof Relation){
+		if(rel instanceof Relation ){
 			resultState = applyBasicRepair(baseState, repair, smellOccurance);
 	
 			// TODO preprobit na repair.applyOnState() s vyuzitim override
@@ -203,7 +203,7 @@ public class StateProcessor {
 		 */
 
 		// fitness = (state.getDepth());
-
+		System.out.println("Fitness: " + fitness);
 		state.setFitness(fitness);
 	}
 

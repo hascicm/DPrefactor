@@ -22,10 +22,10 @@ public class PatternDetector {
 		this.patterns = patterns;
 	}
 	
-	public PatternRelation checkPattern(State state){
+	public boolean checkPattern(State state){
 		
 		//add relation to state
 		
-		return null;
+		return false;
 	}
 }

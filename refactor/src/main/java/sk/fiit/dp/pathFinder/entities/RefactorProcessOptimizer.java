@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import sk.fiit.dp.pathFinder.dataprovider.DataProvider;
 import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
+import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.usecases.AntColonyPathSearchMultithreded;
 import sk.fiit.dp.pathFinder.usecases.BeePathSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.DefaultPathSearchStrategy;
@@ -58,6 +59,26 @@ public class RefactorProcessOptimizer {
 	public void findRefactoringPath(){
 		//MultiAgent ma = new MultiAgent();
 		//ma.findPath(this.dataProvider.getRootState(), this.pathSearchStrategy);
+		
+		for(SmellOccurance so : this.dataProvider.getRootState().getSmells()){
+			System.out.println(so.getSmell().getName());
+		}
+		//DEBUG
+		this.dataProvider.getRootState().getSmells().remove(0);
+		this.dataProvider.getRootState().getSmells().remove(0);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		this.dataProvider.getRootState().getSmells().remove(1);
+		//DEBUG
+		
+		
 		Long startTime = System.currentTimeMillis();
 		optimalPath = this.pathSearchStrategy.findPath(this.dataProvider.getRootState(), 0);
 		System.out.println("");

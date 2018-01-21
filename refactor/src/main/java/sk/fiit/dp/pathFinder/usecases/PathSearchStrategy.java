@@ -18,9 +18,9 @@ public abstract class PathSearchStrategy {
 	protected RelationCreator relationCreator;
 	protected PatternDetector patternDetector;
 	protected int lastStateId = 0;
+	protected long rootStateSmellsWeight = 0;
 	
 	private static double PROBABILITY_THRASHOLD = 0.00;
-	private long rootStateSmellsWeight = 0;
 	private ProbabilityCalculationStrategy probabolityCalculationStrategy = new AndOrProbabilityCalculationStrategy(); 
 	
 	private boolean isPatternDetection = false;
@@ -176,13 +176,15 @@ public abstract class PathSearchStrategy {
 	
 	protected void expandCurrentState(State currentState){
 		
-		
+		boolean foundPattern = false;
 		if(this.isPatternDetection){
-			this.patternDetector.checkPattern(currentState);
+			if(this.patternDetector.checkPattern(currentState)){
+				foundPattern = true;
+			}
 		}
 		
 		//PATTERN NOT FOUND
-		if(currentState.getRelations() == null){		
+		if(!foundPattern){		
 			relationCreator.addRelationsToState(currentState);
 		}
 		

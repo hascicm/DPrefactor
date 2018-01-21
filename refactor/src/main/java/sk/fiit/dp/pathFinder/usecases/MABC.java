@@ -10,9 +10,10 @@ public class MABC extends BeePathSearchStrategy implements Runnable {
 	private List<BeeSpace> bees;
 	
 	
-	public MABC(RelationCreator relationCreator) {
+	public MABC(RelationCreator relationCreator, long rootStateFitness) {
 		super(relationCreator);
 		this.bees = new ArrayList<BeeSpace>(); 
+		this.rootStateSmellsWeight = rootStateFitness;
 	}
 
 	@Override
