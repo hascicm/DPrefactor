@@ -153,6 +153,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 			
 			for(Bee b : fittestBees){
 				this.bees.add(b);
+				
 			}
 			
 			for(Bee b : remainingBees){
