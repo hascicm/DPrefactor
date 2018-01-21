@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import sk.fiit.dp.pathFinder.entities.stateSpace.PatternRelation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
@@ -15,15 +16,23 @@ public abstract class PathSearchStrategy {
 	protected State localMaximum = null;
 	protected PriorityQueue<GraphRelation> queue;
 	protected RelationCreator relationCreator;
+	protected PatternDetector patternDetector;
 	protected int lastStateId = 0;
-	
 	
 	private static double PROBABILITY_THRASHOLD = 0.00;
 	private long rootStateSmellsWeight = 0;
 	private ProbabilityCalculationStrategy probabolityCalculationStrategy = new AndOrProbabilityCalculationStrategy(); 
 	
+	private boolean isPatternDetection = false;
+	
 	public PathSearchStrategy(RelationCreator relationCreator){
 		this.relationCreator = new RelationCreator(relationCreator);
+	}
+	
+	public PathSearchStrategy(RelationCreator relationCreator, PatternDetector patternDetector){
+		this.relationCreator = new RelationCreator(relationCreator);
+		this.isPatternDetection = true;
+		this.patternDetector = patternDetector;
 	}
 	
 	//GETTERS AND SETTERS
@@ -34,7 +43,18 @@ public abstract class PathSearchStrategy {
 	public void setProbabolityCalculationStrategy(ProbabilityCalculationStrategy probabolityCalculationStrategy) {
 		this.probabolityCalculationStrategy = probabolityCalculationStrategy;
 	}
+	
+	
 	//GETTERS AND SETTERS
+
+	public PatternDetector getPatternDetector() {
+		return patternDetector;
+	}
+
+	public void setPatternDetector(PatternDetector patternDetector) {
+		this.isPatternDetection = true;
+		this.patternDetector = patternDetector;
+	}
 
 	public abstract List<Relation> findPath(State rootState, int depth);
 			
@@ -45,7 +65,11 @@ public abstract class PathSearchStrategy {
 		for(int i = 0; i < length; i++){
 			
 			rel = rels.get(i);
-			State s = StateProcessor.applyRepair(rel.getFromState(), rel.getUsedRepair(), rel.getFixedSmellOccurance());
+			
+			
+			State s = StateProcessor.applyRepair(rel);
+			
+			
 			s.setSourceRelation(rel);
 			s.setDepth(rel.getFromState().getDepth() + 1);
 			rel.setToState(s);
@@ -152,7 +176,15 @@ public abstract class PathSearchStrategy {
 	
 	protected void expandCurrentState(State currentState){
 		
-		relationCreator.addRelationsToState(currentState);
+		
+		if(this.isPatternDetection){
+			this.patternDetector.checkPattern(currentState);
+		}
+		
+		//PATTERN NOT FOUND
+		if(currentState.getRelations() == null){		
+			relationCreator.addRelationsToState(currentState);
+		}
 		
 		applyRepair(currentState.getRelations());
 		

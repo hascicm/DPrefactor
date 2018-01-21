@@ -13,6 +13,7 @@ import sk.fiit.dp.pathFinder.usecases.DefaultPathSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.MinMaxProbabilityCalculationStrategy;
 import sk.fiit.dp.pathFinder.usecases.MonteCarloSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.PathSearchStrategy;
+import sk.fiit.dp.pathFinder.usecases.PatternDetector;
 import sk.fiit.dp.pathFinder.usecases.RelationCreator;
 
 public class RefactorProcessOptimizer {
@@ -27,7 +28,8 @@ public class RefactorProcessOptimizer {
 
 	private void init(String method) {
 		//this.dataProvider = new DatabaseDataProvider();
-		this.dataProvider = new DatabaseDataProvider(); 
+		this.dataProvider = new DatabaseDataProvider();
+		
 		if (method.equals("A*")){
 			Logger.getLogger("pathfinter").log(Level.INFO, "starting pathfinding using A*");
 			this.pathSearchStrategy = new DefaultPathSearchStrategy(new RelationCreator(this.dataProvider.getSmellTypes(), this.dataProvider.getRepairs()));
@@ -48,6 +50,9 @@ public class RefactorProcessOptimizer {
 	
 		//Probability Calculation Strategy
 		this.pathSearchStrategy.setProbabolityCalculationStrategy(new MinMaxProbabilityCalculationStrategy());
+		
+		//if is apply pattern
+		this.pathSearchStrategy.setPatternDetector(new PatternDetector(this.getDataProvider().getPatterns()));
 	}
 
 	public void findRefactoringPath(){

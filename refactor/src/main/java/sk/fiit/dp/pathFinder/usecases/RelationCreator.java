@@ -126,7 +126,7 @@ public class RelationCreator {
 		return relations;
 	}
 	
-	static void combinations(List<Dependency> dependencies, int len, int startPosition, 
+	private static void combinations(List<Dependency> dependencies, int len, int startPosition, 
 		Dependency[] results, List<List<Dependency>> combinations){
         if (len == 0){
             

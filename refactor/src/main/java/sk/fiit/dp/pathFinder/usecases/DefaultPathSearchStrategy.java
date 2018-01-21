@@ -91,7 +91,7 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 			}
 						
 			if(currentState.getDepth() < MAX_DEPTH){
-				expandCurrentState(currentState);
+				expandCurrentState(currentState);			
 			}
 			
 			//DEBUG

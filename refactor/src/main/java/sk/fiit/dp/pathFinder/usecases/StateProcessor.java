@@ -13,21 +13,31 @@ import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
+import sk.fiit.dp.pathFinder.entities.stateSpace.PatternRelation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class StateProcessor {
 
-	public static State applyRepair(State baseState, Repair repair, SmellOccurance smellOccurance) {
-
-		State resultState = applyBasicRepair(baseState, repair, smellOccurance);
-
-		// TODO preprobit na repair.applyOnState() s vyuzitim override
-		if (repair instanceof DependencyRepair) {
-			applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
+	public static State applyRepair(Relation rel) {
+		
+		State baseState = rel.getFromState();
+		Repair repair = rel.getUsedRepair();
+		SmellOccurance smellOccurance = rel.getFixedSmellOccurance();
+		State resultState = null;
+		
+		if(rel instanceof Relation){
+			resultState = applyBasicRepair(baseState, repair, smellOccurance);
+	
+			// TODO preprobit na repair.applyOnState() s vyuzitim override
+			if (repair instanceof DependencyRepair) {
+				applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
+			}	
+		}else if(rel instanceof PatternRelation){
+			resultState = applyPatternRelation((PatternRelation)rel);
 		}
-
+			
 		return resultState;
 	}
 
@@ -288,6 +298,13 @@ public class StateProcessor {
 		
 		
 		return result; 
+	}
+	
+	private static State applyPatternRelation(PatternRelation rel){
+		
+		State resultState = null;
+		
+		return resultState; 
 	}
 	
 }

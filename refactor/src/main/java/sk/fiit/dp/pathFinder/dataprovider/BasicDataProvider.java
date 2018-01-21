@@ -10,6 +10,7 @@ import sk.fiit.dp.pathFinder.entities.DependencyType;
 import sk.fiit.dp.pathFinder.entities.Location;
 import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
+import sk.fiit.dp.pathFinder.entities.Pattern;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
@@ -220,6 +221,12 @@ public class BasicDataProvider implements DataProvider{
 	public void initializeRootState(List<JessInput> searchResults) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<Pattern> getPatterns() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

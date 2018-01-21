@@ -9,6 +9,8 @@ import sk.fiit.dp.pathFinder.entities.DependencyRepair;
 import sk.fiit.dp.pathFinder.entities.Location;
 import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
+import sk.fiit.dp.pathFinder.entities.Pattern;
+import sk.fiit.dp.pathFinder.entities.PatternSmellUse;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.Repair.RepairUse;
 import sk.fiit.dp.pathFinder.entities.SmellType;
@@ -272,6 +274,25 @@ public class DatabaseDataProvider implements DataProvider {
 		}
 		this.smells = reducedSmells;
 		this.repairs = reducedRepairs;
+	}
+
+	@Override
+	public List<Pattern> getPatterns() {
+		
+		List<Pattern> result = new ArrayList<Pattern>();
+		
+		Pattern p = new Pattern(); 
+		p.setUsedRepair(this.getRepairs().get(0));
+		PatternSmellUse psu = new PatternSmellUse();
+		psu.setMain(true);
+		p.setFixedSmells(new ArrayList<PatternSmellUse>());
+		p.getFixedSmells().add(psu);
+		
+		
+		p.setResidualSmells(new ArrayList<SmellType>());
+		p.getResidualSmells().add(getSmellTypes().get(1));
+		
+		return result; 
 	}
 
 }
