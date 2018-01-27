@@ -7,25 +7,25 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class MABC extends BeePathSearchStrategy implements Runnable {
 
-	private List<BeeSpace> bees;
+	private List<BeeSpace> colony;
 	
 	
 	public MABC(RelationCreator relationCreator, long rootStateFitness) {
 		super(relationCreator);
-		this.bees = new ArrayList<BeeSpace>(); 
+		this.colony = new ArrayList<BeeSpace>(); 
 		this.rootStateSmellsWeight = rootStateFitness;
 	}
 
 	@Override
 	public void run() {
 		
-		for(BeeSpace bs : this.bees){
+		for(BeeSpace bs : this.colony){
 			exploreSpace(bs.b, bs.s, bs.depth);
 		}
 	}
 	
 	public void addBee(Bee b, State s, Integer depth){
-		this.bees.add(new BeeSpace(b, s, depth));
+		this.colony.add(new BeeSpace(b, s, depth));
 	}
 	
 	private class BeeSpace{

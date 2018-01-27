@@ -60,25 +60,6 @@ public class RefactorProcessOptimizer {
 		//MultiAgent ma = new MultiAgent();
 		//ma.findPath(this.dataProvider.getRootState(), this.pathSearchStrategy);
 		
-		for(SmellOccurance so : this.dataProvider.getRootState().getSmells()){
-			System.out.println(so.getSmell().getName());
-		}
-		//DEBUG
-		this.dataProvider.getRootState().getSmells().remove(0);
-		this.dataProvider.getRootState().getSmells().remove(0);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		this.dataProvider.getRootState().getSmells().remove(1);
-		//DEBUG
-		
-		
 		Long startTime = System.currentTimeMillis();
 		optimalPath = this.pathSearchStrategy.findPath(this.dataProvider.getRootState(), 0);
 		System.out.println("");

@@ -203,7 +203,6 @@ public class StateProcessor {
 		 */
 
 		// fitness = (state.getDepth());
-		System.out.println("Fitness: " + fitness);
 		state.setFitness(fitness);
 	}
 

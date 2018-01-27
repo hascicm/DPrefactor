@@ -22,6 +22,8 @@ public class State {
 		this.smells = new ArrayList<SmellOccurance>(s.getSmells());
 		this.fitness = s.fitness;
 		this.depth = s.depth;
+		this.sourceRelation = s.getSourceRelation();
+		
 	}
 	
 	public List<Relation> getRelations() {

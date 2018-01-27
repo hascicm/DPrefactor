@@ -16,10 +16,10 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class BeePathSearchStrategy extends PathSearchStrategy {
 	
-	private static int NUM_ITER = 10;
-	private static int NUM_BEES = 8; 
-	private static int NUM_EMPLOYED_BEES = 4;
-	private static int NUM_ONLOOKER_BEES = 4;
+	private static int NUM_ITER = 300;
+	private static int NUM_BEES = 64; 
+	private static int NUM_EMPLOYED_BEES = 32;
+	private static int NUM_ONLOOKER_BEES = 32;
 	private static int SCOUT_MAX_DEPTH = 15;
 	private static int PATCH_SIZE = 3;
 	private List<Bee> bees;
@@ -49,14 +49,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 			this.evaluatePopulation(this.bees);
 			
 			Collections.sort(this.bees);
-			//DEBUG
-			//printBees(bees);
-			//printBestBee(bees.get(0));
-			/*if(bees.get(0).getHeuristic() >= 564.0){
-				break;
-			}*/
-			//DEBUG
-			
+						
 			//best <num> of states (employed bees)
 			employeeBees.clear();
 			for(int j = 0; j < NUM_EMPLOYED_BEES; j++){
@@ -344,55 +337,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 		return result;
 	}
 
-	private void exploreSpaceOnLooker(Bee b, State s){
-		/*
-		Random random = new Random();
-		
-		expandCurrentState(s);
-		
-		List<Relation> relations = filterLowProbabilityRelations(s.getRelations());
-		
-		
-		
-		
-		
-		Relation currentRelation;
-		State currentState;
-		int actualDepth = s.getDepth();
-		
-		if(this.queue == null){
-			this.queue = new PriorityQueue<GraphRelation>();
-		}
 			
-			
-		this.queue.clear();
-		
-		expandCurrentState(s);
-		addRelationsToQueue(s.getRelations());
-		
-		this.localMaximum = s;
-		
-		while(!this.queue.isEmpty()){
-			
-			//get next state for visiting
-			currentRelation = this.queue.remove().getRelation();
-			currentState = currentRelation.getToState();
-		
-			if(this.localMaximum.getFitness() < currentState.getFitness()){
-				this.localMaximum = currentState;
-			}
-			
-			if(currentState.getDepth() < (actualDepth + this.PATCH_SIZE)){
-				expandCurrentState(currentState);
-				addRelationsToQueue(currentState.getRelations());
-			}
-			
-		}
-		
-		b.setVisitedState(this.localMaximum);
-		*/
-	}
-		
 	protected class Bee implements Comparable<Bee>{
 		
 		State visitedState;
