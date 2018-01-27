@@ -281,16 +281,42 @@ public class DatabaseDataProvider implements DataProvider {
 		
 		List<Pattern> result = new ArrayList<Pattern>();
 		
-		Pattern p = new Pattern(); 
-		p.setUsedRepair(this.getRepairs().get(0));
-		PatternSmellUse psu = new PatternSmellUse();
-		psu.setMain(true);
-		p.setFixedSmells(new ArrayList<PatternSmellUse>());
-		p.getFixedSmells().add(psu);
+		Pattern p1 = new Pattern(); 
+		p1.setActionField(LocationPartType.METHOD);
+		p1.setUsedRepair(this.getRepairs().get(92));
+		PatternSmellUse psu1 = new PatternSmellUse();
+		psu1.setMain(true);
+		psu1.setSmellType(this.getSmellTypes().get(29));
+		
+		PatternSmellUse psu3 = new PatternSmellUse();
+		psu3.setMain(false);
+		psu3.setSmellType(this.getSmellTypes().get(30));
+		
+		p1.setFixedSmells(new ArrayList<PatternSmellUse>());
+		p1.getFixedSmells().add(psu1);
+		p1.getFixedSmells().add(psu3);
+		
+		p1.setResidualSmells(new ArrayList<SmellType>());
+		p1.getResidualSmells().add(getSmellTypes().get(30));
+		
+		result.add(p1);
+		
+		//----------------------------
+		
+		Pattern p2 = new Pattern(); 
+		p2.setUsedRepair(this.getRepairs().get(91));
+		PatternSmellUse psu2 = new PatternSmellUse();
+		psu2.setMain(true);
+		psu2.setSmellType(this.getSmellTypes().get(30));
+		p2.setFixedSmells(new ArrayList<PatternSmellUse>());
+		p2.getFixedSmells().add(psu2);
 		
 		
-		p.setResidualSmells(new ArrayList<SmellType>());
-		p.getResidualSmells().add(getSmellTypes().get(1));
+		p2.setResidualSmells(new ArrayList<SmellType>());
+				
+		//result.add(p2);
+		
+		
 		
 		return result; 
 	}

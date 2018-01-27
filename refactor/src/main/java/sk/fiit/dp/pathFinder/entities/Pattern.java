@@ -7,6 +7,7 @@ public class Pattern {
 	private List<PatternSmellUse> fixedSmells;
 	private List<SmellType> residualSmells;
 	private Repair usedRepair;
+	private LocationPartType actionField; //the area, in which is dependency effective (for example in Class or Method)
 	
 	public int getId() {
 		return id;
@@ -31,5 +32,15 @@ public class Pattern {
 	}
 	public void setUsedRepair(Repair usedRepair) {
 		this.usedRepair = usedRepair;
-	} 
+	}
+	
+	public SmellType getMainSmell(){
+		return null;
+	}
+	public LocationPartType getActionField() {
+		return actionField;
+	}
+	public void setActionField(LocationPartType actionField) {
+		this.actionField = actionField;
+	}	
 }

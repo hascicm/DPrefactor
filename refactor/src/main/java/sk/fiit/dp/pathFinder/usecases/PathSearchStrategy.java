@@ -167,7 +167,8 @@ public abstract class PathSearchStrategy {
 		rootState.setDepth(depth);
 		rootState.setId(lastStateId++);
 		StateProcessor.calculateFitness(rootState, this.rootStateSmellsWeight);
-		relationCreator.addRelationsToState(rootState);
+		
+		createRelation(rootState);
 		applyRepair(rootState.getRelations());
 		calculateEndNodeFitness(rootState.getRelations());
 		calculateProbabilityOfRelations(rootState.getRelations());
@@ -175,6 +176,16 @@ public abstract class PathSearchStrategy {
 	}
 	
 	protected void expandCurrentState(State currentState){
+		
+		createRelation(currentState);
+		
+		applyRepair(currentState.getRelations());
+		
+		calculateEndNodeFitness(currentState.getRelations());
+		calculateProbabilityOfRelations(currentState.getRelations());
+	}
+	
+	private void createRelation(State currentState){
 		
 		boolean foundPattern = false;
 		if(this.isPatternDetection){
@@ -187,11 +198,6 @@ public abstract class PathSearchStrategy {
 		if(!foundPattern){		
 			relationCreator.addRelationsToState(currentState);
 		}
-		
-		applyRepair(currentState.getRelations());
-		
-		calculateEndNodeFitness(currentState.getRelations());
-		calculateProbabilityOfRelations(currentState.getRelations());
 	}
 	
 }
