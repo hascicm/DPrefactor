@@ -23,7 +23,7 @@ public abstract class PathSearchStrategy {
 	private static double PROBABILITY_THRASHOLD = 0.00;
 	private ProbabilityCalculationStrategy probabolityCalculationStrategy = new AndOrProbabilityCalculationStrategy(); 
 	
-	private boolean isPatternDetection = false;
+	protected boolean isPatternDetection = false;
 	
 	public PathSearchStrategy(RelationCreator relationCreator){
 		this.relationCreator = new RelationCreator(relationCreator);

@@ -59,5 +59,9 @@ public class Relation {
 	
 	public double getProbability() {
 		return probability;
-	}	
+	}
+	
+	public String toString(){
+		return this.getUsedRepair().getName() + " -> " + this.getFixedSmellOccurance().getSmell().getName() + " P: " + this.getProbability();
+	}
 }

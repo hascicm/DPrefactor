@@ -11,6 +11,7 @@ import sk.fiit.dp.pathFinder.entities.DependencyType;
 import sk.fiit.dp.pathFinder.entities.Location;
 import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
+import sk.fiit.dp.pathFinder.entities.PatternSmellUse;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.PatternRelation;
@@ -22,22 +23,27 @@ public class StateProcessor {
 
 	public static State applyRepair(Relation rel) {
 		
-		State baseState = rel.getFromState();
-		Repair repair = rel.getUsedRepair();
-		SmellOccurance smellOccurance = rel.getFixedSmellOccurance();
 		State resultState = null;
 		
-		if(rel instanceof Relation ){
-			resultState = applyBasicRepair(baseState, repair, smellOccurance);
-	
-			// TODO preprobit na repair.applyOnState() s vyuzitim override
-			if (repair instanceof DependencyRepair) {
-				applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
-			}	
-		}else if(rel instanceof PatternRelation){
-			resultState = applyPatternRelation((PatternRelation)rel);
-		}
+		if(!(rel instanceof PatternRelation)){
 			
+			Repair repair = rel.getUsedRepair();
+			SmellOccurance smellOccurance = rel.getFixedSmellOccurance();
+			State baseState = rel.getFromState();
+						
+			if(rel instanceof Relation ){
+				resultState = applyBasicRepair(baseState, repair, smellOccurance);
+		
+				// TODO preprobit na repair.applyOnState() s vyuzitim override
+				if (repair instanceof DependencyRepair) {
+					applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
+				}
+				
+			}	
+		}else{
+			resultState = applyPatternRelation((PatternRelation) rel);
+		}
+		
 		return resultState;
 	}
 
@@ -158,7 +164,7 @@ public class StateProcessor {
 				}
 				
 				if(dep.getPlaceType() == DependencyPlaceType.EXTERNAL){
-					//TODO!!!!
+					//TODO!!!!????
 				}
 
 			}
@@ -301,9 +307,60 @@ public class StateProcessor {
 	
 	private static State applyPatternRelation(PatternRelation rel){
 		
-		State resultState = null;
+		State baseState = rel.getFromState();
+		State resultState = new State();
+		
+		List<SmellOccurance> newSmellsSet = new ArrayList<SmellOccurance>(baseState.getSmells());
+		
+		List<LocationPart> tempLocation = null; 
+		boolean isAssign = false;
+		//REMOVE SMELLS
+		for(PatternSmellUse psu : rel.getPatternSmellUses().keySet()){
+			newSmellsSet.remove(rel.getPatternSmellUses().get(psu));
+			
+			if(!isAssign){
+				tempLocation = rel.getPatternSmellUses().get(psu).getLocations().get(0).getLocation();
+				isAssign = true; 
+			}
+		}
+		
+		//ADD SMELLS
+		List<LocationPart> location = createLocation(tempLocation, rel.getUsedPattern().getActionField());
+		
+		for(SmellType st : rel.getUsedPattern().getResidualSmells()){
+			SmellOccurance newSmellOccurance = new SmellOccurance(st);
+			
+			List<Location> locs = new ArrayList<Location>(); 
+			locs.add(new Location(location));
+			
+			newSmellOccurance.setLocations(locs);
+			
+			newSmellsSet.add(newSmellOccurance);
+		}
+		
+		resultState.setSmells(newSmellsSet);
 		
 		return resultState; 
+	}
+	
+	private static List<LocationPart> createLocation(List<LocationPart> location, LocationPartType actionField){
+		
+		List<LocationPart> newLocation = new ArrayList<LocationPart>();
+		
+		int index = location.size()-1;
+		for(; index >=0; index-- ){
+			
+			if(location.get(index).getLocationPartType() == actionField){
+				break;
+			}
+
+		}
+		
+		for(int i = 0; i < index+1; i++){
+			newLocation.add(location.get(i));
+		}
+		
+		return newLocation;
 	}
 	
 }

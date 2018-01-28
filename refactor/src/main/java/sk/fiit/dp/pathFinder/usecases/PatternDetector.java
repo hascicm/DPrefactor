@@ -1,7 +1,9 @@
 package sk.fiit.dp.pathFinder.usecases;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import sk.fiit.dp.pathFinder.entities.Location;
 import sk.fiit.dp.pathFinder.entities.LocationPart;
@@ -31,6 +33,8 @@ public class PatternDetector {
 	
 	public boolean checkPattern(State state){
 		
+		Map<PatternSmellUse, SmellOccurance> patternSmellUses = new HashMap<PatternSmellUse, SmellOccurance>(); 
+		
 		for(SmellOccurance smellOccurance : state.getSmells()){
 			for(Pattern pattern : patterns){
 				for(PatternSmellUse psu : pattern.getFixedSmells()){
@@ -48,6 +52,7 @@ public class PatternDetector {
 										
 										if(containsActionFiled(commonPath, pattern.getActionField())){
 											foundSmell = true;
+											patternSmellUses.put(tempPsu, tempSmellOccurance);
 											break;
 										}else{
 											foundSmell = false;
@@ -61,6 +66,7 @@ public class PatternDetector {
 								}	
 							}
 							if(!isCorrect){
+								patternSmellUses.clear();
 								break;
 							}
 						}
@@ -71,10 +77,15 @@ public class PatternDetector {
 							patternRelation.setFixedSmellOccurance(smellOccurance);
 							patternRelation.setFromState(state);
 							patternRelation.setUsedPattern(pattern);
+							patternRelation.setUsedRepair(pattern.getUsedRepair());
+							
+							patternSmellUses.put(psu, smellOccurance);
+							patternRelation.setPatternSmellUses(patternSmellUses);
 							
 							List<Relation> rels = new ArrayList<Relation>();
 							rels.add(patternRelation);
 							state.setRelations(rels);
+													
 							
 							return true;
 							

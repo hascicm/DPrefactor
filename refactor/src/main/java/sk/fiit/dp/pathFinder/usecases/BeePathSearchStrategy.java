@@ -16,15 +16,15 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class BeePathSearchStrategy extends PathSearchStrategy {
 	
-	private static int NUM_ITER = 300;
-	private static int NUM_BEES = 64; 
-	private static int NUM_EMPLOYED_BEES = 32;
-	private static int NUM_ONLOOKER_BEES = 32;
-	private static int SCOUT_MAX_DEPTH = 15;
+	private static int NUM_ITER = 10;
+	private static int NUM_BEES = 8; 
+	private static int NUM_EMPLOYED_BEES = 4;
+	private static int NUM_ONLOOKER_BEES = 4;
+	private static int SCOUT_MAX_DEPTH = 5;
 	private static int PATCH_SIZE = 3;
 	private List<Bee> bees;
 	
-	private static int NUM_AGENT = 1;
+	private static int NUM_AGENT = 2;
 	
 	public BeePathSearchStrategy(RelationCreator relationCreator) {
 		super(relationCreator);
@@ -69,7 +69,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 			List<MABC> agents = new ArrayList<MABC>();
 			
 			for(int j = 0; j < NUM_AGENT; j++){
-				agents.add(new MABC(relationCreator, this.rootStateSmellsWeight));
+				agents.add(new MABC(relationCreator, this.rootStateSmellsWeight, this.patternDetector));
 			}
 			
 			recruitedBees.clear();
@@ -120,7 +120,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 			
 			agents.clear();
 			for(int j = 0; j < NUM_AGENT; j++){
-				agents.add(new MABC(relationCreator, this.rootStateSmellsWeight));
+				agents.add(new MABC(relationCreator, this.rootStateSmellsWeight, this.patternDetector));
 			}
 			
 			Bee tempBee = null;
@@ -172,7 +172,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 			System.out.println("-------------");
 			currentState = r.getFromState();
 			System.out.println("S_" + currentState.getId()+ " [ Fitness: " + currentState.getFitness() + ", NumOfSmells: " +currentState.getSmells().size() + ", Depth: " + currentState.getDepth() + "] " + currentState);
-			System.out.println(r.getUsedRepair().getName() + " P: " + r.getProbability());
+			System.out.println(r);
 			currentState = r.getToState();
 			System.out.println("S_" + currentState.getId()+ " [ Fitness: " + currentState.getFitness() + ", NumOfSmells: " +currentState.getSmells().size() + ", Depth: " + currentState.getDepth() + "] " + currentState);
 		}
@@ -233,7 +233,7 @@ public class BeePathSearchStrategy extends PathSearchStrategy {
 
 		ExecutorService taskExecutor = Executors.newFixedThreadPool(NUM_AGENT);
 		for (int i = 0; i < NUM_AGENT; i++) {
-			MABC m = new MABC(relationCreator, this.rootStateSmellsWeight);
+			MABC m = new MABC(relationCreator, this.rootStateSmellsWeight, this.patternDetector);
 
 			for (Bee b : subListsOfBees.get(i)) {
 				m.addBee(b, new State(rootState), SCOUT_MAX_DEPTH);
