@@ -15,7 +15,7 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		
-	private final int MAX_DEPTH = 10;
+	private final int MAX_DEPTH = 15;
 	
 	public DefaultPathSearchStrategy(RelationCreator relationCreator) {
 		super(relationCreator);

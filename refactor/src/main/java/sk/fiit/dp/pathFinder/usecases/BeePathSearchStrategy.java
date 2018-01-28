@@ -16,11 +16,11 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class BeePathSearchStrategy extends PathSearchStrategy {
 	
-	private static int NUM_ITER = 10;
-	private static int NUM_BEES = 8; 
-	private static int NUM_EMPLOYED_BEES = 4;
-	private static int NUM_ONLOOKER_BEES = 4;
-	private static int SCOUT_MAX_DEPTH = 5;
+	private static int NUM_ITER = 300;
+	private static int NUM_BEES = 80; 
+	private static int NUM_EMPLOYED_BEES = 40;
+	private static int NUM_ONLOOKER_BEES = 40;
+	private static int SCOUT_MAX_DEPTH = 15;
 	private static int PATCH_SIZE = 3;
 	private List<Bee> bees;
 	

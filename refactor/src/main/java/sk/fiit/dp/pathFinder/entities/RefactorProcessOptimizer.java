@@ -60,14 +60,14 @@ public class RefactorProcessOptimizer {
 		//MultiAgent ma = new MultiAgent();
 		//ma.findPath(this.dataProvider.getRootState(), this.pathSearchStrategy);
 		
-		System.out.println(this.dataProvider.getRootState());
+		//System.out.println(this.dataProvider.getRootState());
 		//DEBUG
-			for(int i = 0; i< 6; i++){
+			/*for(int i = 0; i< 6; i++){
 				this.getDataProvider().getRootState().getSmells().remove(0);
 			}
 			for(int i = 0; i< 4; i++){
 				this.getDataProvider().getRootState().getSmells().remove(1);
-			}
+			}*/
 		//DEBGU
 		
 		
@@ -89,7 +89,5 @@ public class RefactorProcessOptimizer {
 	}
 	public DataProvider getDataProvider(){
 		return this.dataProvider;
-	}
-
-	
+	}	
 }

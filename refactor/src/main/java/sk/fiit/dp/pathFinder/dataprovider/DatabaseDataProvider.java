@@ -10,6 +10,7 @@ import sk.fiit.dp.pathFinder.entities.Location;
 import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
 import sk.fiit.dp.pathFinder.entities.Pattern;
+import sk.fiit.dp.pathFinder.entities.PatternRepair;
 import sk.fiit.dp.pathFinder.entities.PatternSmellUse;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.Repair.RepairUse;
@@ -281,43 +282,26 @@ public class DatabaseDataProvider implements DataProvider {
 		
 		List<Pattern> result = new ArrayList<Pattern>();
 		
-		Pattern p1 = new Pattern(); 
-		p1.setActionField(LocationPartType.METHOD);
-		p1.setUsedRepair(this.getRepairs().get(92));
+		//--------------------------------
+		String patternDesc = "(-)Catch and Rethrow (1)Remove Exception Throw (+)Empty Catch Clausule => " +
+								" (-)Empty Catch Clausule (2) Log Exception (+) null";
+		Pattern p1 = new Pattern(patternDesc); 
+		p1.setActionField(LocationPartType.NODE);
+		p1.setUsedRepair(new PatternRepair(patternDesc));
+		
+		
 		PatternSmellUse psu1 = new PatternSmellUse();
 		psu1.setMain(true);
 		psu1.setSmellType(this.getSmellTypes().get(29));
 		
-		PatternSmellUse psu3 = new PatternSmellUse();
-		psu3.setMain(false);
-		psu3.setSmellType(this.getSmellTypes().get(30));
-		
+			
 		p1.setFixedSmells(new ArrayList<PatternSmellUse>());
 		p1.getFixedSmells().add(psu1);
-		p1.getFixedSmells().add(psu3);
 		
 		p1.setResidualSmells(new ArrayList<SmellType>());
-		p1.getResidualSmells().add(getSmellTypes().get(30));
-		
-		result.add(p1);
-		
-		//----------------------------
-		
-		Pattern p2 = new Pattern(); 
-		p2.setUsedRepair(this.getRepairs().get(91));
-		PatternSmellUse psu2 = new PatternSmellUse();
-		psu2.setMain(true);
-		psu2.setSmellType(this.getSmellTypes().get(30));
-		p2.setFixedSmells(new ArrayList<PatternSmellUse>());
-		p2.getFixedSmells().add(psu2);
-		
-		
-		p2.setResidualSmells(new ArrayList<SmellType>());
 				
-		//result.add(p2);
-		
-		
-		
+		result.add(p1);
+			
 		return result; 
 	}
 
