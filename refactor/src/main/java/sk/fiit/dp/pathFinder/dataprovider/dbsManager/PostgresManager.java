@@ -8,10 +8,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+
+import net.xqj.basex.bin.ac;
 import sk.fiit.dp.pathFinder.entities.DependencyPlaceType;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
 import sk.fiit.dp.pathFinder.entities.DependencyType;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
+import sk.fiit.dp.pathFinder.entities.Pattern;
+import sk.fiit.dp.pathFinder.entities.PatternSmellUse;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 
@@ -74,7 +79,7 @@ public class PostgresManager {
 				+ "dependencytype, rd.actionField,rd.locationparttype, probability  "
 				+ "from repair  join repairdependencies rd on repair.id=rd.repair_id "
 				+ "order by rapairid,dependencytype desc,smell_id )   as result";
-		//System.out.println(query);
+		// System.out.println(query);
 		ResultSet rs;
 		try {
 			rs = statement.executeQuery(query);
@@ -142,6 +147,79 @@ public class PostgresManager {
 
 		return repairs;
 	}
+
+	public List<Pattern> getPatterns(List<SmellType> smells) {
+		List<Pattern> patterns = new ArrayList<Pattern>();
+		String querry = "select * from ("
+				+ "select pattern.id,locationparttype,description, 'solve' as type, ismain,smelltype_id "
+				+ "from pattern join patternsmelltypesolve on pattern.id=patternsmelltypesolve.pattern_id "
+				+ "union all "
+				+ "select pattern.id,locationparttype,description, 'cause' as type, false as ismain,smelltype_id "
+				+ "from pattern join patternsmelltypecause on pattern.id=patternsmelltypecause.pattern_id) "
+				+ " as result order by id,type";
+		try {
+			ResultSet rs;
+			rs = statement.executeQuery(querry);
+			Pattern actualRecord = null;
+			PatternSmellUse newPSU = null;
+			int curentid = -1;
+
+			boolean finishedsolve = true;
+			boolean finishedcause = true;
+
+			while (rs.next()) {
+				if (curentid != rs.getInt("id")) {
+					if (!finishedsolve)
+						actualRecord.getFixedSmells().add(newPSU);
+					if (!finishedcause)
+						actualRecord.getResidualSmells().add(getSmellById(rs.getInt("smelltype_id"), smells));
+					curentid = rs.getInt("id");
+					actualRecord = new Pattern();
+					actualRecord.setId(rs.getInt("id"));
+					actualRecord.setDescription(rs.getString("description"));
+					actualRecord.setActionField(resolveActionField(rs.getString("locationparttype")));
+					patterns.add(actualRecord);
+					finishedsolve = true;
+					finishedcause = true;
+					actualRecord.setFixedSmells(new ArrayList<PatternSmellUse>());
+					actualRecord.setResidualSmells(new ArrayList<SmellType>());
+				}
+				if (rs.getString("type").equals("solve")) {
+					newPSU = new PatternSmellUse();
+					newPSU.setMain(rs.getBoolean("ismain"));
+					newPSU.setSmellType(getSmellById(rs.getInt("smelltype_id"), smells));
+					actualRecord.getFixedSmells().add(newPSU);
+					finishedsolve = false;
+				} else if (rs.getString("type").equals("cause")) {
+					actualRecord.getResidualSmells().add(getSmellById(rs.getInt("smelltype_id"), smells));
+					finishedsolve = false;
+				}
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+
+		return patterns;
+	}
+
+//	public static void main(String[] args) {
+//		List<SmellType> s = getInstance().getSmellTypes();
+//		List<Pattern> p = getInstance().getPatterns(s);
+//		for (Pattern x : p) {
+//			System.out.println("----------");
+//			System.out.println("id     " + x.getId());
+//			System.out.println("desc   " + x.getDescription());
+//			System.out.println("act f  " + x.getActionField());
+//			System.out.println("----fixed----");
+//			for (PatternSmellUse y : x.getFixedSmells()) {
+//				System.out.println(y.getSmellType().getName());
+//			}
+//			System.out.println("----caused----");
+//			for (SmellType z : x.getResidualSmells()) {
+//				System.out.println(z.getName());
+//			}
+//		}
+//	}
 
 	private DependencyPlaceType resolveLocationPartType(String act) {
 		if (act == null)

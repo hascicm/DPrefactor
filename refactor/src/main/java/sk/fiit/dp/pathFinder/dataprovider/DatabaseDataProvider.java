@@ -23,11 +23,13 @@ public class DatabaseDataProvider implements DataProvider {
 
 	private List<Repair> repairs = null;
 	private List<SmellType> smells = null;
+	private List<Pattern> patterns = null;
 	private State root;
 
 	public DatabaseDataProvider() {
 		smells = PostgresManager.getInstance().getSmellTypes();
 		repairs = PostgresManager.getInstance().getRepairs(smells);
+		patterns = PostgresManager.getInstance().getPatterns(smells);
 		// initRoot();
 	}
 
@@ -39,6 +41,11 @@ public class DatabaseDataProvider implements DataProvider {
 	@Override
 	public List<SmellType> getSmellTypes() {
 		return smells;
+	}
+
+	@Override
+	public List<Pattern> getPatterns() {
+		return patterns;
 	}
 
 	@Override
@@ -264,8 +271,8 @@ public class DatabaseDataProvider implements DataProvider {
 				if (r.getId() == repairId) {
 					reducedRepairs.add(r);
 					List<RepairUse> repUseList = new ArrayList<>();
-					for (RepairUse ru : r.getRepairUses()){
-						if (reducedSmells.contains(ru.getSmell())){
+					for (RepairUse ru : r.getRepairUses()) {
+						if (reducedSmells.contains(ru.getSmell())) {
 							repUseList.add(ru);
 						}
 					}
@@ -277,32 +284,30 @@ public class DatabaseDataProvider implements DataProvider {
 		this.repairs = reducedRepairs;
 	}
 
-	@Override
-	public List<Pattern> getPatterns() {
-		
+	@Deprecated
+	public List<Pattern> getPatternsOLD() {
+
 		List<Pattern> result = new ArrayList<Pattern>();
-		
-		//--------------------------------
-		String patternDesc = "(-)Catch and Rethrow (1)Remove Exception Throw (+)Empty Catch Clausule => " +
-								" (-)Empty Catch Clausule (2) Log Exception (+) null";
-		Pattern p1 = new Pattern(patternDesc); 
+
+		// --------------------------------
+		String patternDesc = "(-)Catch and Rethrow (1)Remove Exception Throw (+)Empty Catch Clausule => "
+				+ " (-)Empty Catch Clausule (2) Log Exception (+) null";
+		Pattern p1 = new Pattern(patternDesc);
 		p1.setActionField(LocationPartType.NODE);
 		p1.setUsedRepair(new PatternRepair(patternDesc));
-		
-		
+
 		PatternSmellUse psu1 = new PatternSmellUse();
 		psu1.setMain(true);
 		psu1.setSmellType(this.getSmellTypes().get(29));
-		
-			
+
 		p1.setFixedSmells(new ArrayList<PatternSmellUse>());
 		p1.getFixedSmells().add(psu1);
-		
+
 		p1.setResidualSmells(new ArrayList<SmellType>());
-				
+
 		result.add(p1);
-			
-		return result; 
+
+		return result;
 	}
 
 }
