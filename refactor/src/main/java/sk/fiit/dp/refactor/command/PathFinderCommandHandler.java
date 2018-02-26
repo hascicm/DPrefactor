@@ -11,8 +11,13 @@ import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import sk.fiit.dp.pathFinder.clustering.ClusteringHandler;
+import sk.fiit.dp.pathFinder.clustering.model.Cluster;
 import sk.fiit.dp.pathFinder.configuration.PathFinderHandler;
+import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
+import sk.fiit.dp.pathFinder.entities.OptimalPathResult;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
+import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
@@ -64,12 +69,12 @@ public class PathFinderCommandHandler {
 	 * @return
 	 */
 	public Map<String, Integer> executePathFinder(String repo, String name, String password, String searchBranch,
-			List<String> toSearch, boolean explanationToSearch, SonarProperties sonarProps,String method) {
+			List<String> toSearch, boolean explanationToSearch, boolean clusteringEnabled, SonarProperties sonarProps,
+			String method) {
 		id = "Refactor" + IdGenerator.generateId();
 
 		try {
-//			System.out.println("pathFinder "+ method);
-			// 0. time generator reset
+			// 0. time stamp generator reset
 			timeGenerator.resetTimeStamp();
 
 			// 1. Vytvori lokalnu kopiu Git repozitara
@@ -107,15 +112,15 @@ public class PathFinderCommandHandler {
 			// NEW vratenie polohy pachov
 			smellPathFinder.findPathsToSmells(searchResults);
 
-//			System.out.println("------------SEARCH--------------------------");
-//
-//			for (JessInput o : searchResults) {
-//				System.out.println("tags:    " + o.getCode());
-//				System.out.println("refcode: " + o.getRefCode());
-//				System.out.println("position " + o.getPosition());
-//				System.out.println("xpathpos " + o.getXpatPosition());
-//			}
-//			System.out.println("--------------------------------------");
+			// System.out.println("------------SEARCH--------------------------");
+			//
+			// for (JessInput o : searchResults) {
+			// System.out.println("tags: " + o.getCode());
+			// System.out.println("refcode: " + o.getRefCode());
+			// System.out.println("position " + o.getPosition());
+			// System.out.println("xpathpos " + o.getXpatPosition());
+			// }
+			// System.out.println("--------------------------------------");
 
 			// 7. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
@@ -139,22 +144,33 @@ public class PathFinderCommandHandler {
 			// explainCommand.createRepairRecord(repo, searchResults);
 			// }
 
-			//18. Vymaze sa docasna BaseX databaza TODO
+			// 18. Vymaze sa docasna BaseX databaza
 			baseX.cleanDatabase(id);
-			//TODO
+
 			// 19. Odstrani sa lokalna git kopia
 			gitCommand.deleteLocalDirectory();
 
+			List<State> rootStates;
+
+			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky
+			// (clustering)
+			if (clusteringEnabled) {
+				rootStates = ClusteringHandler.executeClustering(searchResults);
+			} else {
+				rootStates = DatabaseDataProvider.getInstance().prepareRootStateList(searchResults);
+			}
+
 			// vykoná sa hľadanie optimálnej cesty
-//			System.out.println("\n\nStrating execution of pathFinder\n\n");
-			List<Relation> optimalPath = PathFinderHandler.executePathFinder(searchResults,method);
-			
-//			if (optimalPath != null) {
-//				for (Relation r : optimalPath) {
-//					System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
-//							+ r.getFixedSmellOccurance().getSmell().getName());
-//				}
-//			}
+			List<OptimalPathResult> results = PathFinderHandler.executePathFinder(rootStates, method);
+
+			for (OptimalPathResult current : results) {
+				System.out.println("------------------CLUSTER----------------");
+				System.out.println(current.getRootState().toString());
+					for (Relation r : current.getOptimalPath()) {
+						System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
+								+ r.getFixedSmellOccurance().getSmell().getName());
+					}
+			}
 			return searchCommand.processResults(searchResults);
 		} catch (IOException | GitAPIException | InterruptedException | XQException | SQLException e) {
 			e.printStackTrace();

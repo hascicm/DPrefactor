@@ -8,6 +8,7 @@ import sk.fiit.dp.pathFinder.dataprovider.DataProvider;
 import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
+import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 import sk.fiit.dp.pathFinder.usecases.AntColonyPathSearchMultithreded;
 import sk.fiit.dp.pathFinder.usecases.BeePathSearchStrategy;
 import sk.fiit.dp.pathFinder.usecases.DefaultPathSearchStrategy;
@@ -29,7 +30,7 @@ public class RefactorProcessOptimizer {
 
 	private void init(String method) {
 		//this.dataProvider = new DatabaseDataProvider();
-		this.dataProvider = new DatabaseDataProvider();
+		this.dataProvider = DatabaseDataProvider.getInstance();
 		
 		if (method.equals("A*")){
 			Logger.getLogger("pathfinter").log(Level.INFO, "starting pathfinding using A*");
@@ -56,7 +57,7 @@ public class RefactorProcessOptimizer {
 		this.pathSearchStrategy.setPatternDetector(new PatternDetector(this.getDataProvider().getPatterns()));
 	}
 
-	public void findRefactoringPath(){
+	public void findRefactoringPath(State rootState){
 		//MultiAgent ma = new MultiAgent();
 		//ma.findPath(this.dataProvider.getRootState(), this.pathSearchStrategy);
 		
@@ -74,7 +75,7 @@ public class RefactorProcessOptimizer {
 		
 		
 		Long startTime = System.currentTimeMillis();
-		optimalPath = this.pathSearchStrategy.findPath(this.dataProvider.getRootState(), 0);
+		optimalPath = this.pathSearchStrategy.findPath(rootState, 0);
 		System.out.println("");
 		System.out.println("Time: ");
 		System.out.println(((startTime - System.currentTimeMillis())/1000.0));

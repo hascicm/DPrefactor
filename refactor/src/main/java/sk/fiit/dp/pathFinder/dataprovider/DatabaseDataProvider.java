@@ -3,6 +3,7 @@ package sk.fiit.dp.pathFinder.dataprovider;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.chart.PieChart.Data;
 import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.pathFinder.entities.Dependency;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
@@ -17,19 +18,32 @@ import sk.fiit.dp.pathFinder.entities.Repair.RepairUse;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.refactor.command.GitCommandHandler;
+import sk.fiit.dp.refactor.command.ResourceCommandHandler;
 import sk.fiit.dp.refactor.model.JessInput;
+import sun.security.jca.GetInstance;
 
 public class DatabaseDataProvider implements DataProvider {
-
+	private static DatabaseDataProvider INSTANCE = null; 
 	private List<Repair> repairs = null;
 	private List<SmellType> smells = null;
 	private List<Pattern> patterns = null;
 	private State root;
 
-	public DatabaseDataProvider() {
+	public static DatabaseDataProvider getInstance(){
+		if (INSTANCE == null){
+			INSTANCE = new DatabaseDataProvider();
+		}
+		return INSTANCE;
+	}
+	
+	private DatabaseDataProvider() {
 		smells = PostgresManager.getInstance().getSmellTypes();
 		repairs = PostgresManager.getInstance().getRepairs(smells);
 		patterns = PostgresManager.getInstance().getPatterns(smells);
+		int[] selectedSmells = { 15, 32, 1, 9, 31, 8, 3, 22, 30, 2, 10, 4, 25, 21 };
+		int[] selectedRepairs = { 87, 92, 88, 93, 61, 94, 81, 74, 73, 50, 79, 84, 80, 82, 15, 14, 12, 21, 65, 83, 85 };
+		reduceDBdata(selectedSmells, selectedRepairs);
 		// initRoot();
 	}
 
@@ -51,6 +65,13 @@ public class DatabaseDataProvider implements DataProvider {
 	@Override
 	public State getRootState() {
 		return root;
+	}
+	
+	public List<State> prepareRootStateList(List<JessInput> searchResults) {
+		List<State> result = new ArrayList<State>();
+		this.initializeRootState(searchResults);
+		result.add(this.getRootState());
+		return result;
 	}
 
 	@Override
@@ -295,7 +316,7 @@ public class DatabaseDataProvider implements DataProvider {
 		Pattern p1 = new Pattern(patternDesc);
 		p1.setActionField(LocationPartType.NODE);
 		p1.setUsedRepair(new PatternRepair(patternDesc));
-
+		// TODO parser add this to parser
 		PatternSmellUse psu1 = new PatternSmellUse();
 		psu1.setMain(true);
 		psu1.setSmellType(this.getSmellTypes().get(29));

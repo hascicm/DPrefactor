@@ -16,6 +16,7 @@ import sk.fiit.dp.pathFinder.entities.DependencyRepair;
 import sk.fiit.dp.pathFinder.entities.DependencyType;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
 import sk.fiit.dp.pathFinder.entities.Pattern;
+import sk.fiit.dp.pathFinder.entities.PatternRepair;
 import sk.fiit.dp.pathFinder.entities.PatternSmellUse;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
@@ -178,6 +179,10 @@ public class PostgresManager {
 					actualRecord.setId(rs.getInt("id"));
 					actualRecord.setDescription(rs.getString("description"));
 					actualRecord.setActionField(resolveActionField(rs.getString("locationparttype")));
+					
+					//TODO 
+					actualRecord.setUsedRepair(new PatternRepair(rs.getString("description")));
+					
 					patterns.add(actualRecord);
 					finishedsolve = true;
 					finishedcause = true;

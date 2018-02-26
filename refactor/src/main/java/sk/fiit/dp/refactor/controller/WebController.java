@@ -116,6 +116,7 @@ public class WebController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void addRepairScript(String input) {
 		resourceCommand.addRepairScript(input);
+
 	}
 
 	@PUT
@@ -127,6 +128,7 @@ public class WebController {
 		JSONObject json = new JSONObject(input);
 		JSONArray toSearch = json.getJSONArray("searchCodes");
 		boolean explanationToSearch = json.getBoolean("explanationSearch");
+		boolean clusteringEnabled = true;
 		String gituser = json.getString("name");
 		String gitpass = json.getString("password");
 		String method = json.getString("selectedMethod");
@@ -144,7 +146,7 @@ public class WebController {
 		}
 
 		Map<String, Integer> results = pathFinderCommand.executePathFinder(json.getString("repo"), gituser,
-				gitpass, json.getString("searchBranch"), searchMethods, explanationToSearch, sonarProps,method);
+				gitpass, json.getString("searchBranch"), searchMethods, explanationToSearch, clusteringEnabled, sonarProps,method);
 
 		JSONObject response = new JSONObject();
 		for (String key : results.keySet()) {
