@@ -3,6 +3,9 @@ package sk.fiit.dp.pathFinder.entities.stateSpace;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import sk.fiit.dp.pathFinder.entities.Location;
 
 public class State {
@@ -13,19 +16,19 @@ public class State {
 	private Relation sourceRelation = null;
 	private int depth;
 
-	public State(){
-		
+	public State() {
+
 	}
-	
-	public State(State s){
-		
+
+	public State(State s) {
+
 		this.smells = new ArrayList<SmellOccurance>(s.getSmells());
 		this.fitness = s.fitness;
 		this.depth = s.depth;
 		this.sourceRelation = s.getSourceRelation();
-		
+
 	}
-	
+
 	public List<Relation> getRelations() {
 		return relations;
 	}
@@ -85,6 +88,14 @@ public class State {
 		}
 
 		return sb.toString();
+	}
+
+	public JSONArray asJSONArray() {
+		JSONArray smellsArray = new JSONArray();
+		for (SmellOccurance current : smells) {
+			smellsArray.put(current.toJSON());
+		}
+		return smellsArray;
 	}
 
 	public static MonteCarloState getMonteCarloStateInstance() {

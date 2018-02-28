@@ -6,7 +6,8 @@
 	<link rel="stylesheet" href="../Styles/menu.css">
 	<link rel="stylesheet" type="text/css" href="../Styles/main.css">
 	<script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
-	<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+	<!--<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="../Scripts/main.js"></script> 
 </head>
 
@@ -94,10 +95,20 @@
 		<hr>
 		<div>
 			<button type="button" onclick="execute()">Vykonať</button> 
-		<!--	<button type="button" onclick="clearComments()">Vymaž komentáre</button> --> 
+			<!--	<button type="button" onclick="clearComments()">Vymaž komentáre</button> --> 
 		</div>
 	</section>
 	<section id="pathFinder">
+		<div id="nav">	
+			<ul>		
+				<li>
+					<a href="javascript:pathFinder();"><span>Proces</span></a>
+				</li>
+				<li>
+					<a href="javascript:pathFinderResults();"><span>vysledky</span></a>
+				</li>
+			</ul>
+		</div>
 		<h1>Path Finder</h1>
 		<form>
 			<label for="repo-pathfiner">Git repozitár</label>
@@ -146,20 +157,135 @@
 	</form>
 	<hr>
 	<div>
-	<label id="labelPathFinder" for="pathFindingMethod">Metóda prehľadávania stavového priestoru</label>
-	<select id="pathFindingMethod">
+		<label id="labelPathFinder" for="pathFindingMethod">Metóda prehľadávania stavového priestoru</label>
+		<select id="pathFindingMethod">
 			<option value="A*">A*</option>
 			<option value="bee">Včelí algoritmus</option>
 			<option value="ant">Mravčia kolónia</option>
 			<option value="mc">Monte Carlo</option>
-	</select>
+		</select>
 	</div>
 	<br>
 	<div>
 		<button type="button" onclick="executePathFinder()">Vykonať</button> 
-	<!--	<button type="button" onclick="clearComments()">Vymaž komentáre</button> -->
 	</div>
 </section>
+
+<section id="pathFinderResults">
+		<div id="nav">	
+		<ul>		
+			<li>
+				<a href="javascript:pathFinder();"><span>Proces</span></a>
+			</li>
+			<li>
+				<a href="javascript:pathFinderResults();"><span>vysledky</span></a>
+			</li>
+		</ul>
+	</div>
+			<h2>
+				identifikované pachy
+			</h2>
+			<table id="pathFinderResultsAnalysisList" >
+				<thead>
+					<tr>
+						<th>id</th>
+						<th>nájdený pach</th>
+						<th>poloha</th>
+						<th>čas vykonania</th>
+					</tr>
+				</thead>
+				<tbody id="tabletbodyPathFinderResultsAnalys">
+				</tbody>
+
+			</table>	 	
+
+</section>
+
+<section  id="pathFinderResultsConcrete">
+	<div id="nav">	
+		<ul>		
+			<li>
+				<a href="javascript:pathFinder();"><span>Proces</span></a>
+			</li>
+			<li>
+				<a href="javascript:pathFinderResults();"><span>vysledky</span></a>
+			</li>
+		</ul>
+	</div>
+	<h1>vysledky</h1>
+	<div class="recdetail">
+
+		<label for="pathFinderResultsRepo">repozitar</label>
+		<input class ="detail" type="text" id="pathFinderResultsRepo" name="git repo" value="" readonly><br>
+	</div>
+	<div>
+		<div class="recdetail left"  >
+			<label for="pathFinderResultsUser">použivateľ</label>
+			<input class ="detail" type="text" id="pathFinderResultsUser" name="git user" value="" readonly><br>
+		</div>
+		<div class="recdetail right">	    	
+			<label for="pathFinderResultsTime">čas</label>
+			<input class ="detail" type="text" id="pathFinderResultsTime" name="time stamp" value="" readonly><br>
+		</div>
+	</div>
+	<div style="clear: both;"></div>
+
+	<hr>
+	<div class="recdetail left">
+
+		<label for="pathFinderResultsClusterID">číslo zhluku</label>
+		<input class ="detail" type="text" id="pathFinderResultsClusterID" name="cluster id" value="" readonly>
+
+	</div>
+	<button type="button" onclick="pathFinderResultsNextCluster()">nasledujuci</button> 
+	<button type="button" onclick="pathFinderResultsPreviousCluster()">predchadzajuci</button> 
+	<div style="clear: both;"></div>
+	<hr>
+
+	<div>
+		<div class="recdetail left">
+			<h2>
+				identifikované pachy
+			</h2>
+			<table id="pathFinderResultSmellTable" >
+				<thead>
+					<tr>
+						<th>id</th>
+						<th>nájdený pach</th>
+						<th>poloha</th>
+					</tr>
+				</thead>
+				<tbody id="tabletbodyPathfinderResults">
+				</tbody>
+
+			</table>	 
+
+		</div>
+		<div class="recdetail right">	    	
+			<label for="pathFinderResultsSmell">pach</label>
+			<input class ="detail" type="text" id="pathFinderResultsSmell" name="time stamp" value="" readonly><br>
+			<label for="pathFinderResultsSmellPosition">poloha pachu</label>
+			<input class ="detail" type="text" id="pathFinderResultsSmellPosition" name="time stamp" value="" readonly><br>			
+			<label for="pathFinderResultsRepair">odporúčaná oprava</label>
+			<input class ="detail" type="text" id="pathFinderResultsTime" name="time stamp" value="" readonly><br>
+			<label for="pathFinderResultsTime">poradie opravy</label>
+			<input class ="detail" type="text" id="pathFinderResultsTime" name="time stamp" value="" readonly><br>
+
+			<button type="button" onclick="pathFinderResultsNextRepair()">nasledujuci</button> 
+			<button type="button" onclick="pathFinderResultsPreviousRepair()">predchadzajuci</button> 
+			<button type="button" onclick="pathFinderResultsRepairComplete()">označiť ako opravené</button> 
+
+		</div>
+	</div>
+
+
+
+
+</section>
+
+<div class="pathFinderAlertContainer" id="pathFinderAlertContainer">
+</div>
+
 
 <section id="search" hidden=true>
 	<h1>Možnosti vyhľadávania</h1>
@@ -236,7 +362,7 @@
 
 						<div style="height:600px;overflow:auto;">
 
-							<table id="recordstable" >
+							<table id="result" >
 								<thead>
 									<tr>
 										<th>id</th>
@@ -246,7 +372,7 @@
 										<th>nájdený pach</th>
 									</tr>
 								</thead>
-								<tbody id="tabletbody">
+								<tbody id="RecordsTabletbody">
 								</tbody>
 
 							</table>	 

@@ -1,6 +1,6 @@
 #nav {
 	width : 100%;
-	float : left;
+	float : right;
     margin: 0 0 1em 0;
     padding : 0;
     border-bottom: 5px solid #143157;
@@ -15,7 +15,7 @@
 
 #nav ul {
 	list-style: none;
-	float: right;
+	float: left;
 	height: 55px;
     opacity: 0.75;
 	margin: 0 auto;
@@ -71,4 +71,69 @@
 
 #nav ul li:first-child a span { border-left: none }
 #nav ul li:last-child a span { border-right: none }
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+ 
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 30px;
+  width: 30px;
+  height: 30px;
+  margin-top: -15px;
+  margin-left: -15px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  border-top-color: #07d;
+  animation: spinner .6s linear infinite;
+}
+
+.pathFinderAlert{
+    padding: 30px 50px;
+    border-radius: 10px;
+    background-color: rgba(124, 143, 173, 0.3);
+    width: auto;
+    margin-bottom: 10px;
+    position: relative;
+    max-width: 175px;
+    padding-right: 20px;
+}
+
+.pathFinderAlert.finished .spinner{
+    visibility: hidden;
+}
+
+.pathFinderAlert.finished .spinner:after{
+        content: '';
+    display: block;
+    width: 10px;
+    height: 25px;
+    border: solid rgb(211, 211, 211);
+    border-width: 0px 5px 5px 0;
+    visibility: visible;
+        transform: translateY(-50%) rotate(45deg);
+    position: absolute;
+     position: absolute;
+  top: 50%;
+  left: 25px;
+  }
+
+.pathFinderAlert.finished{
+    background-color: rgba(6, 153, 15,0.3);
+
+}
+
+.pathFinderAlert .text{
+    margin-left: 10px;
+    word-wrap: break-word;
+}
+.pathFinderAlertContainer{
+    right: 10px;
+    bottom: 20px;
+    position: fixed;
+}
 

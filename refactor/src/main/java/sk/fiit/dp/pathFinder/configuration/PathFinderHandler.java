@@ -3,19 +3,19 @@ package sk.fiit.dp.pathFinder.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-import sk.fiit.dp.pathFinder.entities.OptimalPathResult;
+import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
 import sk.fiit.dp.pathFinder.entities.RefactorProcessOptimizer;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class PathFinderHandler {
 
-	public static List<OptimalPathResult> executePathFinder(List<State> rootStates, String method) {
+	public static List<OptimalPathForCluster> executePathFinder(List<State> rootStates, String method) {
 		// int[] selectedSmells = { 15, 32, 1, 9, 31, 8, 3, 22, 30, 2, 10, 4,
 		// 25, 21 };
 		// int[] selectedRepairs = { 87, 92, 88, 93, 61, 94, 81, 74, 73, 50, 79,
 		// 84, 80, 82, 15, 14, 12, 21, 65, 83, 85 };
-		List<OptimalPathResult> result = null;
+		List<OptimalPathForCluster> result = null;
 		if (rootStates.size() == 1) {
 			result = executeSingleThead(rootStates.get(0), method);
 		} else {
@@ -48,12 +48,12 @@ public class PathFinderHandler {
 		return result;
 	}
 
-	private static List<OptimalPathResult> executeSingleThead(State state, String method) {
+	private static List<OptimalPathForCluster> executeSingleThead(State state, String method) {
 		RefactorProcessOptimizer model = new RefactorProcessOptimizer(method);
 		model.findRefactoringPath(state);
 		
-		List<OptimalPathResult> resultList = new ArrayList<OptimalPathResult>();
-		OptimalPathResult result = new OptimalPathResult();
+		List<OptimalPathForCluster> resultList = new ArrayList<OptimalPathForCluster>();
+		OptimalPathForCluster result = new OptimalPathForCluster();
 		result.setRootState(state);
 		result.setOptimalPath(model.getOptimalPath());
 		
@@ -62,8 +62,8 @@ public class PathFinderHandler {
 		return resultList;
 	}
 
-	private static List<OptimalPathResult> executeMultiThdead(List<State> states, String method) {
-		List<OptimalPathResult> result = new ArrayList<OptimalPathResult>();
+	private static List<OptimalPathForCluster> executeMultiThdead(List<State> states, String method) {
+		List<OptimalPathForCluster> result = new ArrayList<OptimalPathForCluster>();
 		List<MultithreadedPathFinder> computers = new ArrayList<MultithreadedPathFinder>();
 		for (int i = 0; i < states.size(); i++) {
 			MultithreadedPathFinder runner = new PathFinderHandler().new MultithreadedPathFinder(states.get(i), method);
@@ -79,7 +79,7 @@ public class PathFinderHandler {
 		}
 
 		for (MultithreadedPathFinder act : computers) {
-			OptimalPathResult actres = new OptimalPathResult();
+			OptimalPathForCluster actres = new OptimalPathForCluster();
 			actres.setRootState(act.root);
 			actres.setOptimalPath(act.result);
 			result.add(actres);

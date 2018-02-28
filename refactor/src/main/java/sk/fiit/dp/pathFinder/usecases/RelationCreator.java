@@ -84,7 +84,7 @@ public class RelationCreator {
 
 	private Relation makeBaseRepairRelation(Repair repair) {		
 		Relation relation = new Relation();
-		relation.setUsedRepair(new Repair(repair.getName(), repair.getRepairUses()));
+		relation.setUsedRepair(new Repair(repair.getId(),repair.getName(), repair.getRepairUses()));
 		return relation;
 	}
 	
@@ -111,7 +111,7 @@ public class RelationCreator {
 		
 		//Every combination is a one Relation
 		for(List<Dependency> tempDependencyList : combinations){
-			DependencyRepair dependencyRepair = new DependencyRepair(repair.getName(), repair.getRepairUses());
+			DependencyRepair dependencyRepair = new DependencyRepair(repair.getId(),repair.getName(), repair.getRepairUses());
 			
 			for(Dependency dep : tempDependencyList){
 				dependencyRepair.addDependency(dep.getType(), dep.getSmell(), dep.getPropability(), dep.getActionField(), dep.getPlaceType());

@@ -15,7 +15,8 @@ public class Repair {
 		this.repairUses = new ArrayList<RepairUse>();
 	}
 	
-	public Repair(String name, List<RepairUse> repairUses) {
+	public Repair(int id, String name, List<RepairUse> repairUses) {
+		this.id = id;
 		this.name = name;
 		this.repairUses = repairUses;
 	}

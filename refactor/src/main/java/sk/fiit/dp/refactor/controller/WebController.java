@@ -3,6 +3,8 @@ package sk.fiit.dp.refactor.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -13,10 +15,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.io.comparator.PathFileComparator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
 import sk.fiit.dp.refactor.command.PathFinderCommandHandler;
 import sk.fiit.dp.refactor.command.RefactorCommandHandler;
 import sk.fiit.dp.refactor.command.ResourceCommandHandler;
@@ -84,6 +86,38 @@ public class WebController {
 	}
 
 	@GET
+	@Path("/pathfinerresults")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getPathFinderResults() {
+		return resourceCommand.getPathFinderRecords();
+	}
+
+	@GET
+	@Path("/PathFinderAnalysisDetail/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getPathFinderAnalysisDetail(@PathParam("id") int id) {
+		return resourceCommand.getPathFinderRecordDetail(id);
+	}
+
+	@GET
+	@Path("/PathFinderAnalysisCluster/{analysisid}/{clusterid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getPathFinderAnalysisCluster(@PathParam("analysisid") int analysisId,
+			@PathParam("clusterid") int clusterNumber) {
+		return resourceCommand.getPathFinderAnalysisCluster(analysisId, clusterNumber);
+	}
+
+	@GET
+	@Path("/getPathFinderRepair/{clusterid}/{repairid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getPathFinderResultRepair(@PathParam("clusterid") int clusterid,
+			@PathParam("repairid") int repairid) {
+		String x = resourceCommand.getPathFinderResultRepair(clusterid, repairid);
+		System.out.println(x);
+		return x;
+	}
+
+	@GET
 	@Path("/records/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRefactoringRecord(@PathParam("id") int id) {
@@ -145,14 +179,16 @@ public class WebController {
 			searchMethods.add(toSearch.getString(i));
 		}
 
-		Map<String, Integer> results = pathFinderCommand.executePathFinder(json.getString("repo"), gituser,
-				gitpass, json.getString("searchBranch"), searchMethods, explanationToSearch, clusteringEnabled, sonarProps,method);
+		List<OptimalPathForCluster> results = pathFinderCommand.executePathFinder(json.getString("repo"), gituser,
+				gitpass, json.getString("searchBranch"), searchMethods, explanationToSearch, clusteringEnabled,
+				sonarProps, method);
 
-		JSONObject response = new JSONObject();
-		for (String key : results.keySet()) {
-			response.put(key, results.get(key));
+		JSONArray response = new JSONArray();
+		for (OptimalPathForCluster r : results) {
+			response.put(r.toJSON());
 		}
-
+		Logger.getLogger("webcontroller").log(Level.INFO, "final part");
+		System.out.println(response.toString());
 		return response.toString();
 	}
 
@@ -189,15 +225,14 @@ public class WebController {
 			allowedRefactoring.add(toRepair.getString(i));
 		}
 
-		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser,
-				gitpass, json.getString("searchBranch"), json.getString("repairBranch"), searchMethods,
-				allowedRefactoring, explanationToSearch, createrepairrecord, sonarProps);
+		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser, gitpass,
+				json.getString("searchBranch"), json.getString("repairBranch"), searchMethods, allowedRefactoring,
+				explanationToSearch, createrepairrecord, sonarProps);
 
 		JSONObject response = new JSONObject();
 		for (String key : results.keySet()) {
 			response.put(key, results.get(key));
 		}
-
 		return response.toString();
 	}
 }

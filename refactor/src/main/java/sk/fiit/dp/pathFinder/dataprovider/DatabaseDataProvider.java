@@ -3,7 +3,6 @@ package sk.fiit.dp.pathFinder.dataprovider;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.chart.PieChart.Data;
 import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.pathFinder.entities.Dependency;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
@@ -18,10 +17,7 @@ import sk.fiit.dp.pathFinder.entities.Repair.RepairUse;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
-import sk.fiit.dp.refactor.command.GitCommandHandler;
-import sk.fiit.dp.refactor.command.ResourceCommandHandler;
 import sk.fiit.dp.refactor.model.JessInput;
-import sun.security.jca.GetInstance;
 
 public class DatabaseDataProvider implements DataProvider {
 	private static DatabaseDataProvider INSTANCE = null; 

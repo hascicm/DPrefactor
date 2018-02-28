@@ -13,8 +13,8 @@ public class DependencyRepair extends Repair {
 		this.dependencies = new ArrayList<Dependency>();
 	}
 		
-	public DependencyRepair(String name, List<RepairUse> repairUses) {
-		super(name, repairUses);
+	public DependencyRepair(int id,String name, List<RepairUse> repairUses) {
+		super(id, name, repairUses);
 		this.dependencies = new ArrayList<Dependency>();
 	}
 	

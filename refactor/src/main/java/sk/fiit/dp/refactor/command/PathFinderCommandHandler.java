@@ -3,6 +3,7 @@ package sk.fiit.dp.refactor.command;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +11,14 @@ import java.util.Map;
 import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.json.JSONArray;
 
 import sk.fiit.dp.pathFinder.clustering.ClusteringHandler;
 import sk.fiit.dp.pathFinder.clustering.model.Cluster;
 import sk.fiit.dp.pathFinder.configuration.PathFinderHandler;
 import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
-import sk.fiit.dp.pathFinder.entities.OptimalPathResult;
+import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
+import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
@@ -68,7 +71,7 @@ public class PathFinderCommandHandler {
 	 * @param explanationToSearch
 	 * @return
 	 */
-	public Map<String, Integer> executePathFinder(String repo, String name, String password, String searchBranch,
+	public List<OptimalPathForCluster> executePathFinder(String repo, String name, String password, String searchBranch,
 			List<String> toSearch, boolean explanationToSearch, boolean clusteringEnabled, SonarProperties sonarProps,
 			String method) {
 		id = "Refactor" + IdGenerator.generateId();
@@ -161,22 +164,28 @@ public class PathFinderCommandHandler {
 			}
 
 			// vykoná sa hľadanie optimálnej cesty
-			List<OptimalPathResult> results = PathFinderHandler.executePathFinder(rootStates, method);
+			List<OptimalPathForCluster> results = PathFinderHandler.executePathFinder(rootStates, method);
 
-			for (OptimalPathResult current : results) {
-				System.out.println("------------------CLUSTER----------------");
-				System.out.println(current.getRootState().toString());
-					for (Relation r : current.getOptimalPath()) {
-						System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
-								+ r.getFixedSmellOccurance().getSmell().getName());
-					}
+//			for (OptimalPathResult current : results) {
+//				System.out.println("------------------CLUSTER----------------");
+//				System.out.println(current.getRootState().toString());
+//					for (Relation r : current.getOptimalPath()) {
+//						System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
+//								+ r.getFixedSmellOccurance().getSmell().getName());
+//					}
+//			}
+			
+			PostgresManager.getInstance().addResultRecord(repo,name,timeGenerator.getTime(),results);
+			
+			for (OptimalPathForCluster r : results){
+				System.out.println("-------------------------\n-------------------------\n-------------------------\n       CLUSTER        \n-------------------------\n-------------------------\n-------------------------\n");
+				System.out.println(r.toJSON().toString());
 			}
-			return searchCommand.processResults(searchResults);
+			
+			return results;
 		} catch (IOException | GitAPIException | InterruptedException | XQException | SQLException e) {
 			e.printStackTrace();
 		}
-
-		return new HashMap<String, Integer>();
-
+		return new ArrayList<OptimalPathForCluster>();
 	}
 }

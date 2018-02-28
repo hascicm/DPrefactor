@@ -10,6 +10,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.Resources;
 import sk.fiit.dp.refactor.helper.Str;
@@ -243,6 +244,26 @@ public class ResourceCommandHandler {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String getPathFinderRecords() {
+		JSONArray repairRecords = PostgresManager.getInstance().getPathFinderResultRecords();
+		return repairRecords.toString();
+	}
+
+	public String getPathFinderRecordDetail(int id) {
+		JSONObject result = PostgresManager.getInstance().getPathFinderResultRecordDetail(id);
+		return result.toString();
+	}
+
+	public String getPathFinderAnalysisCluster(int analysisId, int repairNumber) {
+		JSONObject result = PostgresManager.getInstance().getPathFinderAnalysisCluster(analysisId, repairNumber);
+		return result.toString();
+	}
+
+	public String getPathFinderResultRepair(int clusterid, int repairid) {
+		JSONObject result = PostgresManager.getInstance().getPathFinderResultRepair(clusterid,repairid);
+		return result.toString();
 	}
 
 }

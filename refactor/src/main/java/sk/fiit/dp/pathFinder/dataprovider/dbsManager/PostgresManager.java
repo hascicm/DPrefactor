@@ -1,29 +1,41 @@
 package sk.fiit.dp.pathFinder.dataprovider.dbsManager;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import net.xqj.basex.bin.ac;
+import javafx.print.JobSettings;
+import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.entities.DependencyPlaceType;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
 import sk.fiit.dp.pathFinder.entities.DependencyType;
+import sk.fiit.dp.pathFinder.entities.Location;
+import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.LocationPartType;
+import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
 import sk.fiit.dp.pathFinder.entities.Pattern;
 import sk.fiit.dp.pathFinder.entities.PatternRepair;
 import sk.fiit.dp.pathFinder.entities.PatternSmellUse;
 import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
+import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
+import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 
 public class PostgresManager {
 
 	private Statement statement;
+	private Statement statement2;
 	private static PostgresManager instance = null;
 
 	public static PostgresManager getInstance() {
@@ -38,7 +50,7 @@ public class PostgresManager {
 		try {
 			PpostgresConnector = new PostgresConnector();
 			statement = PpostgresConnector.getStatement();
-
+			statement2 = PpostgresConnector.getStatement();
 		} catch (ClassNotFoundException | SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
@@ -52,7 +64,7 @@ public class PostgresManager {
 			rs = statement.executeQuery(query);
 			while (rs.next()) {
 				SmellType smell = new SmellType(rs.getInt("id"), rs.getString("name"), rs.getInt("weight"),
-						rs.getString("code"));
+						rs.getString("code"), rs.getString("description"));
 				smells.add(smell);
 			}
 		} catch (SQLException e) {
@@ -179,10 +191,10 @@ public class PostgresManager {
 					actualRecord.setId(rs.getInt("id"));
 					actualRecord.setDescription(rs.getString("description"));
 					actualRecord.setActionField(resolveActionField(rs.getString("locationparttype")));
-					
-					//TODO 
+
+					// TODO delete this after pattern repair functionality check
 					actualRecord.setUsedRepair(new PatternRepair(rs.getString("description")));
-					
+
 					patterns.add(actualRecord);
 					finishedsolve = true;
 					finishedcause = true;
@@ -207,24 +219,91 @@ public class PostgresManager {
 		return patterns;
 	}
 
-//	public static void main(String[] args) {
-//		List<SmellType> s = getInstance().getSmellTypes();
-//		List<Pattern> p = getInstance().getPatterns(s);
-//		for (Pattern x : p) {
-//			System.out.println("----------");
-//			System.out.println("id     " + x.getId());
-//			System.out.println("desc   " + x.getDescription());
-//			System.out.println("act f  " + x.getActionField());
-//			System.out.println("----fixed----");
-//			for (PatternSmellUse y : x.getFixedSmells()) {
-//				System.out.println(y.getSmellType().getName());
-//			}
-//			System.out.println("----caused----");
-//			for (SmellType z : x.getResidualSmells()) {
-//				System.out.println(z.getName());
-//			}
-//		}
-//	}
+	public void addResultRecord(String repo, String name, long timestamp, List<OptimalPathForCluster> results)
+			throws SQLException {
+		int analysisID = addAnalysisRecord(repo, name, timestamp);
+		int clusterNumber = 1;
+		for (OptimalPathForCluster cluster : results) {
+			addClusterRecord(cluster, analysisID, clusterNumber);
+			clusterNumber++;
+		}
+
+	}
+
+	private int addAnalysisRecord(String repo, String name, long timestamp) throws SQLException {
+		String query = "insert into pathfinderanalysis (git,gituser,time) values ('" + repo + "','" + name + "','"
+				+ timestamp + "')";
+		statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+		ResultSet rs = statement.getGeneratedKeys();
+		int analysisID = -1;
+		while (rs.next()) {
+			analysisID = rs.getInt(1);
+		}
+		return analysisID;
+	}
+
+	private Map<SmellOccurance, Integer> addClusterRecord(OptimalPathForCluster cluster, int analysisID,
+			int clusterNumber) throws SQLException {
+		String query = "insert into cluster (pathfinderanalysis_id,cluster_number) values (" + analysisID + ","
+				+ clusterNumber + ")";
+		statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+		ResultSet rs = statement.getGeneratedKeys();
+		int clusterID = -1;
+		while (rs.next()) {
+			clusterID = rs.getInt(1);
+		}
+		Map<SmellOccurance, Integer> repairOrderMap = new HashMap<>();
+
+		for (SmellOccurance smellOcc : cluster.getRootState().getSmells()) {
+			int id = addSmellOccurenceRecord(smellOcc, clusterID);
+			repairOrderMap.put(smellOcc, id);
+		}
+
+		int repairOrder = 1;
+		for (Relation r : cluster.getOptimalPath()) {
+			int smellOccID = repairOrderMap.get(r.getFixedSmellOccurance());
+			addRepairSequencePartRecord(clusterID, smellOccID, r.getUsedRepair().getId(), repairOrder);
+			repairOrder++;
+		}
+		return repairOrderMap;
+	}
+
+	private int addSmellOccurenceRecord(SmellOccurance smellOcc, int clusterID) throws SQLException {
+		String query = "insert into smelloccurrence (cluster_id,smell_id) values ('" + clusterID + "','"
+				+ smellOcc.getSmell().getId() + "')";
+
+		statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+		ResultSet rs = statement.getGeneratedKeys();
+		int smellOccID = -1;
+		while (rs.next()) {
+			smellOccID = rs.getInt(1);
+		}
+		addSmellPositionRecord(smellOcc.getLocations(), smellOccID);
+		return smellOccID;
+	}
+
+	private void addSmellPositionRecord(List<Location> locations, int smellOccID) throws SQLException {
+		for (Location l : locations) {
+			int locationPartOrder = 0;
+			int LocationID = 0;
+			for (LocationPart lp : l.getLocation()) {
+				String query = "insert into smellposition (smelloccurrence_id,type,name,positionorder,locationid) values "
+						+ "('" + smellOccID + "','" + lp.getLocationPartType().toString() + "','" + lp.getId() + "',"
+						+ locationPartOrder + "," + LocationID + ")";
+				locationPartOrder++;
+				statement.executeUpdate(query);
+			}
+			LocationID++;
+		}
+	}
+
+	private void addRepairSequencePartRecord(int clusterID, Integer fixedSmellOccID, int usedRepairID, int repairOrder)
+			throws SQLException {
+		String query = "insert into repairsequencepart (smelloccurrence_id,repair_id,cluster_id,repairorder) values "
+				+ "('" + fixedSmellOccID + "','" + usedRepairID + "','" + clusterID + "'," + repairOrder + ")";
+		statement.executeUpdate(query);
+
+	}
 
 	private DependencyPlaceType resolveLocationPartType(String act) {
 		if (act == null)
@@ -256,5 +335,133 @@ public class PostgresManager {
 			return LocationPartType.ATTRIBUTE;
 		}
 		return null;
+	}
+
+	public JSONArray getPathFinderResultRecords() {
+		JSONArray result = new JSONArray();
+		String querry = "select * from pathfinderanalysis";
+		ResultSet rs;
+		try {
+			rs = statement.executeQuery(querry);
+			while (rs.next()) {
+				JSONObject current = new JSONObject();
+				current.put("id", rs.getInt("id"));
+				current.put("git", rs.getString("git"));
+				current.put("gituser", rs.getString("gituser"));
+				current.put("time", rs.getString("time"));
+				result.put(current);
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+		return result;
+	}
+
+	public JSONObject getPathFinderResultRecordDetail(int id) {
+		JSONObject result = new JSONObject();
+		String qurry = "select * from pathfinderanalysis pfa where pfa.id = " + id;
+		ResultSet rs;
+		try {
+			rs = statement.executeQuery(qurry);
+			while (rs.next()) {
+				result.append("git", rs.getString("git"));
+				result.append("gituser", rs.getString("gituser"));
+
+				Date date = new Date(rs.getLong("time"));
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				result.append("time", sdf.format(date));
+
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+
+		return result;
+	}
+
+	public JSONObject getPathFinderAnalysisCluster(int analysisId, int ClusterNumber) {
+		JSONObject test = new JSONObject();
+		JSONArray result = new JSONArray();
+		boolean inserted = false;
+		String querry = "select c.id as clusterid, st.name,st.description,sc.id from cluster c join smelloccurrence sc on c.id= sc.cluster_id "
+				+ "join smelltype st on st.id = sc.smell_id where c.pathfinderanalysis_id = " + analysisId
+				+ " and c.cluster_number = " + ClusterNumber + " order by sc.id";
+		ResultSet rs;
+		try {
+			rs = statement.executeQuery(querry);
+			JSONObject curr = null;
+			while (rs.next()) {
+				if (!inserted) {
+					test.put("clusterid", rs.getString("clusterid"));
+					inserted = true;
+				}
+				curr = new JSONObject();
+				curr.append("id", rs.getInt("id"));
+				curr.append("smellname", rs.getString("name"));
+				curr.append("description", rs.getString("description"));
+				result.put(curr);
+
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+		test.put("smells", result);
+
+		return test;
+	}
+
+	private JSONArray getSmellLocationByID(int smelloccID) {
+		System.out.println("4");
+		JSONArray result = new JSONArray();
+		String querry = "select * from smellposition sp where sp.smelloccurrence_id = " + smelloccID
+				+ "order by locationid,positionorder";
+		ResultSet rs;
+		List<LocationPart> locparts = new ArrayList<LocationPart>();
+		Location loc = null;
+		try {
+
+			rs = statement2.executeQuery(querry);
+			int locationid = -1;
+			while (rs.next()) {
+				if (locationid != rs.getInt("locationid")) {
+					if (loc != null) {
+						result.put(loc.toJSON());
+						locparts = new ArrayList<LocationPart>();
+					}
+					loc = new Location(locparts);
+					locationid = rs.getInt("locationid");
+				}
+				locparts.add(new LocationPart(LocationPartType.valueOf(rs.getString("type")), rs.getString("name")));
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+		System.out.println("5");
+
+		return result;
+
+	}
+
+	public JSONObject getPathFinderResultRepair(int clusterid, int repairid) {
+		JSONObject result = new JSONObject();
+		String querry = "select st.name as smell ,r.name as repair, repairorder from repairsequencepart rsp "
+				+ "join repair r on r.id = rsp.repair_id join smelloccurrence so on so.id=rsp.smelloccurrence_id "
+				+ "join smelltype st on st.id = smell_id where rsp.cluster_id =" + clusterid + " and repairorder = "
+				+ repairid;
+		ResultSet rs;
+
+		System.out.println(querry);
+		try {
+			rs = statement.executeQuery(querry);
+			while (rs.next()) {
+				result.put("repair", rs.getString("repair"));
+				result.put("smell", rs.getString("smell"));
+				result.put("order", rs.getInt("repairorder"));
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+
+		return result;
 	}
 }
