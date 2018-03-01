@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Refactor</title>
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
 	<link rel="stylesheet" href="../Styles/menu.css">
 	<link rel="stylesheet" type="text/css" href="../Styles/main.css">
 	<script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
@@ -66,7 +67,12 @@
 		<hr>
 		<p/>
 		<form>
-			<input type="checkbox" class = 'inputcheckbox' id = "explanationSearch">Vysvetlenia do search vetvy<br>
+			<div class="roundedOne">
+				<input type="checkbox" class = 'inputcheckbox' id = "explanationSearch">
+				<div class="rO"></div>
+				<label>Vysvetlenia do search vetvy</label>
+			</div>
+			<br>
 			<!--	<input type="checkbox" class = 'inputcheckbox' id = "explanationRepair">Vysvetlenia do repair vetvy<br>-->
 			<input type="checkbox" class = 'inputcheckbox' id = "createrepairrecord">vytvorit zaznam o oprave<br>
 
@@ -100,7 +106,7 @@
 	</section>
 	<section id="pathFinder">
 		<div id="nav">	
-			<ul>		
+			<ul class="subnav">		
 				<li>
 					<a href="javascript:pathFinder();"><span>Proces</span></a>
 				</li>
@@ -173,7 +179,7 @@
 
 <section id="pathFinderResults">
 		<div id="nav">	
-		<ul>		
+		<ul class="subnav">		
 			<li>
 				<a href="javascript:pathFinder();"><span>Proces</span></a>
 			</li>
@@ -182,9 +188,9 @@
 			</li>
 		</ul>
 	</div>
-			<h2>
+			<h1>
 				identifikované pachy
-			</h2>
+			</h1>
 			<table id="pathFinderResultsAnalysisList" >
 				<thead>
 					<tr>
@@ -203,7 +209,7 @@
 
 <section  id="pathFinderResultsConcrete">
 	<div id="nav">	
-		<ul>		
+		<ul class="subnav">		
 			<li>
 				<a href="javascript:pathFinder();"><span>Proces</span></a>
 			</li>
@@ -327,7 +333,7 @@
 	</section>
 	<section id="rules" hidden=true>
 		<h1>Aktualizujte pravidlá expertného systému</h1>
-		<textarea id="ruleDef">
+		<textarea id="ruleDef" rows="35">
 		</textarea>
 		<button type="button" onclick="saveRules()">Uložiť</button>
 	</section>
@@ -338,7 +344,7 @@
 			<input type="text" name="name" id="rEditName" placeholder="názov">
 			<input type="text" name="code" id="rEditCode" placeholder="kód">
 			<p>
-				<textarea id="rEditScript">
+				<textarea rows="30" id="rEditScript">
 				</textarea>
 				<button type="button" onclick="saveRepair()">Uložiť</button>
 			</section>
@@ -349,7 +355,7 @@
 					<input type="text" name="name" id="sEditName" placeholder="názov">
 					<input type="text" name="code" id="sEditCode" placeholder="kód">
 					<p>
-						<textarea id="sEditScript">
+						<textarea rows="30" id="sEditScript">
 						</textarea>
 						<button type="button" onclick="saveSearch()">Uložiť</button>
 					</section>
@@ -360,7 +366,7 @@
 					<section id = "records">
 						<h1>najdene zaznamy o opravach</h1>
 
-						<div style="height:600px;overflow:auto;">
+						<div style="height:600px;">
 
 							<table id="result" >
 								<thead>
@@ -416,7 +422,7 @@
 						</div>
 						<div class="recdetail">
 							<label for="recordDetailRepairs">možné opravy</label>
-							<textarea class ="detail" type="text" id="recordDetailRepairs" name="repairs " value="" readonly rows="1"></textarea>
+							<textarea class ="detail" type="text" id="recordDetailRepairs" name="repairs " value="" rows="3" readonly rows="1"></textarea>
 
 						</div>
 						<div style="clear: both;"></div>
