@@ -75,7 +75,11 @@ public class PathFinderCommandHandler {
 			List<String> toSearch, boolean explanationToSearch, boolean clusteringEnabled, SonarProperties sonarProps,
 			String method) {
 		id = "Refactor" + IdGenerator.generateId();
-
+		
+		//DEBUG
+			clusteringEnabled = false;
+		//DEBUG
+		
 		try {
 			// 0. time stamp generator reset
 			timeGenerator.resetTimeStamp();

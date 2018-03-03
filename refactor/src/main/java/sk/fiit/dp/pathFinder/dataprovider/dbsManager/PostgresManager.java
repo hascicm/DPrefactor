@@ -319,6 +319,9 @@ public class PostgresManager {
 	private LocationPartType resolveActionField(String act) {
 		if (act == null)
 			return null;
+		
+		act = act.toLowerCase();
+		
 		if (act.equals("method")) {
 			return LocationPartType.METHOD;
 		} else if (act.equals("package")) {
