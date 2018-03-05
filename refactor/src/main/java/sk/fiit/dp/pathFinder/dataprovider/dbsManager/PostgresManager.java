@@ -319,9 +319,9 @@ public class PostgresManager {
 	private LocationPartType resolveActionField(String act) {
 		if (act == null)
 			return null;
-		
+
 		act = act.toLowerCase();
-		
+
 		if (act.equals("method")) {
 			return LocationPartType.METHOD;
 		} else if (act.equals("package")) {
@@ -348,10 +348,13 @@ public class PostgresManager {
 			rs = statement.executeQuery(querry);
 			while (rs.next()) {
 				JSONObject current = new JSONObject();
-				current.put("id", rs.getInt("id"));
-				current.put("git", rs.getString("git"));
-				current.put("gituser", rs.getString("gituser"));
-				current.put("time", rs.getString("time"));
+				current.append("id", rs.getInt("id"));
+				current.append("git", rs.getString("git"));
+				current.append("gituser", rs.getString("gituser"));
+				
+				Date date = new Date(rs.getLong("time"));
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				current.append("time", sdf.format(date));
 				result.put(current);
 			}
 		} catch (SQLException e) {
@@ -465,6 +468,44 @@ public class PostgresManager {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
 
+		return result;
+	}
+
+	public JSONObject getPathFinderAnalysisInfo(int analysisId) {
+		JSONObject result = new JSONObject();
+		String query = "select count(*) as result from pathfinderanalysis pfa join cluster c on c.pathfinderanalysis_id = pfa.id where pfa.id = "
+				+ analysisId;
+		ResultSet rs = null;
+
+		try {
+			rs = statement.executeQuery(query);
+			while (rs.next()) {
+				result.put("clustecount", rs.getInt("result"));
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+
+		return result;
+	}
+
+	public JSONObject getPathFinderClusterInfo(int clusterId) {
+
+		JSONObject result = new JSONObject();
+		String query = "		select count(*) as result from cluster c join repairsequencepart rsp on c.id = rsp.cluster_id where c.id = "
+				+ clusterId;
+		System.out.println(query);
+		ResultSet rs = null;
+
+		try {
+			rs = statement.executeQuery(query);
+			while (rs.next()) {
+				result.put("repaircount", rs.getInt("result"));
+			}
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+		System.out.println(result);
 		return result;
 	}
 }

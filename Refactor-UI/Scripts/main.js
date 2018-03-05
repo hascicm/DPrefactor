@@ -8,6 +8,29 @@ window.onload = function() {
     home();
 }
 
+
+function buttonSelection(path){
+	$('#nav li').each(function() { 
+		if ($(this).children('a').attr('href') == path)
+		{
+			$(this).children('a').addClass('navbuttonselected');
+		} else {
+			$(this).children('a').removeClass('navbuttonselected');
+		}
+	})
+}
+
+function buttonSelectionSubnav(path){
+		$('.subnav li').each(function() { 
+		if ($(this).children('a').attr('href') == path)
+		{
+			$(this).children('a').addClass('navbuttonselected');
+		} else {
+			$(this).children('a').removeClass('navbuttonselected');
+		}
+	})
+}
+
 function init(){
 	
 	$("#sonarHost").prop("disabled", true);
@@ -87,126 +110,16 @@ function execute() {
 	});
 }
 
-function executePathFinder() {
-	var searchCodes = [];
-	var table = document.getElementById("searchTable");
-	var length = table.rows.length;
-	for(var i = length; i > 1 ; --i) {
-		if(table.rows[i - 1].cells[0].getElementsByTagName("input")[0].checked) {
-			searchCodes.push(table.rows[i - 1].cells[1].innerHTML);
-		}
-	}
-	
-	var methodSelect = document.getElementById("pathFindingMethod");
-	var repo = document.getElementById("repo-pathfiner").value;
-	$( '<div class="pathFinderAlert" id= "'+document.getElementById("repo-pathfiner").value+
-		'"> <div class=\"spinner\"></div> <div class="text"> '+document.getElementById("repo-pathfiner").value+
-		' </div> </div>' ).appendTo( "#pathFinderAlertContainer").hide().fadeIn(1000);
 
 
 
 
 
 
-	var method = methodSelect.options[methodSelect.selectedIndex].value;
-	//alert(method)
-	var request = {
-		repo : document.getElementById("repo-pathfiner").value,
-		name : document.getElementById("name-pathfiner").value,
-		password : document.getElementById("password-pathfiner").value,
-		searchBranch : document.getElementById("searchBranch-pathfiner").value,
-		explanationSearch : document.getElementById("explanationSearch-pathfiner").checked,
-		selectedMethod : method,
-//		createrepairrecord : document.getElementById("createrepairrecord-pathfiner").checked,
-		isSonarEnabled : document.getElementById("sonarQubeAnalyze-pathfiner").checked,
-		sonarHost: document.getElementById("sonarHost-pathfiner").value,
-		sonarLogin: document.getElementById("sonarLogin-pathfiner").value,
-		sonarPassword: document.getElementById("sonarPassword-pathfiner").value,
-		searchCodes : searchCodes,
-	}
-
-	$.ajax({
-		type: "PUT",
-		url: "http://localhost:8080/refactor/executePathFinder/",
-		data: JSON.stringify(request),
-		contentType:"application/json; charset=utf-8",
-		dataType: "json",
-		success: function(response) {
-			var string = "Boli nájdené nasledujúce problémy: \n\n";
-			for(var i in response) {
-				string += i + ":		" + response[i] + "\n";
-			}
-			$("#" + $.escapeSelector(repo)).addClass("finished");
-			$("#" + $.escapeSelector(repo)).delay(5000).fadeOut(1000);
-				setTimeout(function() {	$("#" + $.escapeSelector(repo)).delay(5000).fadeOut(1000);}, 2500);
-			console.log(response);
-			//window.alert(string);
-		}
-	});
-}
-
-function pathFinder(){
-	document.getElementById("home").hidden = true;
-	document.getElementById("pathFinder").hidden = false;
+function home() {
 	document.getElementById("pathFinderResultsConcrete").hidden = true;
-    document.getElementById("search").hidden = true;
-    document.getElementById("refactor").hidden = true;
-    document.getElementById("rules").hidden = true;
-    document.getElementById("preferences").hidden = true;
-    document.getElementById("about").hidden = true;
-    document.getElementById("repairEdit").hidden = true;
-    document.getElementById("searchEdit").hidden = true;
-    document.getElementById("SmellDatabase").hidden = true;
-    document.getElementById("records").hidden = true;
-    document.getElementById("recordDetail").hidden = true;
-    document.getElementById("pathFinderResults").hidden = true;    
-
-
-}
-
-
-function pathFinderResults(){
-	document.getElementById("home").hidden = true;
+	document.getElementById("home").hidden = false;
 	document.getElementById("pathFinder").hidden = true;
-	document.getElementById("pathFinderResultsConcrete").hidden = true;
-	document.getElementById("search").hidden = true;
-	document.getElementById("refactor").hidden = true;
-	document.getElementById("rules").hidden = true;
-	document.getElementById("preferences").hidden = true;
-	document.getElementById("about").hidden = true;
-	document.getElementById("repairEdit").hidden = true;
-	document.getElementById("searchEdit").hidden = true;
-	document.getElementById("SmellDatabase").hidden = true;
-	document.getElementById("records").hidden = true;
-	document.getElementById("recordDetail").hidden = true;
-	document.getElementById("pathFinderResults").hidden = false;
-
-	jQuery.get("http://localhost:8080/refactor/pathfinerresults", function(response) {
-		var table = document.getElementById("tabletbodyPathFinderResultsAnalys");
-		var length = table.rows.length
-		for(var i = length; i > 0 ; --i) {
-			table.deleteRow(i - 1);
-		}
-
-		response.forEach(function(value) {
-			//var row = table.insertRow(i);
-			$(table).append("<tr><td>"+value.id+"</td><td>"+value.git+"</td><td>"+value.gituser+"</td><td>"
-				+value.time+"</td><td>"+
-				'<a href="javascript:PathFinderAnalysisDetail(' + value.id + ');"><span>podrobnosti</span></a>'+"</td></tr>");
-
-		})
-	});
-
-
-}
-
-var currentPathfinderCluster = 0;
-var currentPathFinderRepair = 0; 
-
-function PathFinderAnalysisDetail(i){
-	document.getElementById("home").hidden = true;
-	document.getElementById("pathFinder").hidden = true;
-	document.getElementById("pathFinderResultsConcrete").hidden = false;
 	document.getElementById("search").hidden = true;
 	document.getElementById("refactor").hidden = true;
 	document.getElementById("rules").hidden = true;
@@ -218,73 +131,8 @@ function PathFinderAnalysisDetail(i){
 	document.getElementById("records").hidden = true;
 	document.getElementById("recordDetail").hidden = true;
 	document.getElementById("pathFinderResults").hidden = true;
+	buttonSelection("javascript:home();");
 
-	jQuery.get("http://localhost:8080/refactor/PathFinderAnalysisDetail/" + i, function(response) {
-		document.getElementById("pathFinderResultsRepo").value = response.git
-		document.getElementById("pathFinderResultsUser").value = response.gituser
-		document.getElementById("pathFinderResultsTime").value = response.time
-
-		jQuery.get("http://localhost:8080/refactor/PathFinderAnalysisCluster/"+ i + "/1"  ,function(response){
-			console.log(response);
-			currentPathfinderCluster = response.clusterid;
-			var table = document.getElementById("pathFinderResultSmellTable");
-			response.smells.forEach(function(value) {
-			//var row = table.insertRow(i);
-			$(table).append("<tr><td>"+value.id+"</td><td>"+value.smellname+"</td><td>"+value.description+"</td></tr>");
-
-		})
-
-			jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster +"/1"  , function(response){
-				console.log(response);
-			})
-
-		});
-	});
-}
-
-
-
-
-
-
-function pathFinderResultsConcrete(){
-	document.getElementById("home").hidden = true;
-	document.getElementById("pathFinder").hidden = true;
-	document.getElementById("pathFinderResultsConcrete").hidden = false;
-    document.getElementById("search").hidden = true;
-    document.getElementById("refactor").hidden = true;
-    document.getElementById("rules").hidden = true;
-    document.getElementById("preferences").hidden = true;
-    document.getElementById("about").hidden = true;
-    document.getElementById("repairEdit").hidden = true;
-    document.getElementById("searchEdit").hidden = true;
-    document.getElementById("SmellDatabase").hidden = true;
-    document.getElementById("records").hidden = true;
-    document.getElementById("recordDetail").hidden = true;
-    document.getElementById("pathFinderResults").hidden = true;
-
-    
-}
-
-
-
-
-
-function home() {
-	document.getElementById("pathFinderResultsConcrete").hidden = true;
-	document.getElementById("home").hidden = false;
-	document.getElementById("pathFinder").hidden = true;
-    document.getElementById("search").hidden = true;
-    document.getElementById("refactor").hidden = true;
-    document.getElementById("rules").hidden = true;
-    document.getElementById("preferences").hidden = true;
-    document.getElementById("about").hidden = true;
-    document.getElementById("repairEdit").hidden = true;
-    document.getElementById("searchEdit").hidden = true;
-    document.getElementById("SmellDatabase").hidden = true;
-    document.getElementById("records").hidden = true;
-    document.getElementById("recordDetail").hidden = true;
-    document.getElementById("pathFinderResults").hidden = true;
 
 }
 
@@ -299,7 +147,13 @@ function search() {
 		var i = 1;
 		response.forEach(function(value) {
 			var row = table.insertRow(i);
-			row.insertCell(0).innerHTML = '<input type="checkbox" name="active" checked="checked"/>';
+
+
+	//		<input type="checkbox" id="sonarQubeAnalyze-pathfiner" name="cc" /><label for="sonarQubeAnalyze-pathfiner"><span></span></label>
+
+			//row.insertCell(0).innerHTML = '<input type="checkbox" name="active" checked="checked"/>';
+			var currid = "setable" + i;
+			row.insertCell(0).innerHTML = '<input type="checkbox" id='+currid+'  name="active" checked = "checked" /><label for='+currid+'><span></span></label>';
 			row.insertCell(1).innerHTML = value.code;
 			row.insertCell(2).innerHTML = value.name;
 			row.insertCell(3).innerHTML = '<a href="javascript:searchEdit(' + i + ');"><span>edit</span></a>';
@@ -321,6 +175,7 @@ function search() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+	buttonSelection("javascript:search();");
 
 }
 
@@ -335,7 +190,9 @@ function refactor() {
 		var i = 1;
 		response.forEach(function(value) {
 			var row = table.insertRow(i);
-			row.insertCell(0).innerHTML = '<input type="checkbox" name="active" checked="checked"/>';
+
+			var currid = "reftable" + i;
+			row.insertCell(0).innerHTML = '<input type="checkbox" id='+currid+' name="active" checked = "checked"/><label for='+currid+'><span></span></label>';
 			row.insertCell(1).innerHTML = value.code;
 			row.insertCell(2).innerHTML = value.name;
 			row.insertCell(3).innerHTML = '<a href="javascript:repairEdit(' + i + ');"><span>edit</span></a>';
@@ -357,9 +214,12 @@ function refactor() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+	buttonSelection("javascript:refactor(0);");
 
 
 }
+
+
 
 function preferences() {
     document.getElementById("home").hidden = true;
@@ -377,8 +237,10 @@ function preferences() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
-
+    buttonSelection("javascript:preferences(0);");
     prioritization();
+
+
 }
 
 function rules() {
@@ -401,7 +263,7 @@ function rules() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
-
+    buttonSelection("javascript:rules(0);");
 
 }
 
@@ -421,7 +283,7 @@ function about() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
-
+    buttonSelection("javascript:about(0);");
 }
 
 function smells() {
@@ -478,6 +340,7 @@ function records() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    buttonSelection("javascript:records();");
 
 
 }

@@ -266,4 +266,14 @@ public class ResourceCommandHandler {
 		return result.toString();
 	}
 
+	public String getPathFinderAnalysisInfo(int analysisId) {
+		JSONObject result = PostgresManager.getInstance().getPathFinderAnalysisInfo(analysisId);
+		return result.toString();
+	}
+
+	public String getPathFinderClusterInfo(int clusterId) {
+		JSONObject result = PostgresManager.getInstance().getPathFinderClusterInfo(clusterId);
+		return result.toString();
+	}
+
 }

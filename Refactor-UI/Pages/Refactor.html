@@ -10,6 +10,8 @@
 	<!--<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="../Scripts/main.js"></script> 
+	<script src="../Scripts/pathFinder.js"></script> 
+
 </head>
 
 <body>
@@ -67,14 +69,16 @@
 		<hr>
 		<p/>
 		<form>
-			<div class="roundedOne">
-				<input type="checkbox" class = 'inputcheckbox' id = "explanationSearch">
-				<div class="rO"></div>
-				<label>Vysvetlenia do search vetvy</label>
-			</div>
-			<br>
-			<!--	<input type="checkbox" class = 'inputcheckbox' id = "explanationRepair">Vysvetlenia do repair vetvy<br>-->
-			<input type="checkbox" class = 'inputcheckbox' id = "createrepairrecord">vytvorit zaznam o oprave<br>
+
+
+			<p>
+			<input type="checkbox" id="explanationSearch" name="cc" />
+   			<label for="explanationSearch"><span></span>Vysvetlenia do search vetvy</label>
+   			</p>
+			<p>
+			<input type="checkbox" id="createrepairrecord" name="cc" />
+   			<label for="createrepairrecord"><span></span>vytvorit zaznam o oprave</label>
+   			</p>
 
 		</form>
 		<p/>
@@ -82,7 +86,8 @@
 		<h3>SonarQube</h3>
 		<form>
 			<p>
-				<input type="checkbox" class = 'inputcheckbox' id = "sonarQubeAnalyze">Analyzovať projekt pomocou nástroja SonarQube<br>
+			<input type="checkbox" id="sonarQubeAnalyze" name="cc" />
+   			<label for="sonarQubeAnalyze"><span></span>Analyzovať projekt pomocou nástroja SonarQube</label>
 			</p>
 			<p>
 				<label for="sonarHost">Hostname</label>
@@ -111,7 +116,7 @@
 					<a href="javascript:pathFinder();"><span>Proces</span></a>
 				</li>
 				<li>
-					<a href="javascript:pathFinderResults();"><span>vysledky</span></a>
+					<a href="javascript:pathFinderResults();"><span>Výsledky</span></a>
 				</li>
 			</ul>
 		</div>
@@ -128,6 +133,7 @@
 		<hr>
 
 		<form>
+
 			<label for="search-pathfiner">Git branch - vyhľadávanie</label>
 			<input type="text" name="search-pathfiner" value="search-pathfinder" id="searchBranch-pathfiner"><p/>
 		</form>
@@ -135,328 +141,351 @@
 		<hr>
 		<p/>
 		<form>
-			<input type="checkbox" class = 'inputcheckbox' id = "explanationSearch-pathfiner">Vysvetlenia do search vetvy<br>
-	<!--		<input type="checkbox" class = 'inputcheckbox' id = "explanationRepair">Vysvetlenia do repair vetvy<br>
-		<input type="checkbox" class = 'inputcheckbox' id = "createrepairrecord-pathfiner">vytvorit zaznam o oprave<br>-->
-
-	</form>
-	<p/>
-	<hr>
-	<h3>SonarQube</h3>
-	<form>
-		<p>
-			<input type="checkbox" class = 'inputcheckbox' id = "sonarQubeAnalyze-pathfiner">Analyzovať projekt pomocou nástroja SonarQube<br>
-		</p>
-		<p>
-			<label for="sonarHost-pathfiner">Hostname</label>
-			<input type="text" name="sonarHost-pathfiner" value="http://localhost:9000" id="sonarHost-pathfiner">
-		</p>
-		<p>
-			<label for="sonarLogin-pathfiner">Prihlasovacie meno</label>
-			<input type="text" name="sonarLogin-pathfiner" value="admin" id="sonarLogin-pathfiner">
-		</p>
-		<p>
-			<label for="sonarPassword-pathfiner">Heslo</label>
-			<input type="password" name="sonarPassword-pathfiner" value="admin" id="sonarPassword-pathfiner">
-		</p>
-
-	</form>
-	<hr>
-	<div>
-		<label id="labelPathFinder" for="pathFindingMethod">Metóda prehľadávania stavového priestoru</label>
-		<select id="pathFindingMethod">
-			<option value="A*">A*</option>
-			<option value="bee">Včelí algoritmus</option>
-			<option value="ant">Mravčia kolónia</option>
-			<option value="mc">Monte Carlo</option>
-		</select>
-	</div>
-	<br>
-	<div>
-		<button type="button" onclick="executePathFinder()">Vykonať</button> 
-	</div>
-</section>
-
-<section id="pathFinderResults">
-		<div id="nav">	
-		<ul class="subnav">		
-			<li>
-				<a href="javascript:pathFinder();"><span>Proces</span></a>
-			</li>
-			<li>
-				<a href="javascript:pathFinderResults();"><span>vysledky</span></a>
-			</li>
-		</ul>
-	</div>
-			<h1>
-				identifikované pachy
-			</h1>
-			<table id="pathFinderResultsAnalysisList" >
-				<thead>
-					<tr>
-						<th>id</th>
-						<th>nájdený pach</th>
-						<th>poloha</th>
-						<th>čas vykonania</th>
-					</tr>
-				</thead>
-				<tbody id="tabletbodyPathFinderResultsAnalys">
-				</tbody>
-
-			</table>	 	
-
-</section>
-
-<section  id="pathFinderResultsConcrete">
-	<div id="nav">	
-		<ul class="subnav">		
-			<li>
-				<a href="javascript:pathFinder();"><span>Proces</span></a>
-			</li>
-			<li>
-				<a href="javascript:pathFinderResults();"><span>vysledky</span></a>
-			</li>
-		</ul>
-	</div>
-	<h1>vysledky</h1>
-	<div class="recdetail">
-
-		<label for="pathFinderResultsRepo">repozitar</label>
-		<input class ="detail" type="text" id="pathFinderResultsRepo" name="git repo" value="" readonly><br>
-	</div>
-	<div>
-		<div class="recdetail left"  >
-			<label for="pathFinderResultsUser">použivateľ</label>
-			<input class ="detail" type="text" id="pathFinderResultsUser" name="git user" value="" readonly><br>
-		</div>
-		<div class="recdetail right">	    	
-			<label for="pathFinderResultsTime">čas</label>
-			<input class ="detail" type="text" id="pathFinderResultsTime" name="time stamp" value="" readonly><br>
-		</div>
-	</div>
-	<div style="clear: both;"></div>
-
-	<hr>
-	<div class="recdetail left">
-
-		<label for="pathFinderResultsClusterID">číslo zhluku</label>
-		<input class ="detail" type="text" id="pathFinderResultsClusterID" name="cluster id" value="" readonly>
-
-	</div>
-	<button type="button" onclick="pathFinderResultsNextCluster()">nasledujuci</button> 
-	<button type="button" onclick="pathFinderResultsPreviousCluster()">predchadzajuci</button> 
-	<div style="clear: both;"></div>
-	<hr>
-
-	<div>
-		<div class="recdetail left">
-			<h2>
-				identifikované pachy
-			</h2>
-			<table id="pathFinderResultSmellTable" >
-				<thead>
-					<tr>
-						<th>id</th>
-						<th>nájdený pach</th>
-						<th>poloha</th>
-					</tr>
-				</thead>
-				<tbody id="tabletbodyPathfinderResults">
-				</tbody>
-
-			</table>	 
-
-		</div>
-		<div class="recdetail right">	    	
-			<label for="pathFinderResultsSmell">pach</label>
-			<input class ="detail" type="text" id="pathFinderResultsSmell" name="time stamp" value="" readonly><br>
-			<label for="pathFinderResultsSmellPosition">poloha pachu</label>
-			<input class ="detail" type="text" id="pathFinderResultsSmellPosition" name="time stamp" value="" readonly><br>			
-			<label for="pathFinderResultsRepair">odporúčaná oprava</label>
-			<input class ="detail" type="text" id="pathFinderResultsTime" name="time stamp" value="" readonly><br>
-			<label for="pathFinderResultsTime">poradie opravy</label>
-			<input class ="detail" type="text" id="pathFinderResultsTime" name="time stamp" value="" readonly><br>
-
-			<button type="button" onclick="pathFinderResultsNextRepair()">nasledujuci</button> 
-			<button type="button" onclick="pathFinderResultsPreviousRepair()">predchadzajuci</button> 
-			<button type="button" onclick="pathFinderResultsRepairComplete()">označiť ako opravené</button> 
-
-		</div>
-	</div>
-
-
-
-
-</section>
-
-<div class="pathFinderAlertContainer" id="pathFinderAlertContainer">
-</div>
-
-
-<section id="search" hidden=true>
-	<h1>Možnosti vyhľadávania</h1>
-	<table id="searchTable">
-		<tr>
-			<th>Aktívny</th>
-			<th>Kód</th>
-			<th>Názov</th>
-			<th>Editovať</th>
-		</tr>
-	</table>
-	<button type="button" onclick="addSearch()">Pridať</button>
-</section>
-<section id="refactor" hidden=true>
-	<h1>Možnosti refaktorovania</h1>
-	<table id="repairTable">
-		<tr>
-			<th>Aktívny</th>
-			<th>Kód</th>
-			<th>Názov</th>
-			<th>Editovať</th>
-		</tr>
-	</table>
-	<button type="button" onclick="addRepair()">Pridať</button>
-</section>
-<section id="preferences" hidden=true>
-	<h1>Prioritizácia problémov</h1>
-	<p>
-		Potiahnutím upravte vaše preferenicie:
-		<ol id="priorityList">
-			<li>Bad Size</li>
-			<li>Bad Location</li>
-			<li>Bad Class Content</li>
-			<li>Bad Inheritance</li>
-			<li>Needless Part</li>
-			<li>Attribute Problem</li>
-			<li>Bad Communication</li>
-		</ol>
-	</section>
-	<section id="rules" hidden=true>
-		<h1>Aktualizujte pravidlá expertného systému</h1>
-		<textarea id="ruleDef" rows="35">
-		</textarea>
-		<button type="button" onclick="saveRules()">Uložiť</button>
-	</section>
-
-	<section id="repairEdit" hidden=true>
-		<h1>Aktualizujte pravidlo</h1>
-		<p>
-			<input type="text" name="name" id="rEditName" placeholder="názov">
-			<input type="text" name="code" id="rEditCode" placeholder="kód">
 			<p>
-				<textarea rows="30" id="rEditScript">
-				</textarea>
-				<button type="button" onclick="saveRepair()">Uložiť</button>
-			</section>
+			<input type="checkbox" id="explanationSearch-pathfiner" name="cc" />
+   			<label for="explanationSearch-pathfiner"><span></span>Vysvetlenia do search vetvy</label>
+   			</p>
+		</form>
+		<p/>
+		<hr>
+		<h3>SonarQube</h3>
+		<form>
+			<p>
+			<input type="checkbox" id="sonarQubeAnalyze-pathfiner" name="cc" />
+   			<label for="sonarQubeAnalyze-pathfiner"><span></span>Analyzovať projekt pomocou nástroja SonarQube</label>
 
-			<section id="searchEdit" hidden=true>
-				<h1>Aktualizujte pravidlo</h1>
-				<p>
-					<input type="text" name="name" id="sEditName" placeholder="názov">
-					<input type="text" name="code" id="sEditCode" placeholder="kód">
+			</p>
+			<p>
+				<label for="sonarHost-pathfiner">Hostname</label>
+				<input type="text" name="sonarHost-pathfiner" value="http://localhost:9000" id="sonarHost-pathfiner">
+			</p>
+			<p>
+				<label for="sonarLogin-pathfiner">Prihlasovacie meno</label>
+				<input type="text" name="sonarLogin-pathfiner" value="admin" id="sonarLogin-pathfiner">
+			</p>
+			<p>
+				<label for="sonarPassword-pathfiner">Heslo</label>
+				<input type="password" name="sonarPassword-pathfiner" value="admin" id="sonarPassword-pathfiner">
+			</p>
+
+		</form>
+		<hr>
+
 					<p>
-						<textarea rows="30" id="sEditScript">
-						</textarea>
-						<button type="button" onclick="saveSearch()">Uložiť</button>
-					</section>
-					<section id="SmellDatabase" hidden=true>
-						<h1>Prehľad pachov</h1>
-					</section>
+			<input type="checkbox" id="utilizeclustering" name="cc" />
+   			<label for="utilizeclustering"><span></span>Použiť zhlukovaniie na urýchlenie analýzy</label>
 
-					<section id = "records">
-						<h1>najdene zaznamy o opravach</h1>
+			</p>
 
-						<div style="height:600px;">
+		<p>
+			<div>
+				<label id="labelPathFinder" for="pathFindingMethod">Metóda prehľadávania stavového priestoru</label>
+				<select id="pathFindingMethod">
+					<option value="A*">A*</option>
+					<option value="bee">Včelí algoritmus</option>
+					<option value="ant">Mravčia kolónia</option>
+					<option value="mc">Monte Carlo</option>
+				</select>
+			</div>
+		</p>
+		<br>
+		<div>
+			<button type="button" onclick="executePathFinder()">Vykonať</button> 
+		</div>
+	</section>
 
-							<table id="result" >
-								<thead>
-									<tr>
-										<th>id</th>
-										<th>čas opravy</th>
-										<th>git repozitár</th>
-										<th>značka v zdrojovom kóde</th>
-										<th>nájdený pach</th>
-									</tr>
-								</thead>
-								<tbody id="RecordsTabletbody">
-								</tbody>
+	<section id="pathFinderResults">
+		<div id="nav">	
+			<ul class="subnav">		
+				<li>
+					<a href="javascript:pathFinder();"><span>Proces</span></a>
+				</li>
+				<li>
+					<a href="javascript:pathFinderResults();"><span>Výsledky</span></a>
+				</li>
+			</ul>
+		</div>
+		<h1>
+			Výsledky analýz
+		</h1>
+		<table id="pathFinderResultsAnalysisList" >
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>Git repozitár</th>
+					<th>používateľ</th>
+					<th>čas vykonania</th>
+				</tr>
+			</thead>
+			<tbody id="tabletbodyPathFinderResultsAnalys">
+			</tbody>
 
-							</table>	 
-						</div>
+		</table>	 	
+
+	</section>
+
+	<section  id="pathFinderResultsConcrete">
+		<div id="nav">	
+			<ul class="subnav">		
+				<li>
+					<a href="javascript:pathFinder();"><span>Proces</span></a>
+				</li>
+				<li>
+					<a href="javascript:pathFinderResults();"><span>Výsledky</span></a>
+				</li>
+			</ul>
+		</div>
+		<div>
+			<div class="recdetail left"  >
+
+				<h1>Výsledky</h1>
+			</div>
+			<div class="recdetail right">	
+				<button type="button" id="pathFinderResultsBack" onclick="pathFinderResultsBackr()">späť</button> 
+
+			</div>
+		</div>
+		<div style="clear: both;"></div>
+
+		<div class="recdetail">
+
+			<label for="pathFinderResultsRepo">repozitar</label>
+			<input class ="detail" type="text" id="pathFinderResultsRepo" name="git repo" value="" readonly><br>
+		</div>
+		<div>
+			<div class="recdetail left"  >
+				<label for="pathFinderResultsUser">použivateľ</label>
+				<input class ="detail" type="text" id="pathFinderResultsUser" name="git user" value="" readonly><br>
+			</div>
+			<div class="recdetail right">	    	
+				<label for="pathFinderResultsTime">čas</label>
+				<input class ="detail" type="text" id="pathFinderResultsTime" name="time stamp" value="" readonly><br>
+			</div>
+		</div>
+		<div style="clear: both;"></div>
+
+		<hr>
+		<div id="clusterselectiondiv">
+			<div class="recdetail left">
+
+				<label for="pathFinderResultsClusterID">číslo zhluku</label>
+				<input class ="detail" type="text" id="pathFinderResultsClusterID" name="cluster id" value="" readonly>
+
+			</div>
+			<button type="button" id="pathFinderResultsNextCluster" onclick="pathFinderResultsNextCluster()">nasledujuci</button> 
+			<button type="button" id="pathFinderResultsPreviousCluster" onclick="pathFinderResultsPreviousCluster()">predchadzajuci</button> 
+			<div style="clear: both;"></div>
+			<hr>
+		</div>
+		<div>
+			<div class="recdetail left">
+				<h2>
+					identifikované pachy
+				</h2>
+				<table id="pathFinderResultSmellTable" >
+					<thead>
+						<tr>
+							<th>id</th>
+							<th>nájdený pach</th>
+							<th>poloha</th>
+						</tr>
+					</thead>
+					<tbody id="tabletbodyPathfinderResults">
+					</tbody>
+
+				</table>	 
+
+			</div>
+			<div class="recdetail right">	    	
+				<label for="pathFinderResultsSmell">pach</label>
+				<input class ="detail" type="text" id="pathFinderResultsSmell" name="time stamp" value="" readonly><br>
+				<label for="pathFinderResultsSmellPosition">poloha pachu</label>
+				<input class ="detail" type="text" id="pathFinderResultsSmellPosition" name="time stamp" value="" readonly><br>			
+				<label for="pathFinderResultsRepair">odporúčaná oprava</label>
+				<input class ="detail" type="text" id="pathFinderResultsRecRepair" name="time stamp" value="" readonly><br>
+				<label for="pathFinderResultsTime">poradie opravy</label>
+				<input class ="detail" type="text" id="pathFinderResultsOrder" name="time stamp" value="" readonly><br>
+
+				<button type="button" id="pathFinderResultsNextRepair"     onclick="pathFinderResultsNextRepair()">nasledujuci</button> 
+				<button type="button" id="pathFinderResultsPreviousRepair" onclick="pathFinderResultsPreviousRepair()">predchadzajuci</button> 
+				<button type="button" id="pathFinderResultsRepairComplete" onclick="pathFinderResultsRepairComplete()">označiť ako opravené</button> 
+
+			</div>
+		</div>
 
 
-					</section>
 
-					<section id="recordDetail" hidden=true>
-						<h2>záznam o oprave</h2>
 
-						<hr>
-						<div>
-							<div class="recdetail left"  >
-								<label for="recordDetailGit">repozitar</label>
-								<input class ="detail" type="text" id="recordDetailGit" name="git repo" value="" readonly><br>
-							</div>
-							<div class="recdetail right">	    	
-								<label for="recordDetailrefcode">značka v zdrojovom kóde</label>
-								<input class ="detail" type="text" id="recordDetailrefcode" name="ref code" value="" readonly><br>
-							</div>
-						</div>
-						<div class="recdetail left">
-							<div >
-								<label for="recordDetailpath">pozícia pachu</label>
-								<input class ="detail" type="text" id="recordDetailpath" name="path" value="" readonly><br>
-							</div>
+	</section>
 
-							<div style="padding-top: 8px">
-								<label for="recordDetailsmell">názov pachu</label>
-								<input class ="detail" type="text" id="recordDetailsmell" name="smell " value="" readonly><br>
-							</div>
-						</div>
+	<div class="pathFinderAlertContainer" id="pathFinderAlertContainer">
+	</div>
 
-						<div>
 
-							<div class="recdetail right">
-								<label for="recordDetailsmelldesc">popis pachu</label>
-								<textarea class ="detail" type="text" id="recordDetailsmelldesc" name="smell desc " value="" readonly rows="5"></textarea>
-							</div >
-						</div>
-						<div class="recdetail">
-							<label for="recordDetailRepairs">možné opravy</label>
-							<textarea class ="detail" type="text" id="recordDetailRepairs" name="repairs " value="" rows="3" readonly rows="1"></textarea>
+	<section id="search" hidden=true>
+		<h1>Možnosti vyhľadávania</h1>
+		<table id="searchTable">
+			<tr>
+				<th>Aktívny</th>
+				<th>Kód</th>
+				<th>Názov</th>
+				<th>Editovať</th>
+			</tr>
+		</table>
+		<button type="button" onclick="addSearch()">Pridať</button>
+	</section>
+	<section id="refactor" hidden=true>
+		<h1>Možnosti refaktorovania</h1>
+		<table id="repairTable">
+			<tr>
+				<th>Aktívny</th>
+				<th>Kód</th>
+				<th>Názov</th>
+				<th>Editovať</th>
+			</tr>
+		</table>
+		<button type="button" onclick="addRepair()">Pridať</button>
+	</section>
+	<section id="preferences" hidden=true>
+		<h1>Prioritizácia problémov</h1>
+		<p>
+			Potiahnutím upravte vaše preferenicie:
+			<ol id="priorityList">
+				<li>Bad Size</li>
+				<li>Bad Location</li>
+				<li>Bad Class Content</li>
+				<li>Bad Inheritance</li>
+				<li>Needless Part</li>
+				<li>Attribute Problem</li>
+				<li>Bad Communication</li>
+			</ol>
+		</section>
+		<section id="rules" hidden=true>
+			<h1>Aktualizujte pravidlá expertného systému</h1>
+			<textarea id="ruleDef" rows="35">
+			</textarea>
+			<button type="button" onclick="saveRules()">Uložiť</button>
+		</section>
 
-						</div>
-						<div style="clear: both;"></div>
+		<section id="repairEdit" hidden=true>
+			<h1>Aktualizujte pravidlo</h1>
+			<p>
+				<input type="text" name="name" id="rEditName" placeholder="názov">
+				<input type="text" name="code" id="rEditCode" placeholder="kód">
+				<p>
+					<textarea rows="30" id="rEditScript">
+					</textarea>
+					<button type="button" onclick="saveRepair()">Uložiť</button>
+				</section>
 
-						<div class="recdetail left">
-							<label for="recordDetailJessName">použité pravidlo</label>
-							<textarea class ="detail" type="text" id="recordDetailJessName" name="Jess name " value="" readonly rows="1"></textarea>								
-						</div>
-						<div class="recdetail right">
-							<label for="recordDetailJessDesc">popis pravidla</label>
-							<textarea class ="detail" type="text" id="recordDetailJessDesc" name="Jess desc " value="" readonly rows="4"></textarea>								
-						</div>
-						<div style="clear: both;"></div>
-
-						<div>
-							<div class="recdetail left">
-								<label for="recordDetailcodebefore">zdrojový kód pred úpraavou</label>
-								<textarea class ="detail" type="text" id="recordDetailcodebefore" name="code before " value="" readonly rows="25"></textarea>
-							</div>
-							<div class="recdetail right">
-								<label for="recordDetailcodeafter">zdrojový kód po úprave</label>
-								<textarea class ="detail" type="text" id="recordDetailcodeafter" name="code after " value="" readonly rows="25"></textarea>
-							</div>
-						</div>
-						<button type="button" onclick="backToRecords()">Späť</button>
-
-					</section>
-					<section id="about" hidden=true>
-						<h1>O programe Refactor</h1>
+				<section id="searchEdit" hidden=true>
+					<h1>Aktualizujte pravidlo</h1>
+					<p>
+						<input type="text" name="name" id="sEditName" placeholder="názov">
+						<input type="text" name="code" id="sEditCode" placeholder="kód">
 						<p>
-							Program predstavuje výstup diplomového projektu na fakulte Informatiky a Informačných Technológií.
-							Program je vo fáze prototypu, preto ho nemožno použiť na iné, ako vedecké účely.
+							<textarea rows="30" id="sEditScript">
+							</textarea>
+							<button type="button" onclick="saveSearch()">Uložiť</button>
+						</section>
+						<section id="SmellDatabase" hidden=true>
+							<h1>Prehľad pachov</h1>
+						</section>
+
+						<section id = "records">
+							<h1>Záznamy automatického refaktorovania</h1>
+
+							<div style="height:600px;">
+
+								<table id="result" >
+									<thead>
+										<tr>
+											<th>id</th>
+											<th>čas opravy</th>
+											<th>git repozitár</th>
+											<th>značka v zdrojovom kóde</th>
+											<th>nájdený pach</th>
+										</tr>
+									</thead>
+									<tbody id="RecordsTabletbody">
+									</tbody>
+
+								</table>	 
+							</div>
+
+
+						</section>
+
+						<section id="recordDetail" hidden=true>
+							<h2>záznam o oprave</h2>
+
+							<hr>
+							<div>
+								<div class="recdetail left"  >
+									<label for="recordDetailGit">repozitar</label>
+									<input class ="detail" type="text" id="recordDetailGit" name="git repo" value="" readonly><br>
+								</div>
+								<div class="recdetail right">	    	
+									<label for="recordDetailrefcode">značka v zdrojovom kóde</label>
+									<input class ="detail" type="text" id="recordDetailrefcode" name="ref code" value="" readonly><br>
+								</div>
+							</div>
+							<div class="recdetail left">
+								<div >
+									<label for="recordDetailpath">pozícia pachu</label>
+									<input class ="detail" type="text" id="recordDetailpath" name="path" value="" readonly><br>
+								</div>
+
+								<div style="padding-top: 8px">
+									<label for="recordDetailsmell">názov pachu</label>
+									<input class ="detail" type="text" id="recordDetailsmell" name="smell " value="" readonly><br>
+								</div>
+							</div>
+
+							<div>
+
+								<div class="recdetail right">
+									<label for="recordDetailsmelldesc">popis pachu</label>
+									<textarea class ="detail" type="text" id="recordDetailsmelldesc" name="smell desc " value="" readonly rows="5"></textarea>
+								</div >
+							</div>
+							<div class="recdetail">
+								<label for="recordDetailRepairs">možné opravy</label>
+								<textarea class ="detail" type="text" id="recordDetailRepairs" name="repairs " value="" rows="3" readonly rows="1"></textarea>
+
+							</div>
+							<div style="clear: both;"></div>
+
+							<div class="recdetail left">
+								<label for="recordDetailJessName">použité pravidlo</label>
+								<textarea class ="detail" type="text" id="recordDetailJessName" name="Jess name " value="" readonly rows="1"></textarea>								
+							</div>
+							<div class="recdetail right">
+								<label for="recordDetailJessDesc">popis pravidla</label>
+								<textarea class ="detail" type="text" id="recordDetailJessDesc" name="Jess desc " value="" readonly rows="4"></textarea>								
+							</div>
+							<div style="clear: both;"></div>
+
+							<div>
+								<div class="recdetail left">
+									<label for="recordDetailcodebefore">zdrojový kód pred úpraavou</label>
+									<textarea class ="detail" type="text" id="recordDetailcodebefore" name="code before " value="" readonly rows="25"></textarea>
+								</div>
+								<div class="recdetail right">
+									<label for="recordDetailcodeafter">zdrojový kód po úprave</label>
+									<textarea class ="detail" type="text" id="recordDetailcodeafter" name="code after " value="" readonly rows="25"></textarea>
+								</div>
+							</div>
+							<button type="button" onclick="backToRecords()">Späť</button>
+
+						</section>
+						<section id="about" hidden=true>
+							<h1>O programe Refactor</h1>
 							<p>
-								Autor: Lukáš Markovič
-							</section>
-						</body>
-						</html>
+								Program predstavuje výstup diplomového projektu na fakulte Informatiky a Informačných Technológií.
+								Program je vo fáze prototypu, preto ho nemožno použiť na iné, ako vedecké účely.
+								<p>
+									Autor: Lukáš Markovič
+								</section>
+							</body>
+							</html>

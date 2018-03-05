@@ -106,7 +106,21 @@ public class WebController {
 			@PathParam("clusterid") int clusterNumber) {
 		return resourceCommand.getPathFinderAnalysisCluster(analysisId, clusterNumber);
 	}
+	
+	@GET
+	@Path("/PathFinderAnalysisInfo/{analysisid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getPathFinderAnalysisInfo(@PathParam("analysisid") int analysisId){
+		return resourceCommand.getPathFinderAnalysisInfo(analysisId);
+	}
 
+	@GET
+	@Path("PathFinderClusterInfo/{clusterid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getPathFinderClusterInfo(@PathParam("clusterid") int clusterId){
+		return resourceCommand.getPathFinderClusterInfo(clusterId);
+	}
+	
 	@GET
 	@Path("/getPathFinderRepair/{clusterid}/{repairid}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -162,7 +176,8 @@ public class WebController {
 		JSONObject json = new JSONObject(input);
 		JSONArray toSearch = json.getJSONArray("searchCodes");
 		boolean explanationToSearch = json.getBoolean("explanationSearch");
-		boolean clusteringEnabled = true;
+		boolean clusteringEnabled = json.getBoolean("utilizeclustering");
+		clusteringEnabled = false;
 		String gituser = json.getString("name");
 		String gitpass = json.getString("password");
 		String method = json.getString("selectedMethod");

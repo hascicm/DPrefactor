@@ -64,6 +64,16 @@
     border-bottom: 5px solid #0e223d;*/
 }
 
+.navbuttonselected{
+    border-bottom: 5px solid #fff;
+
+}
+
+#pathFinderResultsBack{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 #nav ul li a.active {
     border-bottom: 5px solid #4db6e2;
     height: 65px;
@@ -157,4 +167,28 @@
 
 .subnav li a span{
     top: 12px !important;
+}
+
+
+input[type="checkbox"] {
+    display:none;
+}
+
+input[type="checkbox"] + label {
+    color:#f2f2f2;
+    width: auto;
+}
+
+input[type="checkbox"] + label span {
+    display:inline-block;
+    width:19px;
+    height:19px;
+    margin:-2px 10px 0 0;
+    vertical-align:middle;
+    background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) left top no-repeat;
+    cursor:pointer;
+}
+
+input[type="checkbox"]:checked + label span {
+    background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) -19px top no-repeat;
 }
