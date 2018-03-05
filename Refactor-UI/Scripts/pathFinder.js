@@ -202,6 +202,8 @@ function getClusterInfo(clusterid){
 		if (currentPathfinderrRepairCount>0){
 			jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster + "/1" , function(response){
 			getAndSetRepairInfo(response);		
+			getAndSetSmellOccPosition(response.soid);
+
 			})
 		}
 
@@ -229,7 +231,9 @@ function pathFinderResultsPreviousRepair(){
 	}
 
 	jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster + "/" +  currentPathfinderRepairNumber , function(response){
-		getAndSetRepairInfo(response);		
+		getAndSetRepairInfo(response);
+		getAndSetSmellOccPosition(response.soid);
+		
 	})
 }
 
@@ -248,8 +252,30 @@ function pathFinderResultsNextRepair(){
 
 	jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster + "/" + currentPathfinderRepairNumber  , function(response){
 		getAndSetRepairInfo(response);
+		getAndSetSmellOccPosition(response.soid);
 	})
 }
+
+function getAndSetSmellOccPosition(soid){
+	console.log("position ");
+		jQuery.get("http://localhost:8080/refactor/getSmellOccPosition/"+ soid, function(response){
+			console.log(response);
+			var pos = "";
+			var x = 1;
+			response.forEach(function(value) {
+				pos += "Poloha " + x + "\n";
+				pos += "balík "  + value.package + "\n";
+				pos += "trieda " + value.class + "\n";
+				pos += "metoda " + value.method + "\n";
+				x++;
+
+			})
+			console.log(" is \n " + pos );
+
+			document.getElementById("pathFinderResultsSmellPosition").value = pos;
+	})
+}
+
 
 var currentPathfinderRepairID; 
 

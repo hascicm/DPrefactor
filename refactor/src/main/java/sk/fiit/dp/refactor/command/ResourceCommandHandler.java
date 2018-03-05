@@ -282,4 +282,9 @@ public class ResourceCommandHandler {
 		PostgresManager.getInstance().updatePathfinderRepairStatus(jsonObject);
 	}
 
+	public String getSmellOccPosition(int smelloccid) {
+		JSONArray result = PostgresManager.getInstance().getSmellOccPosition(smelloccid);
+		return result.toString();
+	}
+
 }

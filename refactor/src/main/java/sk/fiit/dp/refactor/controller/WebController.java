@@ -134,10 +134,17 @@ public class WebController {
 	}
 	
 	@PUT
-	@Path("updatePathfinderRepairStatus")
+	@Path("/updatePathfinderRepairStatus")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void updatePathfinderRepairStatus(String input){
 		resourceCommand.updatePathfinderRepairStatus(new JSONObject(input));
+	}
+	
+	@GET
+	@Path("/getSmellOccPosition/{smelloccid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getSmellOccPosition(@PathParam("smelloccid") int smelloccid){
+		return resourceCommand.getSmellOccPosition(smelloccid);
 	}
 
 	@GET

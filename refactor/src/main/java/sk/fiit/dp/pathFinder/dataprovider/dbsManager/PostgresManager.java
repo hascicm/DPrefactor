@@ -33,7 +33,6 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 public class PostgresManager {
 
 	private Statement statement;
-	private Statement statement2;
 	private static PostgresManager instance = null;
 
 	public static PostgresManager getInstance() {
@@ -48,7 +47,6 @@ public class PostgresManager {
 		try {
 			PpostgresConnector = new PostgresConnector();
 			statement = PpostgresConnector.getStatement();
-			statement2 = PpostgresConnector.getStatement();
 		} catch (ClassNotFoundException | SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
@@ -413,39 +411,9 @@ public class PostgresManager {
 		return test;
 	}
 
-	private JSONArray getSmellLocationByID(int smelloccID) {
-		JSONArray result = new JSONArray();
-		String querry = "select * from smellposition sp where sp.smelloccurrence_id = " + smelloccID
-				+ "order by locationid,positionorder";
-		ResultSet rs;
-		List<LocationPart> locparts = new ArrayList<LocationPart>();
-		Location loc = null;
-		try {
-
-			rs = statement2.executeQuery(querry);
-			int locationid = -1;
-			while (rs.next()) {
-				if (locationid != rs.getInt("locationid")) {
-					if (loc != null) {
-						result.put(loc.toJSON());
-						locparts = new ArrayList<LocationPart>();
-					}
-					loc = new Location(locparts);
-					locationid = rs.getInt("locationid");
-				}
-				locparts.add(new LocationPart(LocationPartType.valueOf(rs.getString("type")), rs.getString("name")));
-			}
-		} catch (SQLException e) {
-			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
-		}
-
-		return result;
-
-	}
-
 	public JSONObject getPathFinderResultRepair(int clusterid, int repairid) {
 		JSONObject result = new JSONObject();
-		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id from repairsequencepart rsp "
+		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id,so.id as soid from repairsequencepart rsp "
 				+ "join repair r on r.id = rsp.repair_id join smelloccurrence so on so.id=rsp.smelloccurrence_id "
 				+ "join smelltype st on st.id = smell_id where rsp.cluster_id =" + clusterid + " and repairorder = "
 				+ repairid;
@@ -459,6 +427,7 @@ public class PostgresManager {
 				result.put("order", rs.getInt("repairorder"));
 				result.put("isdone", rs.getBoolean("isdone"));
 				result.put("concrepid", rs.getInt("id"));
+				result.put("soid", rs.getInt("soid"));
 			}
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
@@ -520,5 +489,62 @@ public class PostgresManager {
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
+	}
+
+	public JSONArray getSmellOccPosition(int smelloccid) {
+		// TODO
+		JSONArray result = new JSONArray();
+		String querry = "select * from smellposition sp where sp.smelloccurrence_id = " + smelloccid
+				+ "order by locationid,positionorder";
+		ResultSet rs;
+		JSONObject currentLoc = new JSONObject();
+		int currentOrder = -1;
+		try {
+			rs = statement.executeQuery(querry);
+
+			while (rs.next()) {
+				if (rs.getInt("positionorder") > currentOrder) {
+					currentOrder = rs.getInt("positionorder");
+					if (LocationPartType.valueOf(rs.getString("type")) == LocationPartType.PACKAGE) {
+						String pack = "";
+						if (currentLoc.has("package")) {
+							pack = currentLoc.get("package").toString();
+							currentLoc.remove("package");
+							currentLoc.put("package", pack + "." + rs.getString("name"));
+
+						} else {
+							currentLoc.put("package", rs.getString("name"));
+
+						}
+					}
+
+					if (LocationPartType.valueOf(rs.getString("type")) == LocationPartType.CLASS) {
+						String clas = "";
+						if (currentLoc.has("class")) {
+							clas = currentLoc.get("class").toString();
+							currentLoc.remove("class");
+							currentLoc.put("class", clas + "  nested class: " + rs.getString("name"));
+						} else {
+							currentLoc.put("class", rs.getString("name"));
+
+						}
+					}
+					if (LocationPartType.valueOf(rs.getString("type")) == LocationPartType.METHOD) {
+						currentLoc.put("method", rs.getString("name"));
+					}
+
+				} else {
+					currentOrder = -1;
+					result.put(currentLoc);
+					currentLoc = new JSONObject();
+				}
+			}
+			result.put(currentLoc);
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+		System.out.println(result);
+		return result;
+
 	}
 }
