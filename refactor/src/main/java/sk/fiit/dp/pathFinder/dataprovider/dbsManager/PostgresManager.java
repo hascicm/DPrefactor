@@ -15,8 +15,6 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javafx.print.JobSettings;
-import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.entities.DependencyPlaceType;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
 import sk.fiit.dp.pathFinder.entities.DependencyType;
@@ -92,7 +90,6 @@ public class PostgresManager {
 				+ "dependencytype, rd.actionField,rd.locationparttype, probability  "
 				+ "from repair  join repairdependencies rd on repair.id=rd.repair_id "
 				+ "order by rapairid,dependencytype desc,smell_id )   as result";
-		// System.out.println(query);
 		ResultSet rs;
 		try {
 			rs = statement.executeQuery(query);
@@ -299,8 +296,8 @@ public class PostgresManager {
 
 	private void addRepairSequencePartRecord(int clusterID, Integer fixedSmellOccID, int usedRepairID, int repairOrder)
 			throws SQLException {
-		String query = "insert into repairsequencepart (smelloccurrence_id,repair_id,cluster_id,repairorder) values "
-				+ "('" + fixedSmellOccID + "','" + usedRepairID + "','" + clusterID + "'," + repairOrder + ")";
+		String query = "insert into repairsequencepart (smelloccurrence_id,repair_id,cluster_id,repairorder,isdone) values "
+				+ "('" + fixedSmellOccID + "','" + usedRepairID + "','" + clusterID + "'," + repairOrder + ",'false')";
 		statement.executeUpdate(query);
 
 	}
@@ -351,7 +348,7 @@ public class PostgresManager {
 				current.append("id", rs.getInt("id"));
 				current.append("git", rs.getString("git"));
 				current.append("gituser", rs.getString("gituser"));
-				
+
 				Date date = new Date(rs.getLong("time"));
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				current.append("time", sdf.format(date));
@@ -417,7 +414,6 @@ public class PostgresManager {
 	}
 
 	private JSONArray getSmellLocationByID(int smelloccID) {
-		System.out.println("4");
 		JSONArray result = new JSONArray();
 		String querry = "select * from smellposition sp where sp.smelloccurrence_id = " + smelloccID
 				+ "order by locationid,positionorder";
@@ -442,7 +438,6 @@ public class PostgresManager {
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-		System.out.println("5");
 
 		return result;
 
@@ -450,19 +445,20 @@ public class PostgresManager {
 
 	public JSONObject getPathFinderResultRepair(int clusterid, int repairid) {
 		JSONObject result = new JSONObject();
-		String querry = "select st.name as smell ,r.name as repair, repairorder from repairsequencepart rsp "
+		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id from repairsequencepart rsp "
 				+ "join repair r on r.id = rsp.repair_id join smelloccurrence so on so.id=rsp.smelloccurrence_id "
 				+ "join smelltype st on st.id = smell_id where rsp.cluster_id =" + clusterid + " and repairorder = "
 				+ repairid;
 		ResultSet rs;
 
-		System.out.println(querry);
 		try {
 			rs = statement.executeQuery(querry);
 			while (rs.next()) {
 				result.put("repair", rs.getString("repair"));
 				result.put("smell", rs.getString("smell"));
 				result.put("order", rs.getInt("repairorder"));
+				result.put("isdone", rs.getBoolean("isdone"));
+				result.put("concrepid", rs.getInt("id"));
 			}
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
@@ -494,7 +490,6 @@ public class PostgresManager {
 		JSONObject result = new JSONObject();
 		String query = "		select count(*) as result from cluster c join repairsequencepart rsp on c.id = rsp.cluster_id where c.id = "
 				+ clusterId;
-		System.out.println(query);
 		ResultSet rs = null;
 
 		try {
@@ -505,7 +500,25 @@ public class PostgresManager {
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-		System.out.println(result);
 		return result;
+	}
+
+	public void updatePathfinderRepairStatus(JSONObject jsonObject) {
+		int id = jsonObject.getInt("id");
+		boolean isdone = jsonObject.getBoolean("isdone");
+		String query;
+
+		if (isdone) {
+			query = "UPDATE repairsequencepart SET isdone = TRUE WHERE id = " + id;
+			System.out.println(query);
+		} else {
+			query = "UPDATE repairsequencepart SET isdone = FALSE WHERE id = " + id;
+			System.out.println(query);
+		}
+		try {
+			statement.executeUpdate(query);
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
 	}
 }

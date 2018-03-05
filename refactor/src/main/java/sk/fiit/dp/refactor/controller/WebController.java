@@ -18,6 +18,8 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.eclipsesource.json.JsonObject;
+
 import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
 import sk.fiit.dp.refactor.command.PathFinderCommandHandler;
 import sk.fiit.dp.refactor.command.RefactorCommandHandler;
@@ -129,6 +131,13 @@ public class WebController {
 		String x = resourceCommand.getPathFinderResultRepair(clusterid, repairid);
 		System.out.println(x);
 		return x;
+	}
+	
+	@PUT
+	@Path("updatePathfinderRepairStatus")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void updatePathfinderRepairStatus(String input){
+		resourceCommand.updatePathfinderRepairStatus(new JSONObject(input));
 	}
 
 	@GET

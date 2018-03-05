@@ -250,15 +250,52 @@ function pathFinderResultsNextRepair(){
 		getAndSetRepairInfo(response);
 	})
 }
+
+var currentPathfinderRepairID; 
+
 function getAndSetRepairInfo(response){
+	currentPathfinderRepairID = response.concrepid;
+
 	document.getElementById("pathFinderResultsSmell").value = response.smell;
 	document.getElementById("pathFinderResultsSmellPosition").value = "TODO";
 	document.getElementById("pathFinderResultsRecRepair").value = response.repair;
 	document.getElementById("pathFinderResultsOrder").value = response.order;
+	console.log(response.isdone);
+	if (response.isdone == true){
+		document.getElementById("pathFinderResultsIsdone").value = "Nie"
+		document.getElementById("pathFinderResultsRepairComplete").innerHTML = "označiť ako dokončené";
+	}else {
+		document.getElementById("pathFinderResultsRepairComplete").innerHTML = "označiť ako nedokončené";
+		document.getElementById("pathFinderResultsIsdone").value = "Áno"		
+	}
+
+
 
 }
-function pathFinderResultsRepairComplete(){
 
+
+function pathFinderResultsRepairComplete(){
+	if (document.getElementById("pathFinderResultsIsdone").value == "Nie"){
+		document.getElementById("pathFinderResultsIsdone").value = "Áno";
+		document.getElementById("pathFinderResultsRepairComplete").innerHTML = "označiť ako nedokončené";
+		$.ajax({
+			type: "PUT",
+			url: "http://localhost:8080/refactor/updatePathfinderRepairStatus/",
+			data: JSON.stringify({"isdone" : true, "id" : currentPathfinderRepairID}),
+			contentType:"application/json; charset=utf-8",
+			dataType: "json"
+		});
+	}else if (document.getElementById("pathFinderResultsIsdone").value == "Áno"){
+		document.getElementById("pathFinderResultsIsdone").value = "Nie";		
+		document.getElementById("pathFinderResultsRepairComplete").innerHTML = "označiť ako dokončené";
+		$.ajax({
+			type: "PUT",
+			url: "http://localhost:8080/refactor/updatePathfinderRepairStatus/",
+			data: JSON.stringify({"isdone" : false, "id" : currentPathfinderRepairID}),
+			contentType:"application/json; charset=utf-8",
+			dataType: "json"
+		});
+	}
 }
 
 
