@@ -264,8 +264,8 @@ public class PostgresManager {
 	}
 
 	private int addSmellOccurenceRecord(SmellOccurance smellOcc, int clusterID) throws SQLException {
-		String query = "insert into smelloccurrence (cluster_id,smell_id) values ('" + clusterID + "','"
-				+ smellOcc.getSmell().getId() + "')";
+		String query = "insert into smelloccurrence (cluster_id,smell_id,code) values ('" + clusterID + "','"
+				+ smellOcc.getSmell().getId() + "','" + smellOcc.getCode() + "')";
 
 		statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 		ResultSet rs = statement.getGeneratedKeys();
@@ -384,9 +384,10 @@ public class PostgresManager {
 		JSONObject test = new JSONObject();
 		JSONArray result = new JSONArray();
 		boolean inserted = false;
-		String querry = "select c.id as clusterid, st.name,st.description,sc.id from cluster c join smelloccurrence sc on c.id= sc.cluster_id "
-				+ "join smelltype st on st.id = sc.smell_id where c.pathfinderanalysis_id = " + analysisId
-				+ " and c.cluster_number = " + ClusterNumber + " order by sc.id";
+		String querry = "select c.id as clusterid, st.name,st.description, count(*) from cluster c "
+				+ "join smelloccurrence sc on c.id= sc.cluster_id join smelltype st on st.id = sc.smell_id "
+				+ "where c.pathfinderanalysis_id = " + analysisId + " and c.cluster_number = " + ClusterNumber
+				+ "  group by (clusterid, name,description)";
 		ResultSet rs;
 		try {
 			rs = statement.executeQuery(querry);
@@ -397,7 +398,7 @@ public class PostgresManager {
 					inserted = true;
 				}
 				curr = new JSONObject();
-				curr.append("id", rs.getInt("id"));
+				curr.append("count", rs.getInt("count"));
 				curr.append("smellname", rs.getString("name"));
 				curr.append("description", rs.getString("description"));
 				result.put(curr);
@@ -413,12 +414,12 @@ public class PostgresManager {
 
 	public JSONObject getPathFinderResultRepair(int clusterid, int repairid) {
 		JSONObject result = new JSONObject();
-		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id,so.id as soid from repairsequencepart rsp "
+		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id,so.id as soid,so.code from repairsequencepart rsp "
 				+ "join repair r on r.id = rsp.repair_id join smelloccurrence so on so.id=rsp.smelloccurrence_id "
 				+ "join smelltype st on st.id = smell_id where rsp.cluster_id =" + clusterid + " and repairorder = "
 				+ repairid;
 		ResultSet rs;
-
+		System.out.println(querry);
 		try {
 			rs = statement.executeQuery(querry);
 			while (rs.next()) {
@@ -426,13 +427,14 @@ public class PostgresManager {
 				result.put("smell", rs.getString("smell"));
 				result.put("order", rs.getInt("repairorder"));
 				result.put("isdone", rs.getBoolean("isdone"));
+				result.put("code", rs.getString("code"));
 				result.put("concrepid", rs.getInt("id"));
 				result.put("soid", rs.getInt("soid"));
 			}
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-
+		System.out.println(result);
 		return result;
 	}
 
@@ -479,10 +481,8 @@ public class PostgresManager {
 
 		if (isdone) {
 			query = "UPDATE repairsequencepart SET isdone = TRUE WHERE id = " + id;
-			System.out.println(query);
 		} else {
 			query = "UPDATE repairsequencepart SET isdone = FALSE WHERE id = " + id;
-			System.out.println(query);
 		}
 		try {
 			statement.executeUpdate(query);
@@ -492,7 +492,7 @@ public class PostgresManager {
 	}
 
 	public JSONArray getSmellOccPosition(int smelloccid) {
-		// TODO
+
 		JSONArray result = new JSONArray();
 		String querry = "select * from smellposition sp where sp.smelloccurrence_id = " + smelloccid
 				+ "order by locationid,positionorder";
@@ -543,7 +543,6 @@ public class PostgresManager {
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-		System.out.println(result);
 		return result;
 
 	}

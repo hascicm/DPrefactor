@@ -12,8 +12,9 @@ import sk.fiit.dp.pathFinder.entities.SmellType;
 
 public class SmellOccurance {
 	private SmellType smell;
-	private List<Location> locations; // na prvom mieste sa nachadza klucova
-										// trieda?
+	private List<Location> locations; // na prvom mieste sa nachadza klucova trieda?
+	private String code;
+										
 
 	public SmellOccurance(SmellType smell) {
 		super();
@@ -25,6 +26,13 @@ public class SmellOccurance {
 		super();
 		this.smell = smell;
 		this.locations = locations;
+	}
+
+	public SmellOccurance(SmellType smell, List<Location> locations, String code) {
+		super();
+		this.smell = smell;
+		this.locations = locations;
+		this.setCode(code);
 	}
 
 	public SmellType getSmell() {
@@ -43,6 +51,14 @@ public class SmellOccurance {
 		this.locations = locations;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
 	public JSONObject toJSON() {
 		JSONObject result = new JSONObject();
 		result.append("name", smell.getName());
@@ -66,4 +82,6 @@ public class SmellOccurance {
 		}
 		return result;
 	}
+
+
 }

@@ -85,7 +85,8 @@ public class DatabaseDataProvider implements DataProvider {
 				locationParts.addAll(processStringToLocationPart(str));
 			}
 			locationList.add(new Location(locationParts));
-			SmellOccurance ocurance = new SmellOccurance(smell, locationList);
+			
+			SmellOccurance ocurance = new SmellOccurance(smell, locationList,searchResult.getCode());
 			smellOccurances.add(ocurance);
 		}
 		this.root.setSmells(smellOccurances);

@@ -193,7 +193,6 @@ public class WebController {
 		JSONArray toSearch = json.getJSONArray("searchCodes");
 		boolean explanationToSearch = json.getBoolean("explanationSearch");
 		boolean clusteringEnabled = json.getBoolean("utilizeclustering");
-		clusteringEnabled = false;
 		String gituser = json.getString("name");
 		String gitpass = json.getString("password");
 		String method = json.getString("selectedMethod");
@@ -204,7 +203,6 @@ public class WebController {
 			sonarProps.setLoginName(json.getString("sonarLogin"));
 			sonarProps.setLoginPassword(json.getString("sonarPassword"));
 		}
-
 		List<String> searchMethods = new ArrayList<>();
 		for (int i = 0; i < toSearch.length(); ++i) {
 			searchMethods.add(toSearch.getString(i));
@@ -219,7 +217,6 @@ public class WebController {
 			response.put(r.toJSON());
 		}
 		Logger.getLogger("webcontroller").log(Level.INFO, "final part");
-		System.out.println(response.toString());
 		return response.toString();
 	}
 

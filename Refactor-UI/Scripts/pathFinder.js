@@ -145,7 +145,7 @@ function pathFinderResultsPreviousCluster(){
 			table.deleteRow(i - 1);
 		}
 		response.smells.forEach(function(value) {
-			$(table).append("<tr><td>"+value.id+"</td><td>"+value.smellname+"</td><td>"+value.description+"</td></tr>");
+			$(table).append("<tr><td>"+value.smellname+"</td><td>"+value.description+"</td><td>"+value.count+"</td></tr>");
 
 		})
 		getClusterInfo(currentPathfinderCluster);		
@@ -176,7 +176,7 @@ function pathFinderResultsNextCluster(){
 			table.deleteRow(i - 1);
 		}
 		response.smells.forEach(function(value) {
-			$(table).append("<tr><td>"+value.id+"</td><td>"+value.smellname+"</td><td>"+value.description+"</td></tr>");
+			$(table).append("<tr><td>"+value.smellname+"</td><td>"+value.description+"</td><td>"+value.count+"</td></tr>");
 
 		})
 		getClusterInfo(currentPathfinderCluster);
@@ -257,9 +257,7 @@ function pathFinderResultsNextRepair(){
 }
 
 function getAndSetSmellOccPosition(soid){
-	console.log("position ");
 		jQuery.get("http://localhost:8080/refactor/getSmellOccPosition/"+ soid, function(response){
-			console.log(response);
 			var pos = "";
 			var x = 1;
 			response.forEach(function(value) {
@@ -270,8 +268,6 @@ function getAndSetSmellOccPosition(soid){
 				x++;
 
 			})
-			console.log(" is \n " + pos );
-
 			document.getElementById("pathFinderResultsSmellPosition").value = pos;
 	})
 }
@@ -280,14 +276,15 @@ function getAndSetSmellOccPosition(soid){
 var currentPathfinderRepairID; 
 
 function getAndSetRepairInfo(response){
+	console.log("number of repairs in cluster " + currentPathfinderrRepairCount);
 	currentPathfinderRepairID = response.concrepid;
-
 	document.getElementById("pathFinderResultsSmell").value = response.smell;
 	document.getElementById("pathFinderResultsSmellPosition").value = "TODO";
 	document.getElementById("pathFinderResultsRecRepair").value = response.repair;
 	document.getElementById("pathFinderResultsOrder").value = response.order;
-	console.log(response.isdone);
-	if (response.isdone == true){
+	document.getElementById("pathFinderResultsCode").value = response.code;
+
+	if (response.isdone == false){
 		document.getElementById("pathFinderResultsIsdone").value = "Nie"
 		document.getElementById("pathFinderResultsRepairComplete").innerHTML = "označiť ako dokončené";
 	}else {
@@ -361,7 +358,7 @@ jQuery.get("http://localhost:8080/refactor/PathFinderAnalysisDetail/" + i, funct
 		var table = document.getElementById("pathFinderResultSmellTable");
 		response.smells.forEach(function(value) {
 			//var row = table.insertRow(i);
-			$(table).append("<tr><td>"+value.id+"</td><td>"+value.smellname+"</td><td>"+value.description+"</td></tr>");
+			$(table).append("<tr><td>"+value.smellname+"</td><td>"+value.description+"</td><td>"+value.count+"</td></tr>");
 
 		})
 		jQuery.get("http://localhost:8080/refactor/PathFinderAnalysisInfo/" + i , function(response){

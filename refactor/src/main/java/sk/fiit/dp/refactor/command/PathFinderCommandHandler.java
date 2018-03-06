@@ -76,10 +76,6 @@ public class PathFinderCommandHandler {
 			String method) {
 		id = "Refactor" + IdGenerator.generateId();
 		
-		//DEBUG
-			clusteringEnabled = false;
-		//DEBUG
-		
 		try {
 			// 0. time stamp generator reset
 			timeGenerator.resetTimeStamp();
@@ -162,9 +158,12 @@ public class PathFinderCommandHandler {
 			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky
 			// (clustering)
 			if (clusteringEnabled) {
+				System.out.println("clustering strarting");
 				rootStates = ClusteringHandler.executeClustering(searchResults);
 			} else {
+				System.out.println("clustering not enabled");
 				rootStates = DatabaseDataProvider.getInstance().prepareRootStateList(searchResults);
+				
 			}
 
 			// vykoná sa hľadanie optimálnej cesty
@@ -181,10 +180,10 @@ public class PathFinderCommandHandler {
 			
 			PostgresManager.getInstance().addResultRecord(repo,name,timeGenerator.getTime(),results);
 			
-			for (OptimalPathForCluster r : results){
-				System.out.println("-------------------------\n-------------------------\n-------------------------\n       CLUSTER        \n-------------------------\n-------------------------\n-------------------------\n");
-				System.out.println(r.toJSON().toString());
-			}
+//			for (OptimalPathForCluster r : results){
+//				System.out.println("-------------------------\n-------------------------\n-------------------------\n       CLUSTER        \n-------------------------\n-------------------------\n-------------------------\n");
+//				System.out.println(r.toJSON().toString());
+//			}
 			
 			return results;
 		} catch (IOException | GitAPIException | InterruptedException | XQException | SQLException e) {
