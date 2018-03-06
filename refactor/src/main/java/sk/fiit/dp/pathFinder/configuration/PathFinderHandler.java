@@ -11,39 +11,13 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 public class PathFinderHandler {
 
 	public static List<OptimalPathForCluster> executePathFinder(List<State> rootStates, String method) {
-		// int[] selectedSmells = { 15, 32, 1, 9, 31, 8, 3, 22, 30, 2, 10, 4,
-		// 25, 21 };
-		// int[] selectedRepairs = { 87, 92, 88, 93, 61, 94, 81, 74, 73, 50, 79,
-		// 84, 80, 82, 15, 14, 12, 21, 65, 83, 85 };
+
 		List<OptimalPathForCluster> result = null;
 		if (rootStates.size() == 1) {
 			result = executeSingleThead(rootStates.get(0), method);
 		} else {
 			result = executeMultiThdead(rootStates, method);
 		}
-
-		// RefactorProcessOptimizer model = new
-		// RefactorProcessOptimizer(method);
-		// DataProvider dp = model.getDataProvider();
-		// ((DatabaseDataProvider) dp).reduceDBdata(selectedSmells,
-		// selectedRepairs);
-		// dp.initializeRootState(rootStates);
-		// System.out.println("-----------initialization done ------------");
-		// for (SmellOccurance x : dp.getRootState().getSmells()) {
-		// System.out.println(x.getSmell().getName());
-		// for (Location l : x.getLocations()) {
-		// System.out.println("-------location------");
-		// for (LocationPart lo : l.getLocation()) {
-		// System.out.println("-------part------");
-		// System.out.println(lo.getLocationPartType());
-		// System.out.println(lo.getId());
-		// }
-		// }
-		// }
-
-		// model.findRefactoringPath();
-		// ((DatabaseDataProvider)dp).printSmells();
-		// ((DatabaseDataProvider) dp).printRepairs();
 
 		return result;
 	}

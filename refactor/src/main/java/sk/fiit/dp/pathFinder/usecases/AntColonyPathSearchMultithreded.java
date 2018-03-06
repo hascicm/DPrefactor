@@ -2,7 +2,6 @@ package sk.fiit.dp.pathFinder.usecases;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -12,11 +11,11 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 
 	private static final int numOfThreads = 1;
-	private static final int maxPheromone = 20000;
-	private static final int minPheromone = 0;
-	private static final int pheromoneCalculatioCoeficient = 10;
-	private static final int pheromoneEvaporationPerCrossing = 100000;
-	private static final int maxNonupdatingIterations = 5;
+	private static final int maxPheromone = 10000;
+	private static final int minPheromone = 200;
+	private static final int pheromoneCalculatioCoeficient = 1;
+	private static final int pheromoneEvaporationPerCrossing = 500;
+	private static final int maxNonupdatingIterations = 10000;
 
 	private List<Ant> ants;
 	private State bestState;
@@ -25,19 +24,13 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 
 	private static int iterations = 0;
 
-	private static HashSet<Relation> exploredrelations;
 	private Lock dataProtectionlock = new Lock();
-
-	int lvl1 = 0;
-	int lvl2 = 0;
-	int lvl3 = 0;
-	int lvl4 = 0;
 
 	public AntColonyPathSearchMultithreded(RelationCreator relationCreator) {
 		super(relationCreator);
 		this.ants = new ArrayList<Ant>();
 		new ArrayList<Relation>();
-		exploredrelations = new HashSet<Relation>();
+
 	}
 
 	@Override
@@ -98,7 +91,6 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 
 		for (Relation r : posibleMoves) {
 			sum += r.getPheromoneTrail();
-
 		}
 
 		int x = new Random().nextInt(sum);
@@ -117,7 +109,7 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 		for (Relation rel : relations) {
 			StateProcessor.calculateFitnessForAnts(rel.getToState());
 		}
-	}// */
+	}
 
 	private class Ant implements Runnable {
 		private Thread t;
@@ -161,21 +153,18 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				e.printStackTrace();
 			}
 			expandCurrentState(currentState);
-			StateProcessor.initializeState(currentState);
+			StateProcessor.initializeState(currentState,minPheromone);
 			dataProtectionlock.unlock();
 
 			if (!currentState.getRelations().isEmpty()) {
 				Relation nextRelation = rouletteWheel(getCurrentState().getRelations());
-				System.out.println(
-						"move " + nextRelation.getToState() + " using  " + nextRelation.getUsedRepair().getName() + " depth: " + nextRelation.getToState().getDepth());
 
 				if (isLowProbability(nextRelation.getToState())) {
-					return;
+					finalState = currentState;
 				}
 				setCurrentState(nextRelation.getToState());
-				if (!exploredrelations.contains(nextRelation)) {
-					// exploredrelations.add(nextRelation);
-				}
+
+
 			} else {
 				setFinalState(currentState);
 				// System.out.println("final " + currentState.getDepth());
@@ -200,6 +189,8 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 		}
 
 		private int calculatePheromoneForRelation(Relation relation) {
+//			System.out.println(relation.getPheromoneTrail() +" " +  getPheromone() + " " +pheromoneEvaporationPerCrossing);
+
 			int calculatedPheromone = relation.getPheromoneTrail() + getPheromone() - pheromoneEvaporationPerCrossing;
 			if (calculatedPheromone < minPheromone) {
 				calculatedPheromone = minPheromone;
@@ -207,7 +198,7 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				calculatedPheromone = maxPheromone;
 			}
 			// System.out.println(calculatedPheromone);
-
+			//System.out.println("feromone trail after evaporation" + calculatedPheromone);
 			return calculatedPheromone;
 		}
 
@@ -221,19 +212,18 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 			} else {
 				setPheromone(calculatedPheromone);
 			}
-			// System.out.println("ant " + calculatedPheromone);
 		}
 
-		private void evaporatePheromoneFromTrails(HashSet<Relation> relations) {
-			for (Relation r : relations) {
-				int calculatedPheromone = r.getPheromoneTrail() - pheromoneEvaporationPerCrossing;
-				if (calculatedPheromone < minPheromone) {
-					r.setPheromoneTrail(minPheromone);
-				} else {
-					r.setPheromoneTrail(calculatedPheromone);
-				}
-			}
-		}
+//		private void evaporatePheromoneFromTrails(HashSet<Relation> relations) {
+//			for (Relation r : relations) {
+//				int calculatedPheromone = r.getPheromoneTrail() - pheromoneEvaporationPerCrossing;
+//				if (calculatedPheromone < minPheromone) {
+//					r.setPheromoneTrail(minPheromone);
+//				} else {
+//					r.setPheromoneTrail(calculatedPheromone);
+//				}
+//			}
+//		}
 
 		private void reinitializeAnt(State rootState) {
 			finalState = null;
@@ -261,7 +251,7 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 		}
 
 		public void setPheromone(int pheromone) {
-			this.pheromone += pheromone;
+			this.pheromone = pheromone;
 		}
 	}
 

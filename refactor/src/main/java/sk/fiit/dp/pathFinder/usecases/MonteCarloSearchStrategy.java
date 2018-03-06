@@ -3,7 +3,6 @@ package sk.fiit.dp.pathFinder.usecases;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
@@ -118,15 +117,19 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		for (int i = 0; i < length; i++) {
 
 			rel = rels.get(i);
-			State s = StateProcessor.applyRepairMonteCarlo(rel.getFromState(), rel.getUsedRepair(),
-					rel.getFixedSmellOccurance());
+			State s = StateProcessor.applyRepairMonteCarlo(rel);
 			s.setSourceRelation(rel);
 			s.setDepth(rel.getFromState().getDepth() + 1);
 			rel.setToState(s);
 
 			// sort smells in new state by ID
-			s.getSmells().sort((o1, o2) -> o1.getSmell().getId().compareTo(o2.getSmell().getId()));
-
+			s.getSmells().sort((o1, o2) -> {
+				if (o1.getSmell().getId().compareTo(o2.getSmell().getId()) == 0) {
+					return o1.getLocations().get(0).toString().compareTo(o2.getLocations().get(0).toString());
+				} else {
+					return o1.getSmell().getId().compareTo(o2.getSmell().getId());
+				}
+			});
 		}
 	}
 
@@ -161,19 +164,14 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 				}
 				while (!isLeafNode(curentState)) {
 					moveAgent();
-					System.out.println("agent moving");
 
 				}
 				if (curentState.getFitness() > bestState.getFitness()) {
 					bestState = curentState;
-					System.out.println("new best " + curentState);
-
 				}
 				if (curentState.getN() == 0) {
-					System.out.println("n = 0 - rollout");
 					rollout();
 				} else {
-					System.out.println("n! = 0 - expand and move");
 					expandCurrentState(curentState);
 					moveAgentToFirstChild();
 					rollout();

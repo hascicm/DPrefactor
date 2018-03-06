@@ -419,7 +419,6 @@ public class PostgresManager {
 				+ "join smelltype st on st.id = smell_id where rsp.cluster_id =" + clusterid + " and repairorder = "
 				+ repairid;
 		ResultSet rs;
-		System.out.println(querry);
 		try {
 			rs = statement.executeQuery(querry);
 			while (rs.next()) {
@@ -434,7 +433,6 @@ public class PostgresManager {
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-		System.out.println(result);
 		return result;
 	}
 

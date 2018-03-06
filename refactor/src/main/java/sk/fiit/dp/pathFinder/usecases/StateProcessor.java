@@ -22,60 +22,73 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 public class StateProcessor {
 
 	public static State applyRepair(Relation rel) {
-		
+
 		State resultState = null;
-		
-		if(!(rel instanceof PatternRelation)){
-			
+
+		if (!(rel instanceof PatternRelation)) {
+
 			Repair repair = rel.getUsedRepair();
 			SmellOccurance smellOccurance = rel.getFixedSmellOccurance();
 			State baseState = rel.getFromState();
-						
-			if(rel instanceof Relation ){
+
+			if (rel instanceof Relation) {
 				resultState = applyBasicRepair(baseState, repair, smellOccurance);
-		
+
 				// TODO preprobit na repair.applyOnState() s vyuzitim override
 				if (repair instanceof DependencyRepair) {
 					applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
 				}
-				
-			}	
-		}else{
+
+			}
+		} else {
 			resultState = applyPatternRelation((PatternRelation) rel);
 		}
-		
+
 		return resultState;
 	}
 
-	public static State applyRepairMonteCarlo(State baseState, Repair repair, SmellOccurance smellOccurance) {
+	public static State applyRepairMonteCarlo(Relation rel) {
 
-		State resultState = applyBasicRepairMonteCarlo(baseState, repair, smellOccurance);
+		State resultState = null;
 
-		// TODO preprobit na repair.applyOnState() s vyuzitim override
-		if (repair instanceof DependencyRepair) {
-			applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
+		if (!(rel instanceof PatternRelation)) {
+
+			Repair repair = rel.getUsedRepair();
+			SmellOccurance smellOccurance = rel.getFixedSmellOccurance();
+			State baseState = rel.getFromState();
+
+			if (rel instanceof Relation) {
+				resultState = applyBasicRepairMonteCarlo(baseState, repair, smellOccurance);
+
+				// TODO preprobit na repair.applyOnState() s vyuzitim override
+				if (repair instanceof DependencyRepair) {
+					applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
+				}
+			}
+		} else {
+			resultState = applyPatternRelation((PatternRelation) rel);
+
 		}
-
 		return resultState;
+
 	}
 
 	// for the simply repair without dependency just remove smell occurance
 	private static State applyBasicRepair(State baseState, Repair repair, SmellOccurance smellOccurance) {
 
 		State resultState = new State();
-		
+
 		List<SmellOccurance> smellOccuranceList = new ArrayList<SmellOccurance>(baseState.getSmells());
-		
+
 		smellOccuranceList.remove(smellOccurance);
 
-		/*for (SmellOccurance so : baseState.getSmells()) {
-			if (so != smellOccurance) {
-				smellOccuranceList.add(so);
-			}
-		}*/
-		
+		/*
+		 * for (SmellOccurance so : baseState.getSmells()) { if (so !=
+		 * smellOccurance) { smellOccuranceList.add(so); } }
+		 */
+
 		resultState.setSmells(smellOccuranceList);
-		
+
 		return resultState;
 	}
 
@@ -84,13 +97,14 @@ public class StateProcessor {
 
 		State resultState = State.getMonteCarloStateInstance();
 
-		List<SmellOccurance> smellOccuranceList = new ArrayList<SmellOccurance>();
+		List<SmellOccurance> smellOccuranceList = new ArrayList<SmellOccurance>(baseState.getSmells());
 
-		for (SmellOccurance so : baseState.getSmells()) {
-			if (so != smellOccurance) {
-				smellOccuranceList.add(so);
-			}
-		}
+		smellOccuranceList.remove(smellOccurance);
+
+		/*
+		 * for (SmellOccurance so : baseState.getSmells()) { if (so !=
+		 * smellOccurance) { smellOccuranceList.add(so); } }
+		 */
 
 		resultState.setSmells(smellOccuranceList);
 		return resultState;
@@ -101,70 +115,69 @@ public class StateProcessor {
 		for (Dependency dep : repair.getDependencies()) {
 
 			if (dep.getType() == DependencyType.CAUSE) {
-				
-				if(dep.getPlaceType() == DependencyPlaceType.INTERNAL){
+
+				if (dep.getPlaceType() == DependencyPlaceType.INTERNAL) {
 					SmellOccurance newSmellOccurance = new SmellOccurance(dep.getSmell());
-					
+
 					List<LocationPart> newLocationPartList = new ArrayList<LocationPart>();
-					
-					List<LocationPart> tempLocationPartList = smellOccurance.getLocations().get(0).getLocation(); 
+
+					List<LocationPart> tempLocationPartList = smellOccurance.getLocations().get(0).getLocation();
 					boolean isFound = false;
 					LocationPart currentPart = null;
-					
-					for(int i = tempLocationPartList.size()-1; i >= 0; i--){
-					
+
+					for (int i = tempLocationPartList.size() - 1; i >= 0; i--) {
+
 						currentPart = tempLocationPartList.get(i);
-						
-						if(isFound){
-						
+
+						if (isFound) {
+
 							newLocationPartList.add(currentPart);
-						
-						}else{
-							
-							if(currentPart.getLocationPartType() == dep.getActionField()){
+
+						} else {
+
+							if (currentPart.getLocationPartType() == dep.getActionField()) {
 								isFound = true;
 								newLocationPartList.add(currentPart);
 							}
 						}
 					}
-					
+
 					List<Location> newLocations = new ArrayList<Location>();
 					Collections.reverse(newLocationPartList);
 					Location loc = new Location(newLocationPartList);
 					newLocations.add(loc);
-					
+
 					newSmellOccurance.setLocations(newLocations);
-				
+
 					state.getSmells().add(newSmellOccurance);
 				}
 			}
 
 			if (dep.getType() == DependencyType.SOLVE) {
-				
-				if(dep.getPlaceType() == DependencyPlaceType.INTERNAL){
-					SmellOccurance tempSmellOccurance = isOnSameLocation(state, smellOccurance, dep.getSmell(), dep.getActionField());
-					/*boolean isSolved = false;
-	
-					for (SmellOccurance smellOccurance : state.getSmells()) {
-						if (smellOccurance.getSmell() == dep.getSmell()) {
-	
-							tempSmellOccurance = smellOccurance;
-							isSolved = true;
-							break;
-						}
-					}
-	
-					if (isSolved) {
+
+				if (dep.getPlaceType() == DependencyPlaceType.INTERNAL) {
+					SmellOccurance tempSmellOccurance = isOnSameLocation(state, smellOccurance, dep.getSmell(),
+							dep.getActionField());
+					/*
+					 * boolean isSolved = false;
+					 * 
+					 * for (SmellOccurance smellOccurance : state.getSmells()) {
+					 * if (smellOccurance.getSmell() == dep.getSmell()) {
+					 * 
+					 * tempSmellOccurance = smellOccurance; isSolved = true;
+					 * break; } }
+					 * 
+					 * if (isSolved) {
+					 * state.getSmells().remove(tempSmellOccurance); }
+					 */
+					if (tempSmellOccurance != null) {
 						state.getSmells().remove(tempSmellOccurance);
-					}*/
-					if(tempSmellOccurance != null){
-						state.getSmells().remove(tempSmellOccurance);
 					}
-				
+
 				}
-				
-				if(dep.getPlaceType() == DependencyPlaceType.EXTERNAL){
-					//TODO!!!!????
+
+				if (dep.getPlaceType() == DependencyPlaceType.EXTERNAL) {
+					// TODO!!!!????
 				}
 
 			}
@@ -243,7 +256,7 @@ public class StateProcessor {
 			fitness = 1;
 		}
 		fit = 1 / (float) fitness;
-		fitness = ((int) (fit * 10000));
+		fitness = ((int) (fit * 1000));
 
 		State currentState = state;
 		while (currentState.getSourceRelation() != null) {
@@ -254,9 +267,11 @@ public class StateProcessor {
 		state.setFitness(fitness);
 	}
 
-	public static void initializeState(State state) {
+	public static void initializeState(State state, int minPheromone) {
 		for (Relation r : state.getRelations()) {
-			r.setPheromoneTrail(2000);
+			if (r.getPheromoneTrail() < 1) {
+				r.setPheromoneTrail(minPheromone);
+			} 
 		}
 	}
 
@@ -266,101 +281,102 @@ public class StateProcessor {
 
 		for (SmellOccurance so : s.getSmells()) {
 			sb.append(so.getSmell().getId() + "_");
-			for(LocationPart loc : so.getLocations().get(0).getLocation()){
-				sb.append(loc.getId()+ "_" + loc.getLocationPartType() + "_" );
+			for (LocationPart loc : so.getLocations().get(0).getLocation()) {
+				sb.append(loc.getId() + "_" + loc.getLocationPartType() + "_");
 			}
 		}
 
 		return sb.toString();
 	}
-	
-	public static SmellOccurance isOnSameLocation(State state, SmellOccurance baseSmellOccurance, SmellType smellType, LocationPartType placeType){
-		
+
+	public static SmellOccurance isOnSameLocation(State state, SmellOccurance baseSmellOccurance, SmellType smellType,
+			LocationPartType placeType) {
+
 		SmellOccurance result = null;
 		List<LocationPart> tempPath;
-		
-		for(SmellOccurance smellOccurance : state.getSmells()){
-			
-			if(smellOccurance != baseSmellOccurance){
-				
-				if(smellOccurance.getSmell() == smellType){
-					
-					tempPath = PlaceComparator.findCommonDestinationPath(baseSmellOccurance.getLocations().get(0).getLocation(), 
-																			smellOccurance.getLocations().get(0).getLocation());
-					
-					for(int i = tempPath.size()-1; i >=0; i-- ){
-						
-						if(tempPath.get(i).getLocationPartType() == placeType){
+
+		for (SmellOccurance smellOccurance : state.getSmells()) {
+
+			if (smellOccurance != baseSmellOccurance) {
+
+				if (smellOccurance.getSmell() == smellType) {
+
+					tempPath = PlaceComparator.findCommonDestinationPath(
+							baseSmellOccurance.getLocations().get(0).getLocation(),
+							smellOccurance.getLocations().get(0).getLocation());
+
+					for (int i = tempPath.size() - 1; i >= 0; i--) {
+
+						if (tempPath.get(i).getLocationPartType() == placeType) {
 							result = smellOccurance;
 							break;
 						}
 
 					}
 				}
-				
+
 			}
 		}
-		
-		
-		return result; 
+
+		return result;
 	}
-	
-	private static State applyPatternRelation(PatternRelation rel){
-		
+
+	private static State applyPatternRelation(PatternRelation rel) {
+
 		State baseState = rel.getFromState();
 		State resultState = new State();
-		
+
 		List<SmellOccurance> newSmellsSet = new ArrayList<SmellOccurance>(baseState.getSmells());
-		
-		List<LocationPart> tempLocation = null; 
+
+		List<LocationPart> tempLocation = null;
 		boolean isAssign = false;
-		//REMOVE SMELLS
-		for(PatternSmellUse psu : rel.getPatternSmellUses().keySet()){
+		// REMOVE SMELLS
+		for (PatternSmellUse psu : rel.getPatternSmellUses().keySet()) {
 			newSmellsSet.remove(rel.getPatternSmellUses().get(psu));
-			
-			if(!isAssign){
+
+			if (!isAssign) {
 				tempLocation = rel.getPatternSmellUses().get(psu).getLocations().get(0).getLocation();
-				isAssign = true; 
+				isAssign = true;
 			}
 		}
-		
-		//ADD SMELLS
+
+		// ADD SMELLS
 		List<LocationPart> location = createLocation(tempLocation, rel.getUsedPattern().getActionField());
-		
-		for(SmellType st : rel.getUsedPattern().getResidualSmells()){
+
+		for (SmellType st : rel.getUsedPattern().getResidualSmells()) {
 			SmellOccurance newSmellOccurance = new SmellOccurance(st);
-			
-			List<Location> locs = new ArrayList<Location>(); 
+
+			List<Location> locs = new ArrayList<Location>();
 			locs.add(new Location(location));
-			
+
 			newSmellOccurance.setLocations(locs);
-			
+
 			newSmellsSet.add(newSmellOccurance);
 		}
-		
+
 		resultState.setSmells(newSmellsSet);
-		
-		return resultState; 
+
+		return resultState;
 	}
-	
-	private static List<LocationPart> createLocation(List<LocationPart> location, LocationPartType actionField){
-		
+
+	private static List<LocationPart> createLocation(List<LocationPart> location, LocationPartType actionField) {
+
 		List<LocationPart> newLocation = new ArrayList<LocationPart>();
-		
-		int index = location.size()-1;
-		for(; index >=0; index-- ){
-			
-			if(location.get(index).getLocationPartType() == actionField){
+
+		int index = location.size() - 1;
+		for (; index >= 0; index--) {
+
+			if (location.get(index).getLocationPartType() == actionField) {
 				break;
 			}
 
 		}
-		
-		for(int i = 0; i < index+1; i++){
+
+		for (int i = 0; i < index + 1; i++) {
 			newLocation.add(location.get(i));
 		}
-		
+
 		return newLocation;
 	}
-	
+
 }
