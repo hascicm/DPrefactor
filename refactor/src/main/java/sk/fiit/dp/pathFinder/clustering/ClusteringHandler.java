@@ -25,7 +25,7 @@ public class ClusteringHandler {
 			c.print();
 			i++;
 		}
-		
+
 		System.out.println("merging nested smells");
 		clusters = ClusteringHelperClass.mergeNestedSmells(clusters);
 
@@ -37,10 +37,18 @@ public class ClusteringHandler {
 		System.out.println("execution started");
 		cm.executeClustering(clusters);
 		System.out.println("clustering finished");
-		List<Cluster> x = cm.getResult(3);
+		
+		int desiredClusterCount = (int) Math.round(Math.pow(dataProvider.getSmellTypes().size(), 1.0 / 3));
+		if (desiredClusterCount < 1) {
+			desiredClusterCount = 1;
+		} else if (desiredClusterCount > dataProvider.getSmellTypes().size()) {
+			desiredClusterCount = dataProvider.getSmellTypes().size();
+		}
+
+		List<Cluster> x = cm.getResult(desiredClusterCount);
 
 		List<State> result = new ArrayList<State>();
-		
+
 		System.out.println("--------------- clustering result " + x.size() + " ---------------");
 		for (Cluster c : x) {
 			c.print();
@@ -48,7 +56,6 @@ public class ClusteringHandler {
 			act.setSmells(c.getSmellOccurrences());
 			result.add(act);
 		}
-		
 
 		return result;
 	}

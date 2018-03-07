@@ -20,19 +20,19 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 import sk.fiit.dp.refactor.model.JessInput;
 
 public class DatabaseDataProvider implements DataProvider {
-	private static DatabaseDataProvider INSTANCE = null; 
+	private static DatabaseDataProvider INSTANCE = null;
 	private List<Repair> repairs = null;
 	private List<SmellType> smells = null;
 	private List<Pattern> patterns = null;
 	private State root;
 
-	public static DatabaseDataProvider getInstance(){
-		if (INSTANCE == null){
+	public static DatabaseDataProvider getInstance() {
+		if (INSTANCE == null) {
 			INSTANCE = new DatabaseDataProvider();
 		}
 		return INSTANCE;
 	}
-	
+
 	private DatabaseDataProvider() {
 		smells = PostgresManager.getInstance().getSmellTypes();
 		repairs = PostgresManager.getInstance().getRepairs(smells);
@@ -62,7 +62,7 @@ public class DatabaseDataProvider implements DataProvider {
 	public State getRootState() {
 		return root;
 	}
-	
+
 	public List<State> prepareRootStateList(List<JessInput> searchResults) {
 		List<State> result = new ArrayList<State>();
 		this.initializeRootState(searchResults);
@@ -79,14 +79,15 @@ public class DatabaseDataProvider implements DataProvider {
 
 			List<Location> locationList = new ArrayList<Location>();
 			List<LocationPart> locationParts = new ArrayList<LocationPart>();
-
 			String[] strLocations = searchResult.getXpatPosition().split("::");
 			for (String str : strLocations) {
-				locationParts.addAll(processStringToLocationPart(str));
+				if (!str.trim().isEmpty()) {
+					locationParts.addAll(processStringToLocationPart(str));
+				}
 			}
 			locationList.add(new Location(locationParts));
-			
-			SmellOccurance ocurance = new SmellOccurance(smell, locationList,searchResult.getCode());
+
+			SmellOccurance ocurance = new SmellOccurance(smell, locationList, searchResult.getCode());
 			smellOccurances.add(ocurance);
 		}
 		this.root.setSmells(smellOccurances);
@@ -312,7 +313,7 @@ public class DatabaseDataProvider implements DataProvider {
 				+ " (-)Empty Catch Clausule (2) Log Exception (+) null";
 		Pattern p1 = new Pattern(patternDesc);
 		p1.setActionField(LocationPartType.NODE);
-		p1.setUsedRepair(new PatternRepair(patternDesc,95));
+		p1.setUsedRepair(new PatternRepair(patternDesc, 95));
 		// TODO parser add this to parser
 		PatternSmellUse psu1 = new PatternSmellUse();
 		psu1.setMain(true);
