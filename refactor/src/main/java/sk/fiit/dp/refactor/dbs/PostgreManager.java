@@ -239,6 +239,7 @@ public class PostgreManager {
 				+ record.getRefactoringCode() + "','" + record.getPath() + "','" + record.getCodeBeforeRepair() + "','"
 				+ record.getCodeAfterRepair() + "'," + jessObject + ",'" + smelltypeid + "','" + record.getTimeStamp()
 				+ "')";
+		System.out.println(query);
 		statement.executeUpdate(query);
 
 	}
@@ -319,19 +320,25 @@ public class PostgreManager {
 	public String getExplanationForSearchScript(String code) throws SQLException {
 		String result = "";
 		String query = "select * from smelltype where code = '" + code + "'";
-	//	System.out.println("PGmanager " + query);
 		ResultSet rs = statement.executeQuery(query);
 		int id = 0;
 		while (rs.next()) {
 			id = rs.getInt("id");
-			result += ("//EXPLANATION smellname : " + rs.getString("name"));
-			result += ("\n//EXPLANATION description :" + rs.getString("description"));
+
+			result += createComment("//EXPLANATION smellname : " + rs.getString("name"));
+			result += createComment("\n//EXPLANATION description :" + rs.getString("description"));
 		}
 		rs.close();
 		if (id != 0)
-			result += ("\n//EXPLANATION possible repairs :" + getPossibleRepairForSmellbySmellId(id));
+			result += createComment(
+					"\n//EXPLANATION possible repairs :" + getPossibleRepairForSmellbySmellId(id) + "\n");
 
 		return result;
+	}
+
+	private static String createComment(String c) {
+		String queryPart = " <comment type = \"line\">" + c + " </comment>";
+		return queryPart;
 	}
 
 	public String getSmellLocalisatorScript(String code) throws SQLException {

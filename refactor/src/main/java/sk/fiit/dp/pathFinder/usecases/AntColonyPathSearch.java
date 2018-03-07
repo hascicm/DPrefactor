@@ -69,7 +69,7 @@ public class AntColonyPathSearch extends PathSearchStrategy {
 
 		State currentState = ant.getCurrentState();
 		expandCurrentState(currentState);
-		StateProcessor.initializeState(currentState);
+		StateProcessor.initializeState(currentState, minPheromone);
 
 		if (!currentState.getRelations().isEmpty()) {
 			Relation nextRelation = rouletteWheel(ant.getCurrentState().getRelations());

@@ -4,28 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.json.JSONArray;
-
 import sk.fiit.dp.pathFinder.clustering.ClusteringHandler;
-import sk.fiit.dp.pathFinder.clustering.model.Cluster;
 import sk.fiit.dp.pathFinder.configuration.PathFinderHandler;
 import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
-import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
-import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
+import sk.fiit.dp.refactor.command.explanation.ExplanationCommentHandler;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
-import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.IdGenerator;
 import sk.fiit.dp.refactor.helper.JsonFileWriter;
 import sk.fiit.dp.refactor.helper.TimeStampGenerator;
@@ -40,12 +32,10 @@ public class PathFinderCommandHandler {
 	private ConversionCommandHandler conversionCommand = ConversionCommandHandler.getInstance();
 	private SearchCommandHandler searchCommand = SearchCommandHandler.getInstance();
 	private BaseXManager baseX = BaseXManager.getInstance();
-	private PostgreManager postgre = PostgreManager.getInstance();
-	private RuleEngineCommandHandler ruleCommand = RuleEngineCommandHandler.getInstance();
-	private ExplanationCommandHandler explainCommand = ExplanationCommandHandler.getInstance();
 	private SonarQubeWrapper sonarHandler = SonarQubeWrapper.getInstance();
 	private TimeStampGenerator timeGenerator = TimeStampGenerator.getInstance();
 	private SmellPathFinder smellPathFinder = SmellPathFinder.getInstance();
+	private ExplanationCommentHandler explainCommentsHandler = ExplanationCommentHandler.getInstance();
 	private String id;
 
 	private String sonarOutput;
@@ -75,7 +65,7 @@ public class PathFinderCommandHandler {
 			List<String> toSearch, boolean explanationToSearch, boolean clusteringEnabled, SonarProperties sonarProps,
 			String method) {
 		id = "Refactor" + IdGenerator.generateId();
-		
+
 		try {
 			// 0. time stamp generator reset
 			timeGenerator.resetTimeStamp();
@@ -107,12 +97,20 @@ public class PathFinderCommandHandler {
 			baseX.projectToDatabase(xmlFiles);
 
 			// NEW pripravenie vyhladavacich skriptov s vysvetlenim
-			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch, explanationToSearch, false);
+			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch);
 
 			// 6. Vykona sa vyhladavanie
-			List<JessInput> searchResults = searchCommand.search(search, false);
+			List<JessInput> searchResults = searchCommand.search(search);
 
-			// NEW vratenie polohy pachov
+			// vlozia sa znacky pre vizualizaiu
+			explainCommentsHandler.insertVisualisationMarker(searchResults);
+
+			// vlozia sa vysvetlovacie komentare
+			if (explanationToSearch) {
+				explainCommentsHandler.insertExplanationComments(searchResults);
+			}
+
+			// NEW identifikuju sa polohy pachov
 			smellPathFinder.findPathsToSmells(searchResults);
 
 			// System.out.println("------------SEARCH--------------------------");
@@ -163,28 +161,32 @@ public class PathFinderCommandHandler {
 			} else {
 				System.out.println("clustering not enabled");
 				rootStates = DatabaseDataProvider.getInstance().prepareRootStateList(searchResults);
-				
+
 			}
 
 			// vykoná sa hľadanie optimálnej cesty
 			List<OptimalPathForCluster> results = PathFinderHandler.executePathFinder(rootStates, method);
 
-//			for (OptimalPathResult current : results) {
-//				System.out.println("------------------CLUSTER----------------");
-//				System.out.println(current.getRootState().toString());
-//					for (Relation r : current.getOptimalPath()) {
-//						System.out.println("repair:" + r.getUsedRepair().getName() + " on: "
-//								+ r.getFixedSmellOccurance().getSmell().getName());
-//					}
-//			}
-			
-			PostgresManager.getInstance().addResultRecord(repo,name,timeGenerator.getTime(),results);
-			
-//			for (OptimalPathForCluster r : results){
-//				System.out.println("-------------------------\n-------------------------\n-------------------------\n       CLUSTER        \n-------------------------\n-------------------------\n-------------------------\n");
-//				System.out.println(r.toJSON().toString());
-//			}
-			
+			// zaznam o analyze sa nahra do databazy
+			PostgresManager.getInstance().addResultRecord(repo, name, timeGenerator.getTime(), results);
+
+			// for (OptimalPathResult current : results) {
+			// System.out.println("------------------CLUSTER----------------");
+			// System.out.println(current.getRootState().toString());
+			// for (Relation r : current.getOptimalPath()) {
+			// System.out.println("repair:" + r.getUsedRepair().getName() + "
+			// on: "
+			// + r.getFixedSmellOccurance().getSmell().getName());
+			// }
+			// }
+
+			// for (OptimalPathForCluster r : results){
+			// System.out.println("-------------------------\n-------------------------\n-------------------------\n
+			// CLUSTER
+			// \n-------------------------\n-------------------------\n-------------------------\n");
+			// System.out.println(r.toJSON().toString());
+			// }
+
 			return results;
 		} catch (IOException | GitAPIException | InterruptedException | XQException | SQLException e) {
 			e.printStackTrace();

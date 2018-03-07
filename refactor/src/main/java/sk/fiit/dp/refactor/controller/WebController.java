@@ -18,8 +18,6 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.eclipsesource.json.JsonObject;
-
 import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
 import sk.fiit.dp.refactor.command.PathFinderCommandHandler;
 import sk.fiit.dp.refactor.command.RefactorCommandHandler;
@@ -129,7 +127,6 @@ public class WebController {
 	public String getPathFinderResultRepair(@PathParam("clusterid") int clusterid,
 			@PathParam("repairid") int repairid) {
 		String x = resourceCommand.getPathFinderResultRepair(clusterid, repairid);
-		System.out.println(x);
 		return x;
 	}
 	

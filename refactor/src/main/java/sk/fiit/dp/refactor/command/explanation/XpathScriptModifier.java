@@ -23,42 +23,6 @@ public class XpathScriptModifier {
 		return INSTANCE;
 	}
 
-	public void addexplanation(List<SearchObject> search) {
-
-		for (SearchObject s : search) {
-			Scanner scanner = new Scanner(s.getScript());
-			String scriptExplanation = new String();
-
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-
-				if (line.contains("REFACTOR")) {
-					System.out.println("adding explanation to search script " + s.getName());
-					scriptExplanation += "(<comment type=\"line\">\n" + prepareExplanationString(s.getCode()) + " "
-							+ "\n</comment>,";
-					scriptExplanation += line + "\n" + scanner.nextLine() + ")\n ";
-				} else {
-					scriptExplanation += line + "\n";
-				}
-			}
-			scanner.close();
-			s.setScript(scriptExplanation);
-		}
-
-	}
-
-	private String prepareExplanationString(String code) {
-		String explanationString = "";
-		try {
-			explanationString = pg.getExplanationForSearchScript(code);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		//System.out.println("xpathmodifier prepared string " + explanationString);
-		return explanationString;
-
-	}
-
 	public void addOutputCommand(List<SearchObject> search) {
 		for (SearchObject s : search) {
 			Scanner scanner = new Scanner(s.getScript());
@@ -81,15 +45,5 @@ public class XpathScriptModifier {
 		}
 	}
 
-	public String addRefactoringExplanation(String script) {
-		Scanner scanner = new Scanner(script);
-		String scriptWithOutput = new String();
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			scriptWithOutput += line + "\n";
-		}
-		scanner.close();
-		return scriptWithOutput;
-	}
 
 }

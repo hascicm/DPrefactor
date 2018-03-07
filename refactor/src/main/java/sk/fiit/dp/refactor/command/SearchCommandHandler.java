@@ -45,15 +45,8 @@ public class SearchCommandHandler {
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<SearchObject> prepareSearchScripts(List<String> searchRequest, boolean withExplanation,
-			boolean exprortNode) throws SQLException {
+	public List<SearchObject> prepareSearchScripts(List<String> searchRequest) throws SQLException {
 		List<SearchObject> preparedSearchObjects = postgre.loadActiveSearch(searchRequest);
-		if (withExplanation) {
-			XpathScriptModifier.getInstance().addexplanation(preparedSearchObjects);
-		}
-		if (exprortNode) {
-			XpathScriptModifier.getInstance().addOutputCommand(preparedSearchObjects);
-		}
 		return preparedSearchObjects;
 	}
 
@@ -66,9 +59,9 @@ public class SearchCommandHandler {
 	 * @throws XQException
 	 * @throws IOException
 	 */
-	public List<JessInput> search(List<SearchObject> searchObjects, boolean exprortNode)
+	public List<JessInput> search(List<SearchObject> searchObjects)
 			throws XQException, IOException {
-		applySearch(searchObjects, exprortNode);
+		applySearch(searchObjects);
 		return processSearchResults();
 	}
 
@@ -78,10 +71,10 @@ public class SearchCommandHandler {
 	 * @param searchObjects
 	 * @throws XQException
 	 */
-	private void applySearch(List<SearchObject> searchObjects, boolean exprortNode) throws XQException {
+	private void applySearch(List<SearchObject> searchObjects) throws XQException {
 		for (SearchObject search : searchObjects) {
 			String script = search.getScript();
-			baseX.applySearchXQuery(script, "resultFile", git.getRepoDirectory() + "\\Result.txt", exprortNode);
+			baseX.applySearchXQuery(script, "resultFile", git.getRepoDirectory() + "\\Result.txt");
 		}
 	}
 
@@ -123,7 +116,7 @@ public class SearchCommandHandler {
 			} else if (line.startsWith("POSITION METHOD:")) {
 				result.setPosition(result.getPosition() + "::M:" + line.replace("POSITION METHOD:", ""));
 			} else if (line.startsWith("POSITION PACKAGE:")) {
-				result.setPosition("CC:" +line.replace("POSITION PACKAGE:", ""));
+				result.setPosition("CC:" + line.replace("POSITION PACKAGE:", ""));
 
 			}
 		}

@@ -15,6 +15,12 @@ public class Repair {
 		this.repairUses = new ArrayList<RepairUse>();
 	}
 	
+	public Repair(String name,int id) {
+		this.name = name;
+		this.id = id;
+		this.repairUses = new ArrayList<RepairUse>();
+	}
+	
 	public Repair(int id, String name, List<RepairUse> repairUses) {
 		this.id = id;
 		this.name = name;

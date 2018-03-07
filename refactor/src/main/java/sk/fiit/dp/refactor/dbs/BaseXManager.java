@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQException;
@@ -100,20 +102,11 @@ public class BaseXManager {
 	 * @param value
 	 * @throws XQException
 	 */
-	public void applySearchXQuery(String content, String variableName, String value, boolean exportNode)
+	public void applySearchXQuery(String content, String variableName, String value)
 			throws XQException {
 		expression.bindString(new QName(variableName), value, null);
-		if (exportNode) {
-			expression.bindString(new QName("explanation"),
-					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanation.txt", null);
-		}
-		//System.out.println(content);
-		XQResultSequence x = expression.executeQuery(content);
-		// TODO process output
-		while (x.next()) {
-			// System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			// System.out.println(x.getAtomicValue());
-		}
+		expression.executeQuery(content);
+
 	}
 
 	/**
@@ -124,21 +117,43 @@ public class BaseXManager {
 	 * @param value
 	 * @throws XQException
 	 */
-	public void applyRepairXQuery(String content, String variableName, String value, boolean exportNode)
-			throws XQException {
+	public void applyRepairXQuery(String content, String variableName, String value) throws XQException {
 		expression.bindString(new QName(variableName), value, null);
-		// BIND OF EXPLANATION FILE
-		if (exportNode) {
-			expression.bindString(new QName("explanation"),
-					GitCommandHandler.getInstance().getRepoDirectory() + "\\explanationRepair.txt", null);
-		}
-		// TODO process output
-		XQResultSequence x = expression.executeQuery(content);
-		while (x.next()) {
-			// System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			// System.out.println(x.getAtomicValue());
-		}
+		expression.executeQuery(content);
+
 	}
+
+	// TODO convert to java source
+	public String retrieveRepairedCourceCode(String refCode) {
+		String repairedCode = "";
+		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refCode + "')) return (db:output($node))";
+		System.out.println("getting " + refCode);
+		try {
+			XQResultSequence result = expression.executeQuery(querry);
+			while (result.next()) {
+				repairedCode += result.getSequenceAsString(null) + "\n\n";
+			}
+		} catch (XQException e) {
+			Logger.getLogger("BaseX").log(Level.SEVERE, "repaired code retrieval failed", e);
+		}
+		return repairedCode;
+	}
+
+	public String retrieveSmellyCourceCode(String refcode) {
+		String sourceCode = "";
+		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refcode + "')) return (db:output($node))";
+		System.out.println("getting " + refcode);
+		try {
+			XQResultSequence result = expression.executeQuery(querry);
+			while (result.next()) {
+				sourceCode += result.getSequenceAsString(null) + "\n\n";
+			}
+		} catch (XQException e) {
+			Logger.getLogger("BaseX").log(Level.SEVERE, "repaired code retrieval failed", e);
+		}
+		return sourceCode;
+	}
+
 	/**
 	 * 
 	 * @param script
@@ -171,4 +186,5 @@ public class BaseXManager {
 			stream.close();
 		}
 	}
+
 }

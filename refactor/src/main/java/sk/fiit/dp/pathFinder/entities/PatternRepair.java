@@ -2,8 +2,8 @@ package sk.fiit.dp.pathFinder.entities;
 
 public class PatternRepair extends Repair {
 
-	public PatternRepair(String name) {
-		super(name);
+	public PatternRepair(String name, int id) {
+		super(name,id);
 	}
 	
 	

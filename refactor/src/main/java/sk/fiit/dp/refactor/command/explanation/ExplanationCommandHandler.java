@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.xqj.basex.BaseXConnectionPoolXQDataSource;
 import sk.fiit.dp.refactor.command.GitCommandHandler;
+import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.TimeStampGenerator;
 import sk.fiit.dp.refactor.model.JessInput;
@@ -21,7 +23,10 @@ public class ExplanationCommandHandler {
 	private PostgreManager pg = PostgreManager.getInstance();
 	private List<RepairRecord> records;
 	private TimeStampGenerator timeStampGenerator = TimeStampGenerator.getInstance();
+	private BaseXManager baseX;
+
 	private ExplanationCommandHandler() {
+		baseX = BaseXManager.getInstance();
 	}
 
 	public static ExplanationCommandHandler getInstance() {
@@ -33,24 +38,37 @@ public class ExplanationCommandHandler {
 
 	public void createRepairRecord(String repo, List<JessInput> searchResults) {
 
-		// initialize all records based on serach results
-		records = processSearchExplanationFile();
+		// initialize all records based on search results
+		records = processSearchResults(searchResults);
+		
 		// set repo for all initialized records
 		for (RepairRecord record : records) {
 			record.setGitRepository(repo);
 			record.setTimeStamp(timeStampGenerator.getTime());
-
 		}
 		// link results from jess
-		processJessListenerOutput();
+		//processJessListenerOutput();
+		
 		// process repair file and link it to records
-		processRepairExplanationFile();
+		// processRepairExplanationFile();
 		// link to search result. Used for identification of path to smell
-		linkToResultFile(searchResults);
-		//printrecords();
+		// linkToResultFile(searchResults);
+		printrecords();
+		
+		 //pushRecordsToPostgres();
 
-		pushRecordsToPostgres();
+	}
 
+	private List<RepairRecord> processSearchResults(List<JessInput> searchResults) {
+		List<RepairRecord> records = new ArrayList<RepairRecord>();
+
+		for (JessInput curr : searchResults) {
+			RepairRecord act = new RepairRecord();
+			act.setRefcode(curr.getRefCode());
+			act.setRefactoringCode(curr.getCode());
+			records.add(act);
+		}
+		return records;
 	}
 
 	private void linkToResultFile(List<JessInput> searchResults) {
@@ -63,7 +81,7 @@ public class ExplanationCommandHandler {
 		}
 	}
 
-	private void pushRecordsToPostgres() {
+	public void pushRecordsToPostgres() {
 		for (RepairRecord record : records) {
 			try {
 				pg.AddRepairRecord(record);
@@ -73,12 +91,14 @@ public class ExplanationCommandHandler {
 		}
 	}
 
-	private void printrecords() {
+	public void printrecords() {
 		System.out.println("results--------------\n-----------------\n-----------------");
 		for (RepairRecord record : records) {
-			System.out.println("refcode : " + record.getRefactoringCode());
+			System.out.println("code w  : " + record.getRefactoringCode());
+			System.out.println("code w/o: " + record.getRefcode());
 			System.out.println("git     : " + record.getGitRepository());
 			System.out.println("position: " + record.getPath());
+			System.out.println("time    : " + record.getTimeStamp());
 			if (record.getUsedJessRule() != null) {
 				System.out.println("jess ---------------------");
 				System.out.println("code       : " + record.getUsedJessRule().getCode());
@@ -175,12 +195,43 @@ public class ExplanationCommandHandler {
 		System.out.println("-------------------");
 	}
 
-	private void processJessListenerOutput() {
+	public void processJessListenerOutput() {
 		for (RepairRecord record : records) {
 			for (JessListenerOutput curr : RuleEngineEventHandler.getInstance().getListenerOutputObjects()) {
 				if (record.getRefactoringCode().equals(curr.getCode())) {
 					record.setUsedJessRule(curr);
 				}
+			}
+		}
+	}
+
+	public void getRepairedSourceCode(List<JessInput> searchResults) {
+		for (JessInput curr : searchResults) {
+			String repairedCode = baseX.retrieveRepairedCourceCode(curr.getCode());
+			processRepairedCode(curr.getCode(), repairedCode);
+		}
+	}
+	
+
+	private void processRepairedCode(String code, String repairedCode) {
+		for (RepairRecord record : records) {
+			if (record.getRefactoringCode().equals(code)) {
+				record.setCodeAfterRepair(repairedCode);
+			}
+		}
+	}
+
+	public void getSmellySourceCode(List<JessInput> searchResults) {
+		for (JessInput curr : searchResults) {
+			String repairedCode = baseX.retrieveSmellyCourceCode(curr.getCode());
+			processSmellyCode(curr.getCode(), repairedCode);
+		}
+	}
+
+	private void processSmellyCode(String code, String sourceCode) {
+		for (RepairRecord record : records) {
+			if (record.getRefactoringCode().equals(code)) {
+				record.setCodeBeforeRepair(sourceCode);
 			}
 		}
 	}

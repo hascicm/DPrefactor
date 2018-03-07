@@ -12,6 +12,7 @@ import javax.xml.xquery.XQException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
+import sk.fiit.dp.refactor.command.explanation.ExplanationCommentHandler;
 import sk.fiit.dp.refactor.command.explanation.XpathScriptModifier;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
@@ -37,12 +38,13 @@ public class RefactorCommandHandler {
 	private PostgreManager postgre = PostgreManager.getInstance();
 	private RuleEngineCommandHandler ruleCommand = RuleEngineCommandHandler.getInstance();
 	private ExplanationCommandHandler explainCommand = ExplanationCommandHandler.getInstance();
+	private ExplanationCommentHandler explainCommentsHandler = ExplanationCommentHandler.getInstance();
 	private SonarQubeWrapper sonarHandler = SonarQubeWrapper.getInstance();
 	private TimeStampGenerator timeGenerator = TimeStampGenerator.getInstance();
 	private SmellPathFinder smellPathFinder = SmellPathFinder.getInstance();
 	private String id;
 
-	private String sonarOutput; 
+	private String sonarOutput;
 	private List<SonarIssue> sonarIssues;
 
 	private RefactorCommandHandler() {
@@ -86,10 +88,10 @@ public class RefactorCommandHandler {
 				sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
 				sonarOutput = sonarHandler.getIssues(id);
 				sonarHandler.deleteProject(id);
-				
+
 				sonarIssues = SonarIssuesProcessor.convertSonarOutput(sonarOutput);
 				SonarIssuesProcessor.addSonarIssuesToCode(gitCommand.getRepoDirectory(), sonarIssues);
-				
+
 			}
 			// SONAR
 
@@ -107,25 +109,28 @@ public class RefactorCommandHandler {
 
 			// NEW pripravenie vyhladavacich skriptov s vysvetlenim a exportom
 			// casti kodu
-			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch, explanationToSearch,
-					createRepairRecord);
+			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch);
 
 			// 6. Vykona sa vyhladavanie
-			List<JessInput> searchResults = searchCommand.search(search, createRepairRecord);
-			System.out.println("------------paths Xquerry-------------------");
+			List<JessInput> searchResults = searchCommand.search(search);
+
+			// vlozia sa znacky pre vizualizaiu
+			explainCommentsHandler.insertVisualisationMarker(searchResults);
+
+			// vlozia sa vysvetlovacie komentare
+			if (explanationToSearch) {
+				explainCommentsHandler.insertExplanationComments(searchResults);
+			}
+
 			// NEW vratenie ciest z databazy
 			smellPathFinder.findPathsToSmells(searchResults);
-			
-		
-			System.out.println("------------SEARCH--------------------------");
 
-			for (JessInput o : searchResults) {
-				System.out.println("tags:    " + o.getCode());
-				System.out.println("method:  " + o.getRefCode());
-				System.out.println("position " + o.getPosition());
-				System.out.println("xpathpos " + o.getXpatPosition());
+			// vytvoria sa zaznamy o automatickej oprave
+			
+			if (createRepairRecord || true) {
+				explainCommand.createRepairRecord(repo, searchResults);
+				explainCommand.getSmellySourceCode(searchResults);
 			}
-			System.out.println("--------------------------------------");
 
 			// 7. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
@@ -150,21 +155,25 @@ public class RefactorCommandHandler {
 			// 12. Pravidlovy stroj rozhodne o pouzitom refaktorovani
 			List<JessOutput> requiredRefactoring = ruleCommand.run(searchResults);
 
-			System.out.println("---------JESS-----------------------------");
-
-			for (JessOutput o : requiredRefactoring) {
-				System.out.println("tags:   " + o.getTag());
-				System.out.println("method: " + o.getRefactoringMethod());
-			}
-			System.out.println("--------------------------------------");
+			// System.out.println("---------JESS-----------------------------");
+			//
+			// for (JessOutput o : requiredRefactoring) {
+			// System.out.println("tags: " + o.getTag());
+			// System.out.println("method: " + o.getRefactoringMethod());
+			// }
+			// System.out.println("--------------------------------------");
 
 			// 13. Vykona sa refaktoring
 			System.out.println("---------REFACTOR-----------------------------");
-			applyRefactoring(requiredRefactoring, allowedRefactoring, createRepairRecord);
+			applyRefactoring(requiredRefactoring, allowedRefactoring);
 
 			// TODO explanation
-			if (createRepairRecord) {
-				explainCommand.createRepairRecord(repo, searchResults);
+			if (createRepairRecord || true) {
+				explainCommand.processJessListenerOutput();
+				explainCommand.getRepairedSourceCode(searchResults);
+				explainCommand.printrecords();
+				explainCommand.pushRecordsToPostgres();
+
 			}
 			// 14. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
@@ -190,7 +199,7 @@ public class RefactorCommandHandler {
 		}
 
 		return new HashMap<String, Integer>();
-			
+
 	}
 
 	/**
@@ -202,27 +211,17 @@ public class RefactorCommandHandler {
 	 * @throws SQLException
 	 * @throws XQException
 	 */
-	public void applyRefactoring(List<JessOutput> requiredRefactoring, List<String> allowedRefactoring,
-			boolean createRepairRecord) throws SQLException, XQException {
+	public void applyRefactoring(List<JessOutput> requiredRefactoring, List<String> allowedRefactoring)
+			throws SQLException, XQException {
 		for (JessOutput refactoring : requiredRefactoring) {
 			if (allowedRefactoring.contains(refactoring.getRefactoringMethod())) {
 				String script = postgre.getRepairScript(refactoring.getRefactoringMethod());
-				if (createRepairRecord) {
-					script = prepareRepairScript(refactoring, script);
-				}
+
 				if (script != null && !"".equals(script)) {
-					baseX.applyRepairXQuery(script, "tag", refactoring.getTag(), createRepairRecord);
+					baseX.applyRepairXQuery(script, "tag", refactoring.getTag());
 				}
 			}
 		}
-	}
-
-	// TODO
-	public String prepareRepairScript(JessOutput refactoring, String script) throws SQLException {
-		String RuleExplanation = postgre.getExplanationForScript(refactoring.getRefactoringMethod());
-		String preparedScript = XpathScriptModifier.getInstance().addRefactoringExplanation(script);
-
-		return preparedScript;
 	}
 
 }

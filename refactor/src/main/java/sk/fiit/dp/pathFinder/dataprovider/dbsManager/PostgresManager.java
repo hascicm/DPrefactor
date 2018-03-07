@@ -188,7 +188,7 @@ public class PostgresManager {
 					actualRecord.setActionField(resolveActionField(rs.getString("locationparttype")));
 
 					// TODO delete this after pattern repair functionality check
-					actualRecord.setUsedRepair(new PatternRepair(rs.getString("description")));
+					actualRecord.setUsedRepair(new PatternRepair(rs.getString("description"), 95));
 
 					patterns.add(actualRecord);
 					finishedsolve = true;
@@ -257,6 +257,7 @@ public class PostgresManager {
 		int repairOrder = 1;
 		for (Relation r : cluster.getOptimalPath()) {
 			int smellOccID = repairOrderMap.get(r.getFixedSmellOccurance());
+			System.out.println(r.getUsedRepair().getName());
 			addRepairSequencePartRecord(clusterID, smellOccID, r.getUsedRepair().getId(), repairOrder);
 			repairOrder++;
 		}
