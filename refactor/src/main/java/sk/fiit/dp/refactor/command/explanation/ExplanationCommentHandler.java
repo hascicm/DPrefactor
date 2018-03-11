@@ -58,8 +58,7 @@ public class ExplanationCommentHandler {
 
 		String query = " for $node in xquery:eval(fn:concat(\"//\", '" + smellCode
 				+ "')) return ( insert node element {xs:QName('" + smellCode + "AfterComment')} {" + queryPart
-				+ "} after $node/*[last()])";
-
+				+ "} after $node)";
 		try {
 			baseX.applyXQuery(query);
 		} catch (XQException e) {
@@ -72,7 +71,8 @@ public class ExplanationCommentHandler {
 
 		String query = "for $node in xquery:eval(fn:concat(\"//\", '" + smellCode
 				+ "')) return ( insert node element {xs:QName('" + smellCode + "BeforeComment')} {" + queryPart
-				+ "} before $node/*[1])";
+				+ "} before $node)";
+		System.out.println(query);
 
 		try {
 			baseX.applyXQuery(query);

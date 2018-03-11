@@ -3,6 +3,7 @@ package sk.fiit.dp.pathFinder.dataprovider;
 import java.util.ArrayList;
 import java.util.List;
 
+import sk.fiit.dp.pathFinder.configuration.LocationProcessor;
 import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.pathFinder.entities.Dependency;
 import sk.fiit.dp.pathFinder.entities.DependencyRepair;
@@ -77,55 +78,12 @@ public class DatabaseDataProvider implements DataProvider {
 		for (JessInput searchResult : searchResults) {
 			SmellType smell = this.getSmellType(searchResult.getRefCode());
 
-			List<Location> locationList = new ArrayList<Location>();
-			List<LocationPart> locationParts = new ArrayList<LocationPart>();
-			String[] strLocations = searchResult.getXpatPosition().split("::");
-			for (String str : strLocations) {
-				if (!str.trim().isEmpty()) {
-					locationParts.addAll(processStringToLocationPart(str));
-				}
-			}
-			locationList.add(new Location(locationParts));
+			List<Location> locationList = LocationProcessor.processLocationString(searchResult.getXpatPosition());
 
 			SmellOccurance ocurance = new SmellOccurance(smell, locationList, searchResult.getCode());
 			smellOccurances.add(ocurance);
 		}
 		this.root.setSmells(smellOccurances);
-	}
-
-	List<LocationPart> processStringToLocationPart(String s) {
-		String[] strParts = s.split(":");
-		String type = strParts[0];
-		String id = strParts[1];
-		LocationPartType locationPartType = null;
-		if (type.equals("CC")) {
-			return ProcessPackageString(id);
-		} else if (type.equals("C")) {
-			locationPartType = LocationPartType.CLASS;
-		} else if (type.equals("M")) {
-			locationPartType = LocationPartType.METHOD;
-		} else if (type.equals("NODE")) {
-			locationPartType = LocationPartType.NODE;
-		} else if (type.equals("A")) {
-			locationPartType = LocationPartType.ATTRIBUTE;
-		} else if (type.equals("P")) {
-			locationPartType = LocationPartType.PARAMETER;
-		} else if (type.equals("POS")) {
-			locationPartType = LocationPartType.POSITION;
-		}
-
-		List<LocationPart> list = new ArrayList<LocationPart>();
-		list.add(new LocationPart(locationPartType, id));
-		return list;
-	}
-
-	List<LocationPart> ProcessPackageString(String packageStr) {
-		List<LocationPart> list = new ArrayList<LocationPart>();
-		String[] packages = packageStr.split("\\.");
-		for (String s : packages) {
-			list.add(new LocationPart(LocationPartType.PACKAGE, s));
-		}
-		return list;
 	}
 
 	private void initRoot() {
@@ -313,7 +271,7 @@ public class DatabaseDataProvider implements DataProvider {
 				+ " (-)Empty Catch Clausule (2) Log Exception (+) null";
 		Pattern p1 = new Pattern(patternDesc);
 		p1.setActionField(LocationPartType.NODE);
-		p1.setUsedRepair(new PatternRepair(patternDesc, 95,0));
+		p1.setUsedRepair(new PatternRepair(patternDesc, 95, 0));
 		// TODO parser add this to parser
 		PatternSmellUse psu1 = new PatternSmellUse();
 		psu1.setMain(true);

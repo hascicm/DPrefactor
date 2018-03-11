@@ -21,9 +21,10 @@ public class ExplanationCommandHandler {
 	private static ExplanationCommandHandler INSTANCE;
 	private GitCommandHandler git = GitCommandHandler.getInstance();
 	private PostgreManager pg = PostgreManager.getInstance();
-	private List<RepairRecord> records;
 	private TimeStampGenerator timeStampGenerator = TimeStampGenerator.getInstance();
 	private BaseXManager baseX;
+
+	private List<RepairRecord> records;
 
 	private ExplanationCommandHandler() {
 		baseX = BaseXManager.getInstance();
@@ -40,22 +41,22 @@ public class ExplanationCommandHandler {
 
 		// initialize all records based on search results
 		records = processSearchResults(searchResults);
-		
+
 		// set repo for all initialized records
 		for (RepairRecord record : records) {
 			record.setGitRepository(repo);
 			record.setTimeStamp(timeStampGenerator.getTime());
 		}
 		// link results from jess
-		//processJessListenerOutput();
-		
+		// processJessListenerOutput();
+
 		// process repair file and link it to records
 		// processRepairExplanationFile();
 		// link to search result. Used for identification of path to smell
 		// linkToResultFile(searchResults);
 		printrecords();
-		
-		 //pushRecordsToPostgres();
+
+		// pushRecordsToPostgres();
 
 	}
 
@@ -64,6 +65,8 @@ public class ExplanationCommandHandler {
 
 		for (JessInput curr : searchResults) {
 			RepairRecord act = new RepairRecord();
+			act.setPath(curr.getXpatPosition());
+
 			act.setRefcode(curr.getRefCode());
 			act.setRefactoringCode(curr.getCode());
 			records.add(act);
@@ -211,7 +214,6 @@ public class ExplanationCommandHandler {
 			processRepairedCode(curr.getCode(), repairedCode);
 		}
 	}
-	
 
 	private void processRepairedCode(String code, String repairedCode) {
 		for (RepairRecord record : records) {

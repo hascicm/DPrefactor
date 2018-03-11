@@ -2,6 +2,9 @@ package sk.fiit.dp.pathFinder.clustering;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import sk.fiit.dp.pathFinder.clustering.model.Cluster;
 import sk.fiit.dp.pathFinder.dataprovider.DataProvider;
 import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
@@ -10,23 +13,24 @@ import sk.fiit.dp.refactor.model.JessInput;
 
 public class ClusteringHandler {
 	public static List<State> executeClustering(List<JessInput> searchResults) {
-		System.out.println("clustering is starting");
-
+		
+		Logger.getLogger("clutering logger").log(Level.INFO, "clustering is starting");
 		DataProvider dataProvider = DatabaseDataProvider.getInstance();
-
-		System.out.println("creating inital state");
+		
+		Logger.getLogger("clutering logger").log(Level.INFO, "creating inital state");
 		dataProvider.initializeRootState(searchResults);
-
-		System.out.println("initializing clusters");
+		
+		Logger.getLogger("clutering logger").log(Level.INFO, "initializing clusters");
 		List<Cluster> clusters = ClusteringHelperClass.initializeClusters(dataProvider.getRootState());
-		int i = 1;
-		for (Cluster c : clusters) {
-			System.out.println("----- cluster " + i + " ------");
-			c.print();
-			i++;
-		}
-
-		System.out.println("merging nested smells");
+		
+//		int i = 1;
+//		for (Cluster c : clusters) {
+//			System.out.println("----- cluster " + i + " ------");
+//			c.print();
+//			i++;
+//		}
+		
+		Logger.getLogger("clutering logger").log(Level.INFO, "merging nested smells");
 		clusters = ClusteringHelperClass.mergeNestedSmells(clusters);
 
 		for (Cluster c : clusters) {
@@ -34,9 +38,8 @@ public class ClusteringHandler {
 		}
 
 		CluseteringMethod cm = new HierarchiacalClustering();
-		System.out.println("execution started");
+		Logger.getLogger("clutering logger").log(Level.INFO, "execution started");
 		cm.executeClustering(clusters);
-		System.out.println("clustering finished");
 		
 		int desiredClusterCount = (int) Math.round(Math.pow(dataProvider.getSmellTypes().size(), 1.0 / 3));
 		if (desiredClusterCount < 1) {
@@ -49,14 +52,15 @@ public class ClusteringHandler {
 
 		List<State> result = new ArrayList<State>();
 
-		System.out.println("--------------- clustering result " + x.size() + " ---------------");
+	//	System.out.println("--------------- clustering result " + x.size() + " ---------------");
 		for (Cluster c : x) {
-			c.print();
+	//		c.print();
 			State act = new State();
 			act.setSmells(c.getSmellOccurrences());
 			result.add(act);
 		}
-
+		
+		Logger.getLogger("clutering logger").log(Level.INFO, "clustering finished");
 		return result;
 	}
 }

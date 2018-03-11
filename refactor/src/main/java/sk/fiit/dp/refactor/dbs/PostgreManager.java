@@ -6,6 +6,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import sk.fiit.dp.pathFinder.configuration.LocationProcessor;
+import sk.fiit.dp.pathFinder.entities.Location;
+import sk.fiit.dp.pathFinder.entities.LocationPart;
+import sk.fiit.dp.pathFinder.entities.LocationPartType;
 import sk.fiit.dp.refactor.dbs.connector.PotgreConnector;
 import sk.fiit.dp.refactor.model.RepairObject;
 import sk.fiit.dp.refactor.model.SearchObject;
@@ -275,6 +282,9 @@ public class PostgreManager {
 		rs.next();
 		act.setId(rs.getInt("id"));
 		act.setGitRepository(rs.getString("gitreponame"));
+		// TODO process path
+		List<Location> locationObjects = LocationProcessor.processLocationString(rs.getString("path"));
+		act.setLocationJSON(createLocationJSON(locationObjects));
 		act.setPath(rs.getString("path"));
 		act.setRefactoringCode(rs.getString("refactoringcode"));
 		act.setCodeBeforeRepair(rs.getString("beforerepair"));
@@ -288,6 +298,39 @@ public class PostgreManager {
 		act.setPossibleRepairs(getPossibleRepairForSmellbyRecordId(id));
 
 		return act;
+	}
+
+	private JSONArray createLocationJSON(List<Location> locationObjects) {
+		JSONArray result = new JSONArray();
+		for (Location location : locationObjects) {
+			JSONObject currLoc = new JSONObject();
+			String pack = "";
+			String clas = "";
+			String metd = "";
+			for (LocationPart locationPart : location.getLocation()) {
+
+				if (locationPart.getLocationPartType() == LocationPartType.PACKAGE) {
+					if (pack.equals("")) {
+						pack = locationPart.getId();
+					} else {
+						pack = pack + "." + locationPart.getId();
+					}
+				} else if (locationPart.getLocationPartType() == LocationPartType.CLASS) {
+					if (clas.equals("")) {
+						clas = locationPart.getId();
+					} else {
+						clas = clas + " nested class: " + locationPart.getId();
+					}
+				} else if (locationPart.getLocationPartType() == LocationPartType.METHOD) {
+					metd = locationPart.getId();
+				}
+			}
+			currLoc.put("package", pack);
+			currLoc.put("class", clas);
+			currLoc.put("method", metd);
+			result.put(currLoc);
+		}
+		return result;
 	}
 
 	public String getPossibleRepairForSmellbyRecordId(int id) throws SQLException {

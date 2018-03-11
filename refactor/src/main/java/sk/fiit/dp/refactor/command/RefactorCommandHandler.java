@@ -127,7 +127,7 @@ public class RefactorCommandHandler {
 
 			// vytvoria sa zaznamy o automatickej oprave
 			
-			if (createRepairRecord || true) {
+			if (createRepairRecord) {
 				explainCommand.createRepairRecord(repo, searchResults);
 				explainCommand.getSmellySourceCode(searchResults);
 			}
@@ -168,7 +168,7 @@ public class RefactorCommandHandler {
 			applyRefactoring(requiredRefactoring, allowedRefactoring);
 
 			// TODO explanation
-			if (createRepairRecord || true) {
+			if (createRepairRecord) {
 				explainCommand.processJessListenerOutput();
 				explainCommand.getRepairedSourceCode(searchResults);
 				explainCommand.printrecords();

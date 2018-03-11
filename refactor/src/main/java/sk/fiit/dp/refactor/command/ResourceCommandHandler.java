@@ -134,7 +134,7 @@ public class ResourceCommandHandler {
 			e.printStackTrace();
 		}
 		result = r.asJson();
-
+		System.out.println(result.toString());
 		return result.toString();
 	}
 
@@ -264,7 +264,7 @@ public class ResourceCommandHandler {
 	}
 
 	public String getPathFinderResultRepair(int clusterid, int repairid) {
-		JSONObject result = PostgresManager.getInstance().getPathFinderResultRepair(clusterid,repairid);
+		JSONObject result = PostgresManager.getInstance().getPathFinderResultRepair(clusterid, repairid);
 		return result.toString();
 	}
 

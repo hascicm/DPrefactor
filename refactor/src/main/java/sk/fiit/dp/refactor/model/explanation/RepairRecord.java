@@ -3,6 +3,7 @@ package sk.fiit.dp.refactor.model.explanation;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class RepairRecord {
@@ -18,11 +19,13 @@ public class RepairRecord {
 	private String smellDescription;
 	private String possibleRepairs;
 	private long timeStamp;
+	
+	private JSONArray LocationJSON;
 
 	public JSONObject asJson() {
 		JSONObject json = new JSONObject();
 		json.put("refactoringCode", refactoringCode);
-		json.put("path", path);
+		json.put("path", LocationJSON);
 		json.put("gitRepository", gitRepository);
 		json.put("codeBeforeRepair", codeBeforeRepair);
 		json.put("codeAfterRepair", codeAfterRepair);
@@ -138,6 +141,14 @@ public class RepairRecord {
 
 	public void setTimeStamp(long timeStamp) {
 		this.timeStamp = timeStamp;
+	}
+
+	public JSONArray getLocationJSON() {
+		return LocationJSON;
+	}
+
+	public void setLocationJSON(JSONArray locationJSON) {
+		LocationJSON = locationJSON;
 	}
 
 }

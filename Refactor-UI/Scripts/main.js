@@ -349,7 +349,7 @@ function recordDetail(i) {
 	jQuery.get("http://localhost:8080/refactor/records/" + i, function(response) {
 		    document.getElementById("recordDetailGit").value = response.gitRepository
     		document.getElementById("recordDetailrefcode").value = response.refactoringCode
-    		document.getElementById("recordDetailpath").value = response.path
+    		//document.getElementById("recordDetailpath").value = response.path
    			document.getElementById("recordDetailcodebefore").value = response.codeBeforeRepair
    			document.getElementById("recordDetailcodeafter").value = response.codeAfterRepair
    			document.getElementById("recordDetailsmell").value = response.smellName
@@ -357,6 +357,23 @@ function recordDetail(i) {
  			document.getElementById("recordDetailRepairs").value = response.possibleRepairs
  			document.getElementById("recordDetailJessName").value = response.jessname
  			document.getElementById("recordDetailJessDesc").value = response.jessdesc
+
+
+			var pos = "";
+			var x = 1;
+			response.path.forEach(function(value) {
+				console.log(value);
+				pos += "Poloha " + x + "\n";
+				pos += "balík "  + value.package + "\n";
+				pos += "trieda " + value.class + "\n";
+				if (value.method!= null)
+				pos += "metóda " + value.method + "\n";
+				x++;
+
+			})
+
+			document.getElementById("recordDetailpath").value = pos;
+
 	});
     document.getElementById("home").hidden = true;
 	document.getElementById("pathFinder").hidden = true;
