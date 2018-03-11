@@ -141,7 +141,7 @@ function pathFinderResultsPreviousCluster(){
 
 		var table = document.getElementById("pathFinderResultSmellTable");
 		var length = table.rows.length
-		for(var i = length; i > 0 ; --i) {
+		for(var i = length; i > 1 ; --i) {
 			table.deleteRow(i - 1);
 		}
 		response.smells.forEach(function(value) {
@@ -172,7 +172,7 @@ function pathFinderResultsNextCluster(){
 		currentPathfinderCluster = response.clusterid;
 		var table = document.getElementById("pathFinderResultSmellTable");
 		var length = table.rows.length
-		for(var i = length; i > 0 ; --i) {
+		for(var i = length; i > 1 ; --i) {
 			table.deleteRow(i - 1);
 		}
 		response.smells.forEach(function(value) {
@@ -264,7 +264,8 @@ function getAndSetSmellOccPosition(soid){
 				pos += "Poloha " + x + "\n";
 				pos += "balík "  + value.package + "\n";
 				pos += "trieda " + value.class + "\n";
-				pos += "metoda " + value.method + "\n";
+				if (value.method!= null)
+				pos += "metóda " + value.method + "\n";
 				x++;
 
 			})

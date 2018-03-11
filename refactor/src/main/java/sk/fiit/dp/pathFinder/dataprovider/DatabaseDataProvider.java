@@ -313,7 +313,7 @@ public class DatabaseDataProvider implements DataProvider {
 				+ " (-)Empty Catch Clausule (2) Log Exception (+) null";
 		Pattern p1 = new Pattern(patternDesc);
 		p1.setActionField(LocationPartType.NODE);
-		p1.setUsedRepair(new PatternRepair(patternDesc, 95));
+		p1.setUsedRepair(new PatternRepair(patternDesc, 95,0));
 		// TODO parser add this to parser
 		PatternSmellUse psu1 = new PatternSmellUse();
 		psu1.setMain(true);

@@ -147,11 +147,6 @@
 
 }
 
-button:disabled{
-    background-color: #777;
-    border: initial #555;
-}
-
 .pathFinderAlert .text{
     margin-left: 10px;
     word-wrap: break-word;

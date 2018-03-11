@@ -188,7 +188,8 @@ public class PostgresManager {
 					actualRecord.setActionField(resolveActionField(rs.getString("locationparttype")));
 
 					// TODO delete this after pattern repair functionality check
-					actualRecord.setUsedRepair(new PatternRepair(rs.getString("description"), 95));
+					actualRecord
+							.setUsedRepair(new PatternRepair(rs.getString("description"), 95, actualRecord.getId()));
 
 					patterns.add(actualRecord);
 					finishedsolve = true;
@@ -258,7 +259,7 @@ public class PostgresManager {
 		for (Relation r : cluster.getOptimalPath()) {
 			int smellOccID = repairOrderMap.get(r.getFixedSmellOccurance());
 			System.out.println(r.getUsedRepair().getName());
-			addRepairSequencePartRecord(clusterID, smellOccID, r.getUsedRepair().getId(), repairOrder);
+			addRepairSequencePartRecord(clusterID, smellOccID, r.getUsedRepair(), repairOrder);
 			repairOrder++;
 		}
 		return repairOrderMap;
@@ -293,10 +294,18 @@ public class PostgresManager {
 		}
 	}
 
-	private void addRepairSequencePartRecord(int clusterID, Integer fixedSmellOccID, int usedRepairID, int repairOrder)
+	private void addRepairSequencePartRecord(int clusterID, Integer fixedSmellOccID, Repair repair, int repairOrder)
 			throws SQLException {
-		String query = "insert into repairsequencepart (smelloccurrence_id,repair_id,cluster_id,repairorder,isdone) values "
-				+ "('" + fixedSmellOccID + "','" + usedRepairID + "','" + clusterID + "'," + repairOrder + ",'false')";
+		String query = "";
+		if (repair instanceof PatternRepair) {
+			query = "insert into repairsequencepart (smelloccurrence_id,repair_id,pattern_id,cluster_id,repairorder,isdone) values "
+					+ "('" + fixedSmellOccID + "','" + repair.getId() + "','" + ((PatternRepair) repair).getPatternID()
+					+ "','" + clusterID + "'," + repairOrder + ",'false')";
+		} else {
+			query = "insert into repairsequencepart (smelloccurrence_id,repair_id,cluster_id,repairorder,isdone) values "
+					+ "('" + fixedSmellOccID + "','" + repair.getId() + "','" + clusterID + "'," + repairOrder
+					+ ",'false')";
+		}
 		statement.executeUpdate(query);
 
 	}
@@ -415,15 +424,21 @@ public class PostgresManager {
 
 	public JSONObject getPathFinderResultRepair(int clusterid, int repairid) {
 		JSONObject result = new JSONObject();
-		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id,so.id as soid,so.code from repairsequencepart rsp "
+		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id,so.id as soid,so.code,"
+				+ "p.description as patterndesc from repairsequencepart rsp "
 				+ "join repair r on r.id = rsp.repair_id join smelloccurrence so on so.id=rsp.smelloccurrence_id "
-				+ "join smelltype st on st.id = smell_id where rsp.cluster_id =" + clusterid + " and repairorder = "
-				+ repairid;
+				+ "join smelltype st on st.id = smell_id left join pattern p on rsp.pattern_id = p.id where rsp.cluster_id ="
+				+ clusterid + " and repairorder = " + repairid;
 		ResultSet rs;
+		System.out.println(querry);
 		try {
 			rs = statement.executeQuery(querry);
 			while (rs.next()) {
-				result.put("repair", rs.getString("repair"));
+				if (rs.getString("patterndesc") == null) {
+					result.put("repair", rs.getString("repair"));
+				} else {
+					result.put("repair", rs.getString("patterndesc"));
+				}
 				result.put("smell", rs.getString("smell"));
 				result.put("order", rs.getInt("repairorder"));
 				result.put("isdone", rs.getBoolean("isdone"));
@@ -434,6 +449,8 @@ public class PostgresManager {
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
+		System.out.println(result + "\n");
+
 		return result;
 	}
 
