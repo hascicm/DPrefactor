@@ -246,7 +246,6 @@ public class PostgreManager {
 				+ record.getRefactoringCode() + "','" + record.getPath() + "','" + record.getCodeBeforeRepair() + "','"
 				+ record.getCodeAfterRepair() + "'," + jessObject + ",'" + smelltypeid + "','" + record.getTimeStamp()
 				+ "')";
-		System.out.println(query);
 		statement.executeUpdate(query);
 
 	}

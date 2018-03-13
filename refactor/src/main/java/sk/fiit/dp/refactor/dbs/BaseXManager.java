@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +17,6 @@ import javax.xml.xquery.XQResultSequence;
 
 import com.xqj2.XQConnection2;
 
-import sk.fiit.dp.refactor.command.GitCommandHandler;
 import sk.fiit.dp.refactor.dbs.connector.BaseXConnector;
 
 public class BaseXManager {
@@ -102,8 +102,7 @@ public class BaseXManager {
 	 * @param value
 	 * @throws XQException
 	 */
-	public void applySearchXQuery(String content, String variableName, String value)
-			throws XQException {
+	public void applySearchXQuery(String content, String variableName, String value) throws XQException {
 		expression.bindString(new QName(variableName), value, null);
 		expression.executeQuery(content);
 
@@ -123,15 +122,13 @@ public class BaseXManager {
 
 	}
 
-	// TODO convert to java source
 	public String retrieveRepairedCourceCode(String refCode) {
 		String repairedCode = "";
-		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refCode + "')) return (db:output($node))";
-		System.out.println("getting " + refCode);
+		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refCode + "')) return (db:output($node/*))";
 		try {
 			XQResultSequence result = expression.executeQuery(querry);
 			while (result.next()) {
-				repairedCode += result.getSequenceAsString(null) + "\n\n";
+				repairedCode += result.getSequenceAsString(null);
 			}
 		} catch (XQException e) {
 			Logger.getLogger("BaseX").log(Level.SEVERE, "repaired code retrieval failed", e);
@@ -139,17 +136,16 @@ public class BaseXManager {
 		return repairedCode;
 	}
 
-	public String retrieveSmellyCourceCode(String refcode) {
+	public String retrieveSmellySourceCode(String refcode) {
 		String sourceCode = "";
-		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refcode + "')) return (db:output($node))";
-		System.out.println("getting " + refcode);
+		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refcode + "')) return (db:output($node/*))";
 		try {
 			XQResultSequence result = expression.executeQuery(querry);
 			while (result.next()) {
-				sourceCode += result.getSequenceAsString(null) + "\n\n";
+				sourceCode += result.getItemAsString(null);
 			}
 		} catch (XQException e) {
-			Logger.getLogger("BaseX").log(Level.SEVERE, "repaired code retrieval failed", e);
+			Logger.getLogger("BaseX").log(Level.SEVERE, "source code retrieval failed", e);
 		}
 		return sourceCode;
 	}

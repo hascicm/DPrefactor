@@ -1,20 +1,27 @@
 package sk.fiit.dp.refactor.command.explanation;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.jdt.core.ToolFactory;
+import org.eclipse.jdt.core.formatter.CodeFormatter;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
 
-import net.xqj.basex.BaseXConnectionPoolXQDataSource;
+import com.google.common.io.Files;
+
+import sk.fiit.dp.refactor.command.ConversionCommandHandler;
 import sk.fiit.dp.refactor.command.GitCommandHandler;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.TimeStampGenerator;
 import sk.fiit.dp.refactor.model.JessInput;
 import sk.fiit.dp.refactor.model.explanation.JessListenerOutput;
-import sk.fiit.dp.refactor.model.explanation.RepairExplanationTempObject;
 import sk.fiit.dp.refactor.model.explanation.RepairRecord;
 
 public class ExplanationCommandHandler {
@@ -22,6 +29,7 @@ public class ExplanationCommandHandler {
 	private GitCommandHandler git = GitCommandHandler.getInstance();
 	private PostgreManager pg = PostgreManager.getInstance();
 	private TimeStampGenerator timeStampGenerator = TimeStampGenerator.getInstance();
+	private ConversionCommandHandler conversion = ConversionCommandHandler.getInstance();
 	private BaseXManager baseX;
 
 	private List<RepairRecord> records;
@@ -47,16 +55,7 @@ public class ExplanationCommandHandler {
 			record.setGitRepository(repo);
 			record.setTimeStamp(timeStampGenerator.getTime());
 		}
-		// link results from jess
-		// processJessListenerOutput();
 
-		// process repair file and link it to records
-		// processRepairExplanationFile();
-		// link to search result. Used for identification of path to smell
-		// linkToResultFile(searchResults);
-		printrecords();
-
-		// pushRecordsToPostgres();
 
 	}
 
@@ -72,16 +71,6 @@ public class ExplanationCommandHandler {
 			records.add(act);
 		}
 		return records;
-	}
-
-	private void linkToResultFile(List<JessInput> searchResults) {
-		for (RepairRecord record : records) {
-			for (JessInput curr : searchResults) {
-				if (record.getRefactoringCode().equals(curr.getCode())) {
-					record.setPath(curr.getPosition());
-				}
-			}
-		}
 	}
 
 	public void pushRecordsToPostgres() {
@@ -117,87 +106,6 @@ public class ExplanationCommandHandler {
 		}
 	}
 
-	private List<RepairRecord> processSearchExplanationFile() {
-		System.out.println("search file content");
-		List<RepairRecord> records = new ArrayList<RepairRecord>();
-
-		try {
-			List<String> lines = Files.readAllLines(Paths.get(git.getRepoDirectory() + "\\explanation.txt"));
-			String codeFromFile = "";
-			RepairRecord curent = null;
-
-			for (String l : lines) {
-				if (l.startsWith("NAME: ")) {
-					if (curent != null) {
-						curent.setCodeBeforeRepair(codeFromFile);
-						curent.setPath("");
-						records.add(curent);
-					}
-					curent = new RepairRecord();
-					curent.setRefactoringCode(l.replace("NAME: ", ""));
-					curent.setRefcode(l.replace("NAME: ", "").replaceAll("[0-9]", ""));
-					codeFromFile = "";
-				} else {
-					codeFromFile += l + "\n";
-				}
-			}
-			if (curent != null) {
-				curent.setCodeBeforeRepair(codeFromFile);
-				curent.setPath("");
-				records.add(curent);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		System.out.println("-------------------");
-		return records;
-	}
-
-	private void processRepairExplanationFile() {
-		System.out.println("repair file content");
-		List<RepairExplanationTempObject> parsedRepairedSources = new ArrayList<RepairExplanationTempObject>();
-
-		try {
-			List<String> lines = Files.readAllLines(Paths.get(git.getRepoDirectory() + "\\explanationRepair.txt"));
-			String sourceCodeFromFile = "";
-			RepairExplanationTempObject o = null;
-
-			for (String l : lines) {
-				if (l.startsWith("NAME: ")) {
-					if (o != null) {
-						o.setCode(sourceCodeFromFile);
-						parsedRepairedSources.add(o);
-					}
-					o = new RepairExplanationTempObject();
-					o.setRefactoringCode(l.replace("NAME: ", ""));
-					sourceCodeFromFile = "";
-
-				} else {
-					sourceCodeFromFile += l + "\n";
-				}
-				if (o != null) {
-					o.setCode(sourceCodeFromFile);
-					parsedRepairedSources.add(o);
-				}
-				System.out.println(l);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		for (RepairExplanationTempObject temp : parsedRepairedSources) {
-			for (RepairRecord record : records) {
-				if (temp.getRefactoringCode().equals(record.getRefactoringCode())) {
-					record.setCodeAfterRepair(temp.getCode());
-				}
-			}
-
-		}
-		System.out.println("-------------------");
-	}
-
 	public void processJessListenerOutput() {
 		for (RepairRecord record : records) {
 			for (JessListenerOutput curr : RuleEngineEventHandler.getInstance().getListenerOutputObjects()) {
@@ -213,21 +121,63 @@ public class ExplanationCommandHandler {
 			String repairedCode = baseX.retrieveRepairedCourceCode(curr.getCode());
 			processRepairedCode(curr.getCode(), repairedCode);
 		}
+		for (RepairRecord record : records) {
+			String source = record.getCodeAfterRepair();
+			String withoutXMLTags = removeXMLTags(source);
+			record.setCodeAfterRepair(formatSourceCodeString(withoutXMLTags));
+		}
 	}
 
 	private void processRepairedCode(String code, String repairedCode) {
 		for (RepairRecord record : records) {
 			if (record.getRefactoringCode().equals(code)) {
+				
 				record.setCodeAfterRepair(repairedCode);
 			}
 		}
 	}
 
-	public void getSmellySourceCode(List<JessInput> searchResults) {
+	public void getSmellySourceCode(List<JessInput> searchResults, String repoPath) {
 		for (JessInput curr : searchResults) {
-			String repairedCode = baseX.retrieveSmellyCourceCode(curr.getCode());
-			processSmellyCode(curr.getCode(), repairedCode);
+			String smellyCode = baseX.retrieveSmellySourceCode(curr.getCode());
+			processSmellyCode(curr.getCode(), smellyCode);
 		}
+		// clear code of XML tags and format it 
+		for (RepairRecord record : records) {
+			String source = record.getCodeBeforeRepair();
+			String withoutXMLTags = removeXMLTags(source);
+			record.setCodeBeforeRepair(formatSourceCodeString(withoutXMLTags));
+		}
+
+	}
+
+	private String removeXMLTags(String code) {
+		return code.replaceAll("<comment.*>.*(\\s*)</comment>", "").replaceAll("<[^>]+>", "").replaceAll("\\s+", " ");
+	}
+
+	/**
+	 * method for formating source code from string 
+	 * @param code
+	 *            source code without any formating
+	 * @return if formatter is capable of formating source code,then formated
+	 *         source code is returned, else code from argument is returned
+	 */
+	private String formatSourceCodeString(String code) {
+		CodeFormatter codeFormatter = ToolFactory.createCodeFormatter(null);
+
+		TextEdit textEdit = codeFormatter.format(CodeFormatter.K_UNKNOWN, code, 0, code.length(), 0, null);
+		IDocument doc = new Document(code);
+		try {
+			textEdit.apply(doc);
+			return doc.get();
+		} catch (MalformedTreeException e) {
+			e.printStackTrace();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			return code;
+		}
+		return null;
 	}
 
 	private void processSmellyCode(String code, String sourceCode) {

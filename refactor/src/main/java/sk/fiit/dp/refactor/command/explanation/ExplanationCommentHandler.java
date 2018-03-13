@@ -47,8 +47,7 @@ public class ExplanationCommentHandler {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		// System.out.println("xpathmodifier prepared string " +
-		// explanationString);
+
 		return explanationString;
 
 	}
@@ -72,7 +71,6 @@ public class ExplanationCommentHandler {
 		String query = "for $node in xquery:eval(fn:concat(\"//\", '" + smellCode
 				+ "')) return ( insert node element {xs:QName('" + smellCode + "BeforeComment')} {" + queryPart
 				+ "} before $node)";
-		System.out.println(query);
 
 		try {
 			baseX.applyXQuery(query);

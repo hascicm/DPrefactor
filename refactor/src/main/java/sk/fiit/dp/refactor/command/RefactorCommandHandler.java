@@ -13,7 +13,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import sk.fiit.dp.refactor.command.explanation.ExplanationCommandHandler;
 import sk.fiit.dp.refactor.command.explanation.ExplanationCommentHandler;
-import sk.fiit.dp.refactor.command.explanation.XpathScriptModifier;
 import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
@@ -125,15 +124,14 @@ public class RefactorCommandHandler {
 			// NEW vratenie ciest z databazy
 			smellPathFinder.findPathsToSmells(searchResults);
 
-			// vytvoria sa zaznamy o automatickej oprave
-			
-			if (createRepairRecord) {
-				explainCommand.createRepairRecord(repo, searchResults);
-				explainCommand.getSmellySourceCode(searchResults);
-			}
-
 			// 7. Exportuje sa databaza
 			baseX.exportDatabase(gitCommand.getRepoDirectory());
+			
+			// vytvoria sa zaznamy o automatickej oprave
+			if (createRepairRecord) {
+				explainCommand.createRepairRecord(repo, searchResults);
+				explainCommand.getSmellySourceCode(searchResults,gitCommand.getRepoDirectory());
+			}
 
 			// 8. Exportovane subory sa presunu na povodnu poziciu
 			conversionCommand.moveFilesToOriginalLocation(xmlFiles, gitCommand.getRepoDirectory());
@@ -171,7 +169,7 @@ public class RefactorCommandHandler {
 			if (createRepairRecord) {
 				explainCommand.processJessListenerOutput();
 				explainCommand.getRepairedSourceCode(searchResults);
-				explainCommand.printrecords();
+			//	explainCommand.printrecords();
 				explainCommand.pushRecordsToPostgres();
 
 			}
@@ -188,7 +186,7 @@ public class RefactorCommandHandler {
 			gitCommand.pushBranch(repairBranch, name, password);
 
 			// 18. Vymaze sa docasna BaseX databaza TODO
-			// baseX.cleanDatabase(id);
+			baseX.cleanDatabase(id);
 
 			// 19. Odstrani sa lokalna git kopia
 			gitCommand.deleteLocalDirectory();
