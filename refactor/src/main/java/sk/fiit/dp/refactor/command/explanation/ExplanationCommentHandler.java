@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import javax.xml.xquery.XQException;
 
-import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.refactor.dbs.BaseXManager;

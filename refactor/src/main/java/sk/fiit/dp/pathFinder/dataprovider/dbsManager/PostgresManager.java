@@ -29,6 +29,7 @@ import sk.fiit.dp.pathFinder.entities.Repair;
 import sk.fiit.dp.pathFinder.entities.SmellType;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
+import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class PostgresManager {
 
@@ -186,8 +187,6 @@ public class PostgresManager {
 					actualRecord.setId(rs.getInt("id"));
 					actualRecord.setDescription(rs.getString("description"));
 					actualRecord.setActionField(resolveActionField(rs.getString("locationparttype")));
-
-					// TODO delete this after pattern repair functionality check
 					actualRecord
 							.setUsedRepair(new PatternRepair(rs.getString("description"), 95, actualRecord.getId()));
 
@@ -238,8 +237,8 @@ public class PostgresManager {
 		return analysisID;
 	}
 
-	private Map<SmellOccurance, Integer> addClusterRecord(OptimalPathForCluster cluster, int analysisID,
-			int clusterNumber) throws SQLException {
+	private void addClusterRecord(OptimalPathForCluster cluster, int analysisID, int clusterNumber)
+			throws SQLException {
 		String query = "insert into cluster (pathfinderanalysis_id,cluster_number) values (" + analysisID + ","
 				+ clusterNumber + ")";
 		statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
@@ -251,21 +250,42 @@ public class PostgresManager {
 		Map<SmellOccurance, Integer> repairOrderMap = new HashMap<>();
 
 		for (SmellOccurance smellOcc : cluster.getRootState().getSmells()) {
-			int id = addSmellOccurenceRecord(smellOcc, clusterID);
+			int id = addRootSmellOccurenceRecord(smellOcc, clusterID);
 			repairOrderMap.put(smellOcc, id);
 		}
 
 		int repairOrder = 1;
 		for (Relation r : cluster.getOptimalPath()) {
+			// insert repair record
 			int smellOccID = repairOrderMap.get(r.getFixedSmellOccurance());
-			System.out.println(r.getUsedRepair().getName());
-			addRepairSequencePartRecord(clusterID, smellOccID, r.getUsedRepair(), repairOrder);
+			int repairID = addRepairSequencePartRecord(clusterID, smellOccID, r.getUsedRepair(), repairOrder);
+			// clears map
+			repairOrderMap.clear();
+			// get to state and insert do db
+			State toState = r.getToState();
+			for (SmellOccurance smellOcc : toState.getSmells()) {
+				int id = addRepairSmellOccurenceRecord(smellOcc, repairID);
+				repairOrderMap.put(smellOcc, id);
+			}
 			repairOrder++;
 		}
-		return repairOrderMap;
 	}
 
-	private int addSmellOccurenceRecord(SmellOccurance smellOcc, int clusterID) throws SQLException {
+	private int addRepairSmellOccurenceRecord(SmellOccurance smellOcc, int repairID) throws SQLException {
+		String query = "insert into smelloccurrence (repair_id,smell_id,code) values ('" + repairID + "','"
+				+ smellOcc.getSmell().getId() + "','" + smellOcc.getCode() + "')";
+
+		statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+		ResultSet rs = statement.getGeneratedKeys();
+		int smellOccID = -1;
+		while (rs.next()) {
+			smellOccID = rs.getInt(1);
+		}
+		addSmellPositionRecord(smellOcc.getLocations(), smellOccID);
+		return smellOccID;
+	}
+
+	private int addRootSmellOccurenceRecord(SmellOccurance smellOcc, int clusterID) throws SQLException {
 		String query = "insert into smelloccurrence (cluster_id,smell_id,code) values ('" + clusterID + "','"
 				+ smellOcc.getSmell().getId() + "','" + smellOcc.getCode() + "')";
 
@@ -294,7 +314,7 @@ public class PostgresManager {
 		}
 	}
 
-	private void addRepairSequencePartRecord(int clusterID, Integer fixedSmellOccID, Repair repair, int repairOrder)
+	private int addRepairSequencePartRecord(int clusterID, Integer fixedSmellOccID, Repair repair, int repairOrder)
 			throws SQLException {
 		String query = "";
 		if (repair instanceof PatternRepair) {
@@ -306,8 +326,14 @@ public class PostgresManager {
 					+ "('" + fixedSmellOccID + "','" + repair.getId() + "','" + clusterID + "'," + repairOrder
 					+ ",'false')";
 		}
-		statement.executeUpdate(query);
+		statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 
+		ResultSet rs = statement.getGeneratedKeys();
+		int repairID = -1;
+		while (rs.next()) {
+			repairID = rs.getInt(1);
+		}
+		return repairID;
 	}
 
 	private DependencyPlaceType resolveLocationPartType(String act) {
@@ -422,15 +448,15 @@ public class PostgresManager {
 		return test;
 	}
 
-	public JSONObject getPathFinderResultRepair(int clusterid, int repairid) {
+	public JSONObject getPathFinderResultRepair(int clusterid, int repairOrderNumber) {
 		JSONObject result = new JSONObject();
 		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id,so.id as soid,so.code,"
 				+ "p.description as patterndesc from repairsequencepart rsp "
 				+ "join repair r on r.id = rsp.repair_id join smelloccurrence so on so.id=rsp.smelloccurrence_id "
 				+ "join smelltype st on st.id = smell_id left join pattern p on rsp.pattern_id = p.id where rsp.cluster_id ="
-				+ clusterid + " and repairorder = " + repairid;
+				+ clusterid + " and repairorder = " + repairOrderNumber;
 		ResultSet rs;
-		System.out.println(querry);
+
 		try {
 			rs = statement.executeQuery(querry);
 			while (rs.next()) {
@@ -446,10 +472,10 @@ public class PostgresManager {
 				result.put("concrepid", rs.getInt("id"));
 				result.put("soid", rs.getInt("soid"));
 			}
+			rs.close();
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-		System.out.println(result + "\n");
 
 		return result;
 	}
@@ -465,17 +491,18 @@ public class PostgresManager {
 			while (rs.next()) {
 				result.put("clustecount", rs.getInt("result"));
 			}
+			rs.close();
+
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
-
 		return result;
 	}
 
 	public JSONObject getPathFinderClusterInfo(int clusterId) {
 
 		JSONObject result = new JSONObject();
-		String query = "		select count(*) as result from cluster c join repairsequencepart rsp on c.id = rsp.cluster_id where c.id = "
+		String query = "select count(*) as result from cluster c join repairsequencepart rsp on c.id = rsp.cluster_id where c.id = "
 				+ clusterId;
 		ResultSet rs = null;
 
@@ -484,6 +511,7 @@ public class PostgresManager {
 			while (rs.next()) {
 				result.put("repaircount", rs.getInt("result"));
 			}
+			rs.close();
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
@@ -556,10 +584,88 @@ public class PostgresManager {
 				}
 			}
 			result.put(currentLoc);
+			rs.close();
 		} catch (SQLException e) {
 			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
 		}
 		return result;
 
+	}
+
+	public JSONArray getGraphData(int clusterID, int repairCount) {
+		JSONArray result = new JSONArray();
+
+		// ROOTSTATE
+		JSONArray rootSmells = new JSONArray();
+		String querry = "select c.id as clusterid,st.name,st.description,sc.id,sc.code,st.weight from cluster c "
+				+ "join smelloccurrence sc on c.id= sc.cluster_id join smelltype st on st.id = sc.smell_id "
+				+ "where c.id = " + clusterID;
+		try {
+			ResultSet rs = statement.executeQuery(querry);
+			while (rs.next()) {
+				JSONObject currSmell = new JSONObject();
+				currSmell.put("id", rs.getInt("id")); // smelloccID
+				currSmell.put("name", rs.getString("name"));
+				currSmell.put("description", rs.getString("description"));
+				currSmell.put("refcode", rs.getString("code"));
+				currSmell.put("weight", rs.getString("weight"));
+				rootSmells.put(currSmell);
+			}
+			rs.close();
+		} catch (SQLException e) {
+			Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+		}
+
+		// get position for rootsmells
+		for (int i = 0; i < rootSmells.length(); i++) {
+			int id = rootSmells.getJSONObject(i).getInt("id");
+			rootSmells.getJSONObject(i).put("position", getSmellOccPosition(id));
+		}
+		JSONObject state = new JSONObject();
+		state.put("smells", rootSmells);
+
+		result.put(state);
+
+		// iterate over all repairs
+		// TODO chcek boundaries
+		for (int repairNumber = 1; repairNumber <= repairCount; repairNumber++) {
+			state = new JSONObject();
+
+			// process repair
+			JSONObject repair = getPathFinderResultRepair(clusterID, repairNumber);
+			state.put("repair", repair);
+			// process smells
+			JSONArray stateSmells = new JSONArray();
+			querry = "select c.id as clusterid, st.name, st.description, so.id, so.code, st.weight from pathfinderanalysis pfa "
+					+ "join cluster c on c.pathfinderanalysis_id = pfa.id "
+					+ "join repairsequencepart rsp on rsp.cluster_id = c.id "
+					+ "join smelloccurrence so on rsp.id = so.repair_id join smelltype st on so.smell_id = st.id "
+					+ "where c.id = " + clusterID + " and repairorder = " + repairNumber;
+			try {
+				ResultSet rs = statement.executeQuery(querry);
+				while (rs.next()) {
+					JSONObject currSmell = new JSONObject();
+					currSmell.put("id", rs.getInt("id")); // smelloccID
+					currSmell.put("name", rs.getString("name"));
+					currSmell.put("description", rs.getString("description"));
+					currSmell.put("refcode", rs.getString("code"));
+					currSmell.put("weight", rs.getString("weight"));
+					stateSmells.put(currSmell);
+				}
+				rs.close();
+
+			} catch (SQLException e) {
+				Logger.getGlobal().log(Level.SEVERE, "database connection failed", e);
+			}
+			for (int i = 0; i < stateSmells.length(); i++) {
+				int id = stateSmells.getJSONObject(i).getInt("id");
+				stateSmells.getJSONObject(i).put("position", getSmellOccPosition(id));
+			}
+			state.put("smells", stateSmells);
+			result.put(state);
+		}
+
+
+		return result;
 	}
 }

@@ -1,0 +1,189 @@
+    function init() {
+      if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
+      var $ = go.GraphObject.make;  // for conciseness in defining templates
+      myDiagram =
+        $(go.Diagram, "myDiagramDiv",  // Diagram refers to its DIV HTML element by id
+        {
+            // start everything in the middle of the viewport
+            initialContentAlignment: go.Spot.Center,
+            layout: $(go.TreeLayout,  // the layout for the entire diagram
+            {
+              angle: 90,
+              arrangement: go.TreeLayout.ArrangementHorizontal,
+              isRealtime: false
+            })
+          });
+      // define the node template for non-groups
+      myDiagram.nodeTemplate =
+      $(go.Node, "Auto",
+        $(go.Shape, "Rectangle",
+          { stroke: null, strokeWidth: 0 },
+          new go.Binding("fill", "color")),
+        $(go.TextBlock,
+          { margin: 7, font: "Bold 14px Sans-Serif" },
+            //the text, color, and key are all bound to the same property in the node data
+            new go.Binding("text", "text")),
+        {
+
+          // TODO detail Inspector
+          click: function(e, obj) { 
+            console.log("Clicked " +  obj.data.desc) },
+            selectionChanged: function(part) {
+              var shape = part.elt(0);
+              shape.fill = part.isSelected ? "red" : interpolateColor(part.data.weight);
+
+            }
+          }
+          );
+      myDiagram.linkTemplate =
+      $(go.Link,
+        { routing: go.Link.Orthogonal, corner: 10 },
+        $(go.Shape, { strokeWidth: 2 }),
+        $(go.Shape, { toArrow: "OpenTriangle" }),
+        $(go.TextBlock, { 
+          segmentOffset: new go.Point(NaN, NaN),
+          segmentOrientation: go.Link.OrientUpright },
+          new go.Binding("text", "text")),
+        {
+          // TODO detail Inspector
+          click: function(e, obj) {
+
+           console.log("Clicked " +  obj.data.detail); 
+         }
+       }
+       );
+      // define the group template
+      myDiagram.groupTemplate =
+      $(go.Group, "Auto",
+          { // define the group's internal layout
+          layout: $(go.TreeLayout,
+            { angle: 90, arrangement: go.TreeLayout.ArrangementHorizontal, isRealtime: false }),
+            // the group begins unexpanded;
+            // upon expansion, a Diagram Listener will generate contents for the group
+            isSubGraphExpanded: true,
+            // when a group is expanded, if it contains no parts, generate a subGraph inside of it
+          },
+          $(go.Shape, "Rectangle",
+            { fill: "white", stroke: "gray", strokeWidth: 2 },
+            new go.Binding("fill", "color")
+            ),
+          $(go.Panel, "Vertical",
+            { defaultAlignment: go.Spot.Left, margin: 4 },
+            $(go.Panel, "Horizontal",
+              { defaultAlignment: go.Spot.Top },
+              // the SubGraphExpanderButton is a panel that functions as a button to expand or collapse the subGraph
+              //$("SubGraphExpanderButton"),
+              $(go.TextBlock,
+                { font: "Bold 18px Sans-Serif", margin: 4 },
+                new go.Binding("text", "text")
+                )
+              ),
+            // create a placeholder to represent the area where the contents of the group are
+            $(go.Placeholder,
+              { padding: new go.Margin(0, 10) })
+          )  // end Vertical Panel
+        );  // end Group
+      // generate the initial model
+    }
+
+    var stateCounter = 0;
+    var edgeid = 0;
+    function addState(json){
+
+      var groupkey = "group" + stateCounter;
+      var groupnama;
+      if (stateCounter == 0){
+        groupname = "pôvodný stav"
+      } else {
+        groupname = "stav po " +stateCounter + ". oprave";
+      }
+      myDiagram.startTransaction("stateAdd"+stateCounter);
+
+      // add state node 
+      myDiagram.model.addNodeData({key : groupkey, text : groupname, isGroup : true , color : "white"})
+      stateArray.push(groupkey);
+
+      // add all smells 
+      if (json.smells !=null){
+        json.smells.forEach(function(smell) {
+          var smellName = smell.name;
+          var smellKey  = smell.refcode + stateCounter;
+          var smellcolor = interpolateColor(smell.weight);
+          let description = "";
+          description += "názov pachu  : " + smell.name + "\n";
+          description += "popis        : " + smell.description + "\n";
+          description += "váha         : " + smell.weight + "\n";
+          description += "kód pachu    : " + smell.refcode + "\n";
+
+          var x = 1;
+          smell.position.forEach(function(value) {
+            description += "Poloha  č." + x + "\n";
+            description += "balík    :"  + value.package + "\n";
+            description += "trieda   :" + value.class + "\n";
+            if (value.method!= null)
+              description += "metóda: " + value.method + "\n";
+            x++;
+
+          })
+
+
+          myDiagram.model.addNodeData({"key" : smellKey, "text": smellName, "color": smellcolor, "group":groupkey , "weight": smell.weight , desc : description});
+        });
+      }
+      
+      if (json.repair !=null){
+        var fixedSmellKey = json.repair.code + (stateCounter -1 );
+        let description = "";
+        description += "názov orpavy : " + json.repair.smell + "\n";        
+        description += "popis        : " + json.repair.repair + "\n";
+        description += "kód pachu    : " + json.repair.code + "\n";
+
+
+
+        myDiagram.model.addLinkData({from:fixedSmellKey  , to:groupkey, id : edgeid ,text : json.repair.repair, detail : description});
+        edgeid++;
+
+      }
+      myDiagram.commitTransaction("stateAdd"+stateCounter);
+      stateCounter++; 
+
+    }
+
+
+    var smellDinamicColor = true;
+    var stateArray = [];
+
+    function interpolateColor(smellWeight){
+      if (smellDinamicColor){
+        if (smellWeight < 1){
+          smellWeight = 1
+        }else if (smellWeight > 10){
+          smellWeight = 10
+        }
+
+        smellWeight = (smellWeight - 1 ) * 10;
+        return "hsl(" + smellWeight + " , 50% , 50%)"
+      } else return "hsl(195, 24%, 50%)"
+    }
+
+    function getGraphData(clusterID, repairCount){
+      myDiagram.clear();
+      jQuery.get("http://localhost:8080/refactor/getGraphData/"+ clusterID + "/" + repairCount, function(response) {
+        stateCounter = 0;
+        stateArray = [];
+        console.log(response);
+        response.forEach(function(value) {  
+          addState(value);
+        })
+      });
+    }
+
+    function editGroup(position){
+      let key = stateArray[position-1];
+      let data = myDiagram.model.findNodeDataForKey(key);
+      myDiagram.model.removeNodeData(data);
+
+      data.color = "green";
+      myDiagram.model.addNodeData(data);
+      console.log(data);
+    }

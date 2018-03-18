@@ -20,6 +20,7 @@ public class PostgresConnector {
 		statement = connection.createStatement();
 	}
 
+	
 	public Statement getStatement() {
 		return statement;
 	}

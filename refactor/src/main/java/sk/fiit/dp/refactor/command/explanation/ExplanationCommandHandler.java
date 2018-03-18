@@ -123,8 +123,8 @@ public class ExplanationCommandHandler {
 		}
 		for (RepairRecord record : records) {
 			String source = record.getCodeAfterRepair();
-			String withoutXMLTags = removeXMLTags(source);
-			record.setCodeAfterRepair(formatSourceCodeString(withoutXMLTags));
+			//String withoutXMLTags = removeXMLTags(source);
+			record.setCodeAfterRepair(formatSourceCodeString(source));
 		}
 	}
 
@@ -145,8 +145,8 @@ public class ExplanationCommandHandler {
 		// clear code of XML tags and format it 
 		for (RepairRecord record : records) {
 			String source = record.getCodeBeforeRepair();
-			String withoutXMLTags = removeXMLTags(source);
-			record.setCodeBeforeRepair(formatSourceCodeString(withoutXMLTags));
+			//String withoutXMLTags = removeXMLTags(source);
+			record.setCodeBeforeRepair(formatSourceCodeString(source));
 		}
 
 	}

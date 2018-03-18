@@ -106,6 +106,13 @@ public class WebController {
 			@PathParam("clusterid") int clusterNumber) {
 		return resourceCommand.getPathFinderAnalysisCluster(analysisId, clusterNumber);
 	}
+
+	@GET
+	@Path("/getGraphData/{clusterid}/{repairCount}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getGraphData(@PathParam("clusterid") int clusterid, @PathParam("repairCount") int repairCount) {
+		return resourceCommand.getGraphData(clusterid,repairCount);
+	}
 	
 	@GET
 	@Path("/PathFinderAnalysisInfo/{analysisid}")

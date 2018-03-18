@@ -180,11 +180,12 @@ function pathFinderResultsNextCluster(){
 
 		})
 		getClusterInfo(currentPathfinderCluster);
+
 	})
 
 }
 
-function getClusterInfo(clusterid){
+function getClusterInfo(clusterid, callback){
 	currentPathfinderRepairNumber = 1;
 	jQuery.get("http://localhost:8080/refactor/PathFinderClusterInfo/" + clusterid , function(response){
 		currentPathfinderrRepairCount = response.repaircount;
@@ -208,6 +209,7 @@ function getClusterInfo(clusterid){
 		}
 
 	})
+
 
 	
 }
@@ -309,6 +311,7 @@ function pathFinderResultsRepairComplete(){
 			contentType:"application/json; charset=utf-8",
 			dataType: "json"
 		});
+		editGroup(document.getElementById("pathFinderResultsOrder").value);
 	}else if (document.getElementById("pathFinderResultsIsdone").value == "Áno"){
 		document.getElementById("pathFinderResultsIsdone").value = "Nie";		
 		document.getElementById("pathFinderResultsRepairComplete").innerHTML = "označiť ako dokončené";
@@ -319,6 +322,8 @@ function pathFinderResultsRepairComplete(){
 			contentType:"application/json; charset=utf-8",
 			dataType: "json"
 		});
+		editGroup(document.getElementById("pathFinderResultsOrder").value);
+
 	}
 }
 
@@ -377,8 +382,20 @@ jQuery.get("http://localhost:8080/refactor/PathFinderAnalysisDetail/" + i, funct
 
 		getClusterInfo(currentPathfinderCluster);
 
-	});
+			});
 });
+}
+
+function expangPathfinderResultGraph() {
+    var x = document.getElementById("pathFinderResultGraph");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+        console.log("clusterid " + currentPathfinderCluster + " repaircount " +  currentPathfinderrRepairCount);
+        getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
+
+    } else {
+        x.style.display = "none";
+    }
 }
 
 

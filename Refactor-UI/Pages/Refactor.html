@@ -11,6 +11,8 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="../Scripts/main.js"></script> 
 	<script src="../Scripts/pathFinder.js"></script> 
+	<script  src="../resources/go.js"></script>
+	<script src="../Scripts/graph.js"></script> 
 
 </head>
 
@@ -321,7 +323,12 @@
 		</div>
 
 
-
+		<button onclick="expangPathfinderResultGraph()">grafické zobrazenie</button>
+		<div class="recdetail right">	    	
+			<div id="pathFinderResultGraph" style="display: none;">
+				<div id="myDiagramDiv" style="height:600px;width:100%;border:1px solid black"></div>
+			</div>
+		</div>
 
 	</section>
 

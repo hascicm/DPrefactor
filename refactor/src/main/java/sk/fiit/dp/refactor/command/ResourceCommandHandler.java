@@ -83,7 +83,7 @@ public class ResourceCommandHandler {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		System.out.println(methods.toString());
 		return methods.toString();
 	}
 
@@ -284,6 +284,11 @@ public class ResourceCommandHandler {
 
 	public String getSmellOccPosition(int smelloccid) {
 		JSONArray result = PostgresManager.getInstance().getSmellOccPosition(smelloccid);
+		return result.toString();
+	}
+
+	public String getGraphData(int clusteID, int repairCount) {
+		JSONArray result = PostgresManager.getInstance().getGraphData(clusteID, repairCount);
 		return result.toString();
 	}
 
