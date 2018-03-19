@@ -6,11 +6,15 @@
         {
             // start everything in the middle of the viewport
             initialContentAlignment: go.Spot.Center,
+            hasHorizontalScrollbar:false,
+            hasVerticalScrollbar:false,
+            maxSelectionCount:1,
             layout: $(go.TreeLayout,  // the layout for the entire diagram
             {
               angle: 90,
               arrangement: go.TreeLayout.ArrangementHorizontal,
-              isRealtime: false
+              isRealtime: false,
+
             })
           });
       // define the node template for non-groups
@@ -27,7 +31,9 @@
 
           // TODO detail Inspector
           click: function(e, obj) { 
-            console.log("Clicked " +  obj.data.desc) },
+            console.log("Clicked " +  obj.data.desc);
+            setDescriptionToTextarea(obj.data.desc);
+            },
             selectionChanged: function(part) {
               var shape = part.elt(0);
               shape.fill = part.isSelected ? "red" : interpolateColor(part.data.weight);
@@ -47,7 +53,7 @@
         {
           // TODO detail Inspector
           click: function(e, obj) {
-
+            setDescriptionToTextarea(obj.data.detail);
            console.log("Clicked " +  obj.data.detail); 
          }
        }
@@ -84,12 +90,13 @@
           )  // end Vertical Panel
         );  // end Group
       // generate the initial model
+
     }
 
     var stateCounter = 0;
     var edgeid = 0;
+    var isStateDone = true;
     function addState(json){
-
       var groupkey = "group" + stateCounter;
       var groupnama;
       if (stateCounter == 0){
@@ -100,7 +107,12 @@
       myDiagram.startTransaction("stateAdd"+stateCounter);
 
       // add state node 
-      myDiagram.model.addNodeData({key : groupkey, text : groupname, isGroup : true , color : "white"})
+      if (isStateDone || json.repair.isdone){
+        myDiagram.model.addNodeData({key : groupkey, color:"green", text : groupname, isGroup : true})
+      }else{
+        myDiagram.model.addNodeData({key : groupkey, text : groupname, isGroup : true , color : "white"})
+      }
+      isStateDone = false;
       stateArray.push(groupkey);
 
       // add all smells 
@@ -114,19 +126,17 @@
           description += "popis        : " + smell.description + "\n";
           description += "váha         : " + smell.weight + "\n";
           description += "kód pachu    : " + smell.refcode + "\n";
-
+          description += "Poloha pachu\n";
           var x = 1;
           smell.position.forEach(function(value) {
             description += "Poloha  č." + x + "\n";
             description += "balík    :"  + value.package + "\n";
             description += "trieda   :" + value.class + "\n";
             if (value.method!= null)
-              description += "metóda: " + value.method + "\n";
+              description += "metóda:   " + value.method + "\n";
             x++;
 
           })
-
-
           myDiagram.model.addNodeData({"key" : smellKey, "text": smellName, "color": smellcolor, "group":groupkey , "weight": smell.weight , desc : description});
         });
       }
@@ -134,13 +144,16 @@
       if (json.repair !=null){
         var fixedSmellKey = json.repair.code + (stateCounter -1 );
         let description = "";
-        description += "názov orpavy : " + json.repair.smell + "\n";        
-        description += "popis        : " + json.repair.repair + "\n";
-        description += "kód pachu    : " + json.repair.code + "\n";
-
-
-
-        myDiagram.model.addLinkData({from:fixedSmellKey  , to:groupkey, id : edgeid ,text : json.repair.repair, detail : description});
+        description += "názov orpavy : " + json.repair.repair + "\n";   
+        if (json.repair.description!=null){
+          description += "popis        : " + json.repair.description + "\n";
+        }
+        description += "určené pre   : " + json.repair.code + "\n";
+        // if (json.repair.isdone){
+        //   isStateDone= true;
+        // }
+        //,text : json.repair.repair
+        myDiagram.model.addLinkData({from:fixedSmellKey  , to:groupkey, id : edgeid , detail : description});
         edgeid++;
 
       }
@@ -168,6 +181,7 @@
 
     function getGraphData(clusterID, repairCount){
       myDiagram.clear();
+      isStateDone = true;
       jQuery.get("http://localhost:8080/refactor/getGraphData/"+ clusterID + "/" + repairCount, function(response) {
         stateCounter = 0;
         stateArray = [];
@@ -178,12 +192,22 @@
       });
     }
 
-    function editGroup(position){
+    function editGroup(position,done){
       let key = stateArray[position-1];
       let data = myDiagram.model.findNodeDataForKey(key);
       myDiagram.model.removeNodeData(data);
-
-      data.color = "green";
+      console.log("groupedit " + position + " " + done);
+      if (done == true){
+        data.color = "green";
+      }else{
+        data.color = "white"
+      }
       myDiagram.model.addNodeData(data);
+
+
       console.log(data);
+    }
+
+    function setDescriptionToTextarea(text){
+      $("#pathFinderResultGraphText").val(text);
     }

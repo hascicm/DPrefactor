@@ -74,6 +74,7 @@ button:hover{
     color: white;
 }
 
+
 textarea{
 	border-radius: 11px;
     border: 3px solid #fff;
@@ -126,6 +127,7 @@ table  {
 	width:100%;
     width: 100%;
     /* border: 1px solid; */
+    margin-bottom: 30px;
     background: #2f5768;
     border-radius: 20px;
     box-shadow: 0 0 40px 10px #042838;
@@ -143,10 +145,24 @@ ol li {
 	font-size:26px;
 }
 
+.graphdiv.left{
+	width: 69%;
+	float: left;
+}
+
+.graphdiv.right{
+	width: 30%;
+	float: right;
+}
 .textwrapper {
 	border:1px solid #999999;
 	margin-bottom:5px 0;
 	padding:3px;
+}
+
+.buttonSmall{
+    margin: 0;
+    height: 35px;
 }
 
 .recdetail {
@@ -177,6 +193,17 @@ ol li {
 .detail {
 	width: 100%;
 }
+
+.recdetailwithbutton{
+    width: 300px;
+    float: left;
+}
+
+.recdetailbutton{
+    margin: 5px;
+}
+
+
 
 table.scroll {
     width: 100%; /* Optional */

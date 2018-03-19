@@ -280,53 +280,102 @@
 			<hr>
 		</div>
 		<div>
-			<div class="recdetail left">
-				<h2>
-					identifikované pachy
-				</h2>
-				<table id="pathFinderResultSmellTable" >
-					<thead>
-						<tr>
-							<th>nájdený pach</th>
-							<th>popis</th>
-							<th>počet výskytov</th>
-						</tr>
-					</thead>
-					<tbody id="tabletbodyPathfinderResults">
-					</tbody>
+			<div>
+				<div class="recdetail">
+					<div class="recdetail left">
 
-				</table>	 
+						<h2>
+							identifikované pachy
+						</h2>
+					</div>
+					<div class="recdetail right">
+						<button type="button" id="pathFinderResultSmellTableToggle" class="buttonSmall" onclick="pathFinderResultSmellTableToggle()">skryť</button> 
+					</div>
+				</div>
+				<div id="pathFinderResultSmellTableDiv">
+					<table id="pathFinderResultSmellTable" >
+						<thead>
+							<tr>
+								<th>nájdený pach</th>
+								<th>popis</th>
+								<th>počet výskytov</th>
+							</tr>
+						</thead>
+						<tbody id="tabletbodyPathfinderResults">
+						</tbody>
 
+					</table>	 
+				</div>
 			</div>
-			<div class="recdetail right">	    	
-				<label for="pathFinderResultsTime">poradie opravy</label>
-				<input class ="detail" type="text" id="pathFinderResultsOrder" name="order" value="" readonly><br>
-				<label for="pathFinderResultsSmell">pach</label>
-				<input class ="detail" type="text" id="pathFinderResultsSmell" name="Smell" value="" readonly><br>
-				<label for="pathFinderResultsSmellPosition">poloha pachu</label>
-				<textarea class ="detail" type="text" id="pathFinderResultsSmellPosition" name="position" value="" readonly rows="5"></textarea>
-				<label id="labelPathFinder" for="pathFinderResultsCode">označenie v zdrojovom kóde</label>
-				<input class ="detail" type="text" id="pathFinderResultsCode" name="code" value="" readonly><br>					
-				<label for="pathFinderResultsRecRepair">odporúčaná oprava</label>
-				<textarea class ="detail" type="text" id="pathFinderResultsRecRepair" name="repair" value="" readonly rows="2"></textarea>								
-				<label for="pathFinderResultsIsdone">dokončené</label>
-				<input class ="detail" type="text" id="pathFinderResultsIsdone" name="isdone" value="" readonly><br>
+			<div style="clear: both;"></div>
+
+			<hr>
+			<h2>optimálna postupnosť opráv</h2>
+			<div class="recdetail">	  
+				<div class="recdetail left">  	
+					<label for="pathFinderResultsTime">poradie opravy</label>
+					<input class ="detail" type="text" id="pathFinderResultsOrder" name="order" value="" readonly><br>
+				</div>
+				<div class="recdetail right">
+					<div>				
+						<div class="recdetailwithbutton">
+							<label for="pathFinderResultsIsdone">označené ako dokončené</label>
+							<input class ="detail" class="recdetailbutton" type="text" id="pathFinderResultsIsdone" name="isdone" value="" readonly><br>
+						</div>
+						<button type="button" id="pathFinderResultsRepairComplete" class="recdetailbutton" onclick="pathFinderResultsRepairComplete()">označiť ako opravené</button> 
+					</div>
+
+				</div>
+				<div style="clear: both;"></div>
+				<div class="recdetail left"> 
+					<label for="pathFinderResultsSmell">pach</label>
+					<input class ="detail" type="text" id="pathFinderResultsSmell" name="Smell" value="" readonly><br>
+				</div>
+				<div class="recdetail right">
+					<label id="labelPathFinder" for="pathFinderResultsCode">označenie v zdrojovom kóde</label>
+					<input class ="detail" type="text" id="pathFinderResultsCode" name="code" value="" readonly><br>	
+				</div>
+				<div class="recdetail left"> 
+
+					<label for="pathFinderResultsSmellPosition">poloha pachu</label>
+					<textarea class ="detail" type="text" id="pathFinderResultsSmellPosition" name="position" value="" readonly rows="5"></textarea>
+				</div>
+				<div class="recdetail right">
+
+					<label for="pathFinderResultsRecRepair">odporúčaná oprava</label>
+					<textarea class ="detail" type="text" id="pathFinderResultsRecRepair" name="repair" value="" readonly rows="5"></textarea>								
+				</div>
+
 
 
 
 
 				<button type="button" id="pathFinderResultsNextRepair"     onclick="pathFinderResultsNextRepair()">nasledujuci</button> 
 				<button type="button" id="pathFinderResultsPreviousRepair" onclick="pathFinderResultsPreviousRepair()">predchadzajuci</button> 
-				<button type="button" id="pathFinderResultsRepairComplete" onclick="pathFinderResultsRepairComplete()">označiť ako opravené</button> 
-
+				<div style="clear: both;"></div>
+				<hr>
 			</div>
 		</div>
+			<div class="recdetail">	  
+				<div class="recdetail left">  	
 
+						<h2>
+							grafické zobrazenie postupnosti
+						</h2>
+				</div>
+				<div class="recdetail right">
 
-		<button onclick="expandPathfinderResultGraph()">grafické zobrazenie</button>
-		<div class="recdetail right">	    	
-			<div id="pathFinderResultGraph" style="display: none;">
-				<div id="myDiagramDiv" style="height:600px;width:100%;border:1px solid black"></div>
+		<button class="buttonSmall" id="expandPathfinderResultGraphButton" onclick="expandPathfinderResultGraph()">Zobraziť</button>
+				</div>
+		</div>
+		<div style="clear: both;"></div>
+		<div id="pathFinderResultGraphDiv" style="display: none;">	    	
+			<div class="graphdiv left" id="pathFinderResultGraph">
+				<div id="myDiagramDiv" style="height:600px;width:100%;border:1px solid black; background-color: #DAE4E4;margin-bottom: 25px"></div>
+			</div>
+			<div class="graphdiv right">
+		<!--		<h2>popis prvku</h2> -->
+				<textarea  type="text" id="pathFinderResultGraphText" name="" value="" readonly rows="34"></textarea>
 			</div>
 		</div>
 
@@ -464,7 +513,7 @@
 								</div >
 							</div>
 							<div style="clear: both;"></div>
-							
+
 							<div class="recdetail">
 								<label for="recordDetailRepairs">možné opravy</label>
 								<textarea class ="detail" type="text" id="recordDetailRepairs" name="repairs " value="" rows="3" readonly rows="1"></textarea>

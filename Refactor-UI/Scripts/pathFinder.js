@@ -197,13 +197,13 @@ function getClusterInfo(clusterid, callback){
 			document.getElementById("pathFinderResultsNextRepair").disabled = true;
 		}
 		document.getElementById("pathFinderResultsSmell").value = "";
-		document.getElementById("pathFinderResultsSmellPosition").value = "TODO";
+		document.getElementById("pathFinderResultsSmellPosition").value = "pathFinderResultGraphDiv";
 		document.getElementById("pathFinderResultsRecRepair").value = "";
 		document.getElementById("pathFinderResultsOrder").value = "";
 		if (currentPathfinderrRepairCount>0){
 			jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster + "/1" , function(response){
 			getAndSetRepairInfo(response);		
-			getAndSetSmellOccPosition(response.soid);
+			getAndSetSmellOccPosition(response.soid,true);
 			})
 		}
 
@@ -233,7 +233,7 @@ function pathFinderResultsPreviousRepair(){
 
 	jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster + "/" +  currentPathfinderRepairNumber , function(response){
 		getAndSetRepairInfo(response);
-		getAndSetSmellOccPosition(response.soid);
+		getAndSetSmellOccPosition(response.soid,false);
 		
 	})
 }
@@ -253,11 +253,11 @@ function pathFinderResultsNextRepair(){
 
 	jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster + "/" + currentPathfinderRepairNumber  , function(response){
 		getAndSetRepairInfo(response);
-		getAndSetSmellOccPosition(response.soid);
+		getAndSetSmellOccPosition(response.soid,false);
 	})
 }
 
-function getAndSetSmellOccPosition(soid){
+function getAndSetSmellOccPosition(soid,redrawGraph){
 		jQuery.get("http://localhost:8080/refactor/getSmellOccPosition/"+ soid, function(response){
 			var pos = "";
 			var x = 1;
@@ -271,8 +271,8 @@ function getAndSetSmellOccPosition(soid){
 
 			})
 			document.getElementById("pathFinderResultsSmellPosition").value = pos;
-
-			getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
+			if (redrawGraph)
+				getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
 
 	})
 }
@@ -313,7 +313,7 @@ function pathFinderResultsRepairComplete(){
 			contentType:"application/json; charset=utf-8",
 			dataType: "json"
 		});
-		editGroup(document.getElementById("pathFinderResultsOrder").value);
+		editGroup(parseInt(document.getElementById("pathFinderResultsOrder").value) +1,true);
 	}else if (document.getElementById("pathFinderResultsIsdone").value == "Áno"){
 		document.getElementById("pathFinderResultsIsdone").value = "Nie";		
 		document.getElementById("pathFinderResultsRepairComplete").innerHTML = "označiť ako dokončené";
@@ -324,7 +324,7 @@ function pathFinderResultsRepairComplete(){
 			contentType:"application/json; charset=utf-8",
 			dataType: "json"
 		});
-		editGroup(document.getElementById("pathFinderResultsOrder").value);
+		editGroup(parseInt(document.getElementById("pathFinderResultsOrder").value) +1,false);
 
 	}
 }
@@ -389,13 +389,15 @@ jQuery.get("http://localhost:8080/refactor/PathFinderAnalysisDetail/" + i, funct
 }
 
 function expandPathfinderResultGraph() {
-    var x = document.getElementById("pathFinderResultGraph");
+    var x = document.getElementById("pathFinderResultGraphDiv");
     if (x.style.display == "none") {
+    	$("#expandPathfinderResultGraphButton").html("skryť");
     	x.style.display = "block";
         console.log("clusterid " + currentPathfinderCluster + " repaircount " +  currentPathfinderrRepairCount);
         getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
     } else {
     	x.style.display = "none";
+    	$("#expandPathfinderResultGraphButton").html("zobraziť");
 
     }
 }
@@ -405,7 +407,18 @@ function pathFinderResultsBackr(){
 	pathFinderResults();
 }
 
+function pathFinderResultSmellTableToggle(){
+	console.log("toggle");
+	$("#pathFinderResultSmellTableDiv").toggle(0);
+	if ($( "#pathFinderResultSmellTableDiv" ).is( ":visible" )==true){
+		console.log("vis");
+		$("#pathFinderResultSmellTableToggle").html("skryť");
+	}else {
+		console.log("notvis");
+		$("#pathFinderResultSmellTableToggle").html("zobraziť");
 
+	}
+}
 
 function pathFinderResultsConcrete(){
 	document.getElementById("home").hidden = true;

@@ -450,7 +450,7 @@ public class PostgresManager {
 
 	public JSONObject getPathFinderResultRepair(int clusterid, int repairOrderNumber) {
 		JSONObject result = new JSONObject();
-		String querry = "select st.name as smell ,r.name as repair, repairorder, rsp.isdone,rsp.id as id,so.id as soid,so.code,"
+		String querry = "select st.name as smell ,r.name as repair,r.description, repairorder, rsp.isdone,rsp.id as id,so.id as soid,so.code,"
 				+ "p.description as patterndesc from repairsequencepart rsp "
 				+ "join repair r on r.id = rsp.repair_id join smelloccurrence so on so.id=rsp.smelloccurrence_id "
 				+ "join smelltype st on st.id = smell_id left join pattern p on rsp.pattern_id = p.id where rsp.cluster_id ="
@@ -465,6 +465,7 @@ public class PostgresManager {
 				} else {
 					result.put("repair", rs.getString("patterndesc"));
 				}
+				result.put("description",rs.getString("description"));
 				result.put("smell", rs.getString("smell"));
 				result.put("order", rs.getInt("repairorder"));
 				result.put("isdone", rs.getBoolean("isdone"));
@@ -627,7 +628,6 @@ public class PostgresManager {
 		result.put(state);
 
 		// iterate over all repairs
-		// TODO chcek boundaries
 		for (int repairNumber = 1; repairNumber <= repairCount; repairNumber++) {
 			state = new JSONObject();
 
