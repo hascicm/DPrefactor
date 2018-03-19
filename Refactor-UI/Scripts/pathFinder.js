@@ -204,7 +204,6 @@ function getClusterInfo(clusterid, callback){
 			jQuery.get("http://localhost:8080/refactor/getPathFinderRepair/"+ currentPathfinderCluster + "/1" , function(response){
 			getAndSetRepairInfo(response);		
 			getAndSetSmellOccPosition(response.soid);
-
 			})
 		}
 
@@ -272,6 +271,9 @@ function getAndSetSmellOccPosition(soid){
 
 			})
 			document.getElementById("pathFinderResultsSmellPosition").value = pos;
+
+			getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
+
 	})
 }
 
@@ -386,15 +388,15 @@ jQuery.get("http://localhost:8080/refactor/PathFinderAnalysisDetail/" + i, funct
 });
 }
 
-function expangPathfinderResultGraph() {
+function expandPathfinderResultGraph() {
     var x = document.getElementById("pathFinderResultGraph");
-    if (x.style.display === "none") {
-        x.style.display = "block";
+    if (x.style.display == "none") {
+    	x.style.display = "block";
         console.log("clusterid " + currentPathfinderCluster + " repaircount " +  currentPathfinderrRepairCount);
         getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
-
     } else {
-        x.style.display = "none";
+    	x.style.display = "none";
+
     }
 }
 
