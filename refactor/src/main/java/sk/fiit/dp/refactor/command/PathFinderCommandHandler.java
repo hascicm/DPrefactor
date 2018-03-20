@@ -20,9 +20,11 @@ import sk.fiit.dp.refactor.command.sonarQube.SonarQubeWrapper;
 import sk.fiit.dp.refactor.dbs.BaseXManager;
 import sk.fiit.dp.refactor.helper.IdGenerator;
 import sk.fiit.dp.refactor.helper.JsonFileWriter;
+import sk.fiit.dp.refactor.helper.SonarIssuesProcessor;
 import sk.fiit.dp.refactor.helper.TimeStampGenerator;
 import sk.fiit.dp.refactor.model.JessInput;
 import sk.fiit.dp.refactor.model.SearchObject;
+import sk.fiit.dp.refactor.model.SonarIssue;
 
 public class PathFinderCommandHandler {
 
@@ -39,6 +41,7 @@ public class PathFinderCommandHandler {
 	private String id;
 
 	private String sonarOutput;
+	private List<SonarIssue> sonarIssues;
 
 	private PathFinderCommandHandler() {
 	}
@@ -80,7 +83,10 @@ public class PathFinderCommandHandler {
 				sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
 				sonarOutput = sonarHandler.getIssues(id);
 				sonarHandler.deleteProject(id);
-				System.out.println(sonarOutput);
+				
+				sonarIssues = SonarIssuesProcessor.convertSonarOutput(sonarOutput);
+				SonarIssuesProcessor.addSonarIssuesToCode(gitCommand.getRepoDirectory(), sonarIssues);
+				
 			}
 			// SONAR
 
