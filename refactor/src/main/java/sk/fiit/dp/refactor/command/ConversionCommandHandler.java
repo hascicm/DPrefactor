@@ -95,7 +95,7 @@ public class ConversionCommandHandler {
 			String filePath = file.getAbsolutePath().toString();
 			String javaFile = filePath.replace(".xml", ".java");
 			executeSrcML(filePath, javaFile);
-			//Files.delete(file.toPath());
+			Files.delete(file.toPath());
 		}
 
 		// Path dirPath = Paths.get(directory);
