@@ -185,7 +185,7 @@ public class RefactorCommandHandler {
 			// 17. Vykona sa push repair branch na git
 			gitCommand.pushBranch(repairBranch, name, password);
 
-			// 18. Vymaze sa docasna BaseX databaza TODO
+			// 18. Vymaze sa docasna BaseX databaza 
 			baseX.cleanDatabase(id);
 
 			// 19. Odstrani sa lokalna git kopia
