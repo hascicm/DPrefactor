@@ -91,4 +91,12 @@ public class ExplanationCommentHandler {
 			insertCommentBeforeSmell(curr.getCode(), marker);
 		}
 	}
+
+	public void insertSmellRefCodeTags(List<JessInput> searchResults) {
+		for (JessInput curr : searchResults) {
+			insertCommentAfterSmell(curr.getCode(),  "// smelltag start : " + curr.getCode());
+			insertCommentBeforeSmell(curr.getCode(), "// smelltag end   : " + curr.getCode());
+
+		}
+	}
 }

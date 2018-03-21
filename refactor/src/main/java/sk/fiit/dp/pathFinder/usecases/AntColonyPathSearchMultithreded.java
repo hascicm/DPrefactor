@@ -10,7 +10,7 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 
 public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 
-	private static final int numOfThreads = 1;
+	private static final int numOfThreads = 50;
 	private static final int maxPheromone = 10000;
 	private static final int minPheromone = 200;
 	private static final int pheromoneCalculatioCoeficient = 1;

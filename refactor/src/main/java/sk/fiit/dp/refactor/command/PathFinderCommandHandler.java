@@ -111,6 +111,9 @@ public class PathFinderCommandHandler {
 			// 6. Vykona sa vyhladavanie
 			List<JessInput> searchResults = searchCommand.search(search);
 
+			// pridaju sa komentare oznacujuce pach
+			explainCommentsHandler.insertSmellRefCodeTags(searchResults);
+			
 			// vlozia sa znacky pre vizualizaiu
 			explainCommentsHandler.insertVisualisationMarker(searchResults);
 
