@@ -38,11 +38,14 @@
 				<a href="javascript:preferences(0);"><span>Preferencie</span></a>
 			</li>
 			<li>
-				<a href="javascript:records();"><span>zaznamy o opravach</span></a>
+				<a href="javascript:records();"><span>Záznamy o opravách</span></a>
 			</li>
 	<!--		<li>
 				<a href="javascript:smells();"><span>Databáza pachov</span></a>
 			</li>-->
+			<li>
+				<a href="javascript:smellView();"><span>Zobrazenie nálezov</span></a>
+			</li>
 			<li>
 				<a href="javascript:about(0);"><span>O programe</span></a>
 			</li>
@@ -480,7 +483,7 @@
 						</section>
 
 						<section id="recordDetail" hidden=true>
-							<h2>záznam o oprave</h2>
+							<h2>Záznam o oprave</h2>
 
 							<hr>
 							<div>
@@ -544,6 +547,15 @@
 							<button type="button" onclick="backToRecords()">Späť</button>
 
 						</section>
+						<section id="smellView" hidden=true>
+							<h1>Zobrazenie nálezov</h1>
+							<p>
+								Zobraziť nálezy (pachy), ktoré boli objavené týmto prototypom je možné prostredníctvom nástroja CORD (
+								<a target="_blank" href="https://devacts.fiit.stuba.sk/CORD">https://devacts.fiit.stuba.sk/CORD</a>), ktorý je taktiež vytvorený na  Fakulte informatiky a informačných technológií Slovenskej technickej univerzity v Bratislave.
+								Tento nástroj na správu GIT repozitárov poskytuje viaceré náhľady na zdrojový kód, medzi ktoré patrí aj inovatívny spôsob pomocou 3D rozloženia GIT repozitára. Nástroj tiež dokáže zobraziť viaceré užitočné štatisktiky zdrojového kódu. 
+							</p>
+							<h1>Návod</h1>
+						</section>
 						<section id="about" hidden=true>
 							<h1>O programe Refactor</h1>
 							<p>
@@ -551,6 +563,10 @@
 								Program je vo fáze prototypu, preto ho nemožno použiť na iné, ako vedecké účely.
 								<p>
 									Autor: Lukáš Markovič
+								</p>
+								<p>	
+									Spoluautori: Miroslav Haščič, Lukáš Hamacek
+								</p> 
 								</section>
 							</body>
 							</html>
