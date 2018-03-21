@@ -216,6 +216,7 @@ public class PostgresManager {
 
 	public void addResultRecord(String repo, String name, long timestamp, List<OptimalPathForCluster> results)
 			throws SQLException {
+		Logger.getLogger("pathfinder").log(Level.INFO, "uploading results to DB");
 		int analysisID = addAnalysisRecord(repo, name, timestamp);
 		int clusterNumber = 1;
 		for (OptimalPathForCluster cluster : results) {
