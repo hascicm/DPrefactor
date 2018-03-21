@@ -23,12 +23,13 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 	private static int iteration = 0;
 	private long startTime;
 
-	private Lock dataProtectionlock = new Lock();
+	private Lock dataProtectionlock;
 
 	public MonteCarloSearchStrategy(RelationCreator relationCreator) {
 		super(relationCreator);
 		agents = new ArrayList<MonteCarloAgent>();
 		startTime = System.currentTimeMillis();
+		dataProtectionlock = new Lock();
 	}
 
 	@Override
@@ -142,7 +143,9 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			double UCB1;
 			MonteCarloState mcs = (MonteCarloState) r.getToState();
 			double avgValue = 0;
-
+			if (mcs == null){
+				return s;
+			}
 			if (mcs.getN() == 0) {
 				UCB1 = Double.MAX_VALUE;
 			} else {
@@ -184,19 +187,26 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 				}
 				while (!isLeafNode(curentState)) {
 					moveAgent();
-					printCurentState();
+					// printCurentState();
 				}
 
 				if (curentState.getFitness() > bestState.getFitness()) {
-					System.out.println("new best at " + curentState.getDepth() + " fit " + curentState.getFitness());
+					// System.out.println("new best at " +
+					// curentState.getDepth() + " fit " +
+					// curentState.getFitness());
 					bestState = curentState;
 				}
 				if (curentState.getN() == 0) {
 					rollout();
 				} else {
-					dataProtectionlock.lock();
-					expandCurrentState(curentState);
-					dataProtectionlock.unlock();
+					try {
+						dataProtectionlock.lock();
+						expandCurrentState(curentState);
+						dataProtectionlock.unlock();
+
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					moveAgentToFirstChild();
 					rollout();
 				}
@@ -253,20 +263,16 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
 		private boolean isLocked = false;
 
-		public synchronized void lock() {
+		public synchronized void lock() throws InterruptedException {
 			while (isLocked) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				wait();
 			}
 			isLocked = true;
 		}
 
 		public synchronized void unlock() {
 			isLocked = false;
-			notifyAll();
+			notify();
 		}
 	}
 }

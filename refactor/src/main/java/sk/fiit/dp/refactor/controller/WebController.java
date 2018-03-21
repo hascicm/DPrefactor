@@ -220,7 +220,7 @@ public class WebController {
 		for (OptimalPathForCluster r : results) {
 			response.put(r.toJSON());
 		}
-		Logger.getLogger("webcontroller").log(Level.INFO, "final part");
+		Logger.getLogger("webcontroller").log(Level.INFO, "pathfinder process finished");
 		return response.toString();
 	}
 

@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.xml.xquery.XQException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -162,10 +165,10 @@ public class PathFinderCommandHandler {
 			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky
 			// (clustering)
 			if (clusteringEnabled) {
-				System.out.println("clustering strarting");
+				Logger.getLogger("pathfinder").log(Level.INFO, "clustering enabled and starting");
 				rootStates = ClusteringHandler.executeClustering(searchResults);
 			} else {
-				System.out.println("clustering not enabled");
+				Logger.getLogger("pathfinder").log(Level.INFO, "clustering not enabled");
 				rootStates = DatabaseDataProvider.getInstance().prepareRootStateList(searchResults);
 
 			}
