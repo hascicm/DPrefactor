@@ -72,7 +72,7 @@ public class SonarIssuesProcessor {
 				if(sonarIssue.getStartLine() != 0){
 					for(String line : lines){
 						inputCount++;
-						if(line.startsWith("//SONAR_")){
+						if(line.startsWith("//SMELL: ")){
 							continue;
 						}
 						
@@ -93,7 +93,7 @@ public class SonarIssuesProcessor {
 					
 					for(String line : lines){
 						endInputCount++;
-						if(line.startsWith("//SONAR_")){
+						if(line.startsWith("//SMELL: ")){
 							continue;
 						}
 						
@@ -104,13 +104,14 @@ public class SonarIssuesProcessor {
 						count++; 
 					}
 				}
-								
+				
+				/*
 				if(endInputCount != -1){
 					lines.add(endInputCount, "//SONAR_" + sonarIssue.getId() + "_END");
-				}
+				}*/
 				
-				lines.add(inputCount-1, "//SONAR_" + sonarIssue.getId() + " : " + sonarIssue.getMessage());
-			
+				//lines.add(inputCount-1, "//SONAR_" + sonarIssue.getId() + " : " + sonarIssue.getMessage());
+				lines.add(inputCount-1, "\n//SMELL: #SmellType(" + sonarIssue.getMessage() + " [SONAR])");
 				
 					
 				
