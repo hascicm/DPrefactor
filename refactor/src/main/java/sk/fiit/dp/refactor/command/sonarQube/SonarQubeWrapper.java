@@ -114,7 +114,7 @@ public class SonarQubeWrapper {
 
 	public boolean deleteProject(String projectKey) {
 
-		String urlString = "http://localhost:9000/api/projects/delete?key=" + projectKey;
+		String urlString = this.getSonarProps().getHostName() + "/api/projects/delete?key=" + projectKey;
 
 		try {
 			URL url = new URL(urlString);

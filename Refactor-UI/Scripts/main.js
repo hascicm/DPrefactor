@@ -131,6 +131,7 @@ function home() {
 	document.getElementById("records").hidden = true;
 	document.getElementById("recordDetail").hidden = true;
 	document.getElementById("pathFinderResults").hidden = true;
+	document.getElementById("smellView").hidden = true;
 	buttonSelection("javascript:home();");
 
 
@@ -175,6 +176,7 @@ function search() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 	buttonSelection("javascript:search();");
 
 }
@@ -214,6 +216,7 @@ function refactor() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 	buttonSelection("javascript:refactor(0);");
 
 
@@ -237,6 +240,7 @@ function preferences() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
     buttonSelection("javascript:preferences(0);");
     prioritization();
 
@@ -263,6 +267,7 @@ function rules() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
     buttonSelection("javascript:rules(0);");
 
 }
@@ -283,6 +288,7 @@ function about() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
     buttonSelection("javascript:about(0);");
 }
 
@@ -302,6 +308,7 @@ function smells() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 
 }
 
@@ -340,6 +347,7 @@ function records() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
     buttonSelection("javascript:records();");
 
 
@@ -389,6 +397,7 @@ function recordDetail(i) {
     document.getElementById("recordDetail").hidden = false;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 }
 
 function backToRecords(){
@@ -419,6 +428,7 @@ function repairEdit(i) {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 
 
     document.getElementById("rEditName").value = name;
@@ -449,6 +459,7 @@ function searchEdit(i) {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 
     
     document.getElementById("sEditName").value = name;
@@ -541,6 +552,7 @@ function addSearch() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 
     
     document.getElementById("sEditScript").value = "";
@@ -565,6 +577,7 @@ function addRepair() {
     document.getElementById("recordDetail").hidden = true;
    	document.getElementById("pathFinderResultsConcrete").hidden = true;
     document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = true;
 
     
     document.getElementById("rEditScript").value = "";
@@ -574,4 +587,25 @@ function addRepair() {
 
 function prioritization() {
 	Sortable.create(document.getElementById('priorityList'));
+}
+
+
+function smellView() {
+    document.getElementById("home").hidden = true;
+	document.getElementById("pathFinder").hidden = true;
+    document.getElementById("search").hidden = true;
+    document.getElementById("refactor").hidden = true;
+    document.getElementById("rules").hidden = true;
+    document.getElementById("preferences").hidden = true;
+    document.getElementById("about").hidden = true;
+    document.getElementById("repairEdit").hidden = true;
+    document.getElementById("searchEdit").hidden = true;
+    document.getElementById("records").hidden = true;
+    document.getElementById("SmellDatabase").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
+    document.getElementById("recordDetail").hidden = true;
+   	document.getElementById("pathFinderResultsConcrete").hidden = true;
+    document.getElementById("pathFinderResults").hidden = true;
+    document.getElementById("smellView").hidden = false;
+    buttonSelection("javascript:smellView();");
 }
