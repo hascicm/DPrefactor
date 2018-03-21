@@ -178,14 +178,12 @@ public abstract class PathSearchStrategy {
 	protected void expandCurrentState(State currentState){
 		
 		createRelation(currentState);
-		
 		applyRepair(currentState.getRelations());
-		
 		calculateEndNodeFitness(currentState.getRelations());
 		calculateProbabilityOfRelations(currentState.getRelations());
 	}
 	
-	private void createRelation(State currentState){
+	protected void createRelation(State currentState){
 		
 		boolean foundPattern = false;
 		if(this.isPatternDetection){

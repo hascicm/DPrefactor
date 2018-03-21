@@ -101,6 +101,8 @@ public class State {
 	public static MonteCarloState getMonteCarloStateInstance() {
 		State s = new State();
 		MonteCarloState mcs = s.new MonteCarloState();
+		mcs.N = 0;
+		mcs.T = 0;
 
 		return mcs;
 	}

@@ -2,27 +2,33 @@ package sk.fiit.dp.pathFinder.usecases;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.List;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State.MonteCarloState;
+import sk.fiit.dp.pathFinder.usecases.AntColonyPathSearchMultithreded.Lock;
 
 public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
-	private static final int numOfThreads = 1;
-	private static final double constant = 0;
-	private static final int maxIterations = 10;
+	private static final int numOfThreads = 50;
+	private static final double constant = 50;
+	private static final long MaxTimeInMilisec = 10000;
 
 	private List<MonteCarloAgent> agents;
 	private MonteCarloState bestState;
 	private MonteCarloState rootState;
 	private boolean end = false;
 	private static int iteration = 0;
+	private long startTime;
+
+	private Lock dataProtectionlock = new Lock();
 
 	public MonteCarloSearchStrategy(RelationCreator relationCreator) {
 		super(relationCreator);
 		agents = new ArrayList<MonteCarloAgent>();
+		startTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -31,10 +37,8 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		this.rootState.setSmells(rootState.getSmells());
 		this.rootState.setN(0);
 		this.rootState.setT(0);
-		// expandCurrentState(this.rootState);
-		// StateProcessor.initializeState(this.rootState);
+		StateProcessor.calculateFitnessForMonteCarlo(this.rootState, 0);
 		bestState = this.rootState;
-		bestState.setFitness(0);
 
 		MonteCarloAgent curent;
 
@@ -42,8 +46,11 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			curent = new MonteCarloAgent(this.rootState);
 			agents.add(curent);
 			curent.start(i);
+		}
+
+		for (MonteCarloAgent agent : agents) {
 			try {
-				curent.t.join();
+				agent.t.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -81,33 +88,13 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
 	}
 
-	public MonteCarloState UCB1(MonteCarloState s) {
-		MonteCarloState result = null;
-		double maxUCB1 = Double.MIN_VALUE;
-		int N = 0;
-		for (Relation r : s.getRelations()) {
+	@Override
+	protected void expandCurrentState(State currentState) {
 
-			double UCB1;
-			MonteCarloState mcs = (MonteCarloState) r.getToState();
-			double avgValue = 0;
-			if (mcs.getN() == 0) {
-				avgValue = mcs.getFitness();
-				N = 1;
-			} else {
-				avgValue = mcs.getT() / mcs.getN();
-				N = mcs.getN();
-			}
-			UCB1 = avgValue + constant * Math.sqrt((Math.log(rootState.getN()) / N));
-
-			if (maxUCB1 < UCB1) {
-				System.out.println("depth: " + s.getDepth() + " avg " + avgValue);
-				maxUCB1 = UCB1;
-				result = mcs;
-			}
-
-		}
-
-		return result;
+		createRelation(currentState);
+		applyRepair(currentState.getRelations());
+		calculateEndNodeFitness(currentState.getRelations());
+		calculateProbabilityOfRelations(currentState.getRelations());
 	}
 
 	@Override
@@ -136,8 +123,39 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 	@Override
 	protected void calculateEndNodeFitness(List<Relation> relations) {
 		for (Relation rel : relations) {
-			StateProcessor.calculateFitnessForAnts(rel.getToState());
+
+			StateProcessor.calculateFitnessForMonteCarlo(rel.getToState(), rootStateSmellsWeight);
+
+			if (rel.getToState().getFitness() < 0) {
+				rel.getToState().setFitness(1);
+			}
+			// rel.getToState().setFitness(10);
 		}
+	}
+
+	public MonteCarloState UCB1(MonteCarloState s) {
+		MonteCarloState result = null;
+		double maxUCB1 = Double.MIN_VALUE;
+
+		for (Relation r : s.getRelations()) {
+
+			double UCB1;
+			MonteCarloState mcs = (MonteCarloState) r.getToState();
+			double avgValue = 0;
+
+			if (mcs.getN() == 0) {
+				UCB1 = Double.MAX_VALUE;
+			} else {
+				avgValue = mcs.getT() / mcs.getN();
+				UCB1 = avgValue + constant * Math.sqrt((Math.log(rootState.getN()) / mcs.getN()));
+			}
+			if (maxUCB1 < UCB1 && !isLowProbability(mcs)) {
+				maxUCB1 = UCB1;
+				result = mcs;
+			}
+		}
+
+		return result;
 	}
 
 	private class MonteCarloAgent implements Runnable {
@@ -159,20 +177,26 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		public void run() {
 			while (!end) {
 				iteration++;
-				if (iteration > maxIterations) {
+				long currTime = System.currentTimeMillis();
+
+				if ((currTime - startTime) > MaxTimeInMilisec) {
 					end = true;
 				}
 				while (!isLeafNode(curentState)) {
 					moveAgent();
-
+					printCurentState();
 				}
+
 				if (curentState.getFitness() > bestState.getFitness()) {
+					System.out.println("new best at " + curentState.getDepth() + " fit " + curentState.getFitness());
 					bestState = curentState;
 				}
 				if (curentState.getN() == 0) {
 					rollout();
 				} else {
+					dataProtectionlock.lock();
 					expandCurrentState(curentState);
+					dataProtectionlock.unlock();
 					moveAgentToFirstChild();
 					rollout();
 				}
@@ -181,9 +205,6 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
 		private boolean isLeafNode(State state) {
 			if (state.getRelations() == null || state.getRelations().isEmpty()) {
-				System.out.println("leafnode " + "fitness " + state.getFitness() + " T: " + curentState.getT() + " N: "
-						+ curentState.getN());
-
 				return true;
 			}
 			return false;
@@ -191,7 +212,6 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
 		private void moveAgent() {
 			curentState = UCB1(curentState);
-			System.out.println("move :" + curentState.toString());
 		}
 
 		private void moveAgentToFirstChild() {
@@ -203,7 +223,6 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		private void rollout() {
 			double terminalFitnes = simulate();
 			backPropagate(terminalFitnes);
-
 		}
 
 		private void backPropagate(double simultatedFitness) {
@@ -219,10 +238,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		}
 
 		private double simulate() {
-			// TODO Auto-generated method stub
 			double fitnes = curentState.getFitness();
-			System.out.println("fitness " + fitnes + " T: " + curentState.getT() + " N: " + curentState.getN());
-
 			return fitnes;
 		}
 
@@ -230,6 +246,27 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			System.out.println("agent moving, curent state: N:" + curentState.getN() + "  T: " + curentState.getT()
 					+ " depth: " + curentState.getDepth() + " num of smells: " + curentState.getSmells().size()
 					+ " fitness " + curentState.getFitness() + "\t in iteration " + iteration);
+		}
+	}
+
+	public class Lock {
+
+		private boolean isLocked = false;
+
+		public synchronized void lock() {
+			while (isLocked) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			isLocked = true;
+		}
+
+		public synchronized void unlock() {
+			isLocked = false;
+			notifyAll();
 		}
 	}
 }

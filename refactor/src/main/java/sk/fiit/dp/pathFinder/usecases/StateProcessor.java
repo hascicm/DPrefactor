@@ -66,7 +66,7 @@ public class StateProcessor {
 				}
 			}
 		} else {
-			resultState = applyPatternRelation((PatternRelation) rel);
+			resultState = applyPatternRelationMonteCarlo((PatternRelation) rel);
 
 		}
 		return resultState;
@@ -267,11 +267,32 @@ public class StateProcessor {
 		state.setFitness(fitness);
 	}
 
+	public static void calculateFitnessForMonteCarlo(State state, long rootSmellsWeight) {
+		int fitness = 0;
+		float fit = 0;
+		for (SmellOccurance smellOccurance : state.getSmells()) {
+			fitness += smellOccurance.getSmell().getWeight() * 2;
+		}
+		if (fitness == 0) {
+			fitness = 1;
+		}
+		fit = 1 / (float) fitness;
+		fitness = ((int) (fit * 10000));
+
+		State currentState = state;
+		while (currentState.getSourceRelation() != null) {
+			fitness -= (currentState.getSourceRelation().getUsedRepair()
+					.getWeight(currentState.getSourceRelation().getFixedSmellOccurance().getSmell()) * 5);
+			currentState = currentState.getSourceRelation().getFromState();
+		}
+		state.setFitness(fitness);
+	}
+
 	public static void initializeState(State state, int minPheromone) {
 		for (Relation r : state.getRelations()) {
 			if (r.getPheromoneTrail() < 1) {
 				r.setPheromoneTrail(minPheromone);
-			} 
+			}
 		}
 	}
 
@@ -325,6 +346,44 @@ public class StateProcessor {
 
 		State baseState = rel.getFromState();
 		State resultState = new State();
+
+		List<SmellOccurance> newSmellsSet = new ArrayList<SmellOccurance>(baseState.getSmells());
+
+		List<LocationPart> tempLocation = null;
+		boolean isAssign = false;
+		// REMOVE SMELLS
+		for (PatternSmellUse psu : rel.getPatternSmellUses().keySet()) {
+			newSmellsSet.remove(rel.getPatternSmellUses().get(psu));
+
+			if (!isAssign) {
+				tempLocation = rel.getPatternSmellUses().get(psu).getLocations().get(0).getLocation();
+				isAssign = true;
+			}
+		}
+
+		// ADD SMELLS
+		List<LocationPart> location = createLocation(tempLocation, rel.getUsedPattern().getActionField());
+
+		for (SmellType st : rel.getUsedPattern().getResidualSmells()) {
+			SmellOccurance newSmellOccurance = new SmellOccurance(st);
+
+			List<Location> locs = new ArrayList<Location>();
+			locs.add(new Location(location));
+
+			newSmellOccurance.setLocations(locs);
+
+			newSmellsSet.add(newSmellOccurance);
+		}
+
+		resultState.setSmells(newSmellsSet);
+
+		return resultState;
+	}
+
+	private static State applyPatternRelationMonteCarlo(PatternRelation rel) {
+
+		State baseState = rel.getFromState();
+		State resultState = State.getMonteCarloStateInstance();
 
 		List<SmellOccurance> newSmellsSet = new ArrayList<SmellOccurance>(baseState.getSmells());
 
