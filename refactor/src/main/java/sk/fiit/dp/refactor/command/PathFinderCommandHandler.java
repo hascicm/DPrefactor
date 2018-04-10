@@ -218,16 +218,22 @@ public class PathFinderCommandHandler {
 
 	
 	List<JessInput> reduceSmellCount(List<JessInput> searchResults) {
-		//long seed = 7811019;
-	    //Random generator = new Random(seed);
-	    
-	    List<JessInput> reduced = new ArrayList<JessInput>();
-	    
-	    for (int i= 0 ;i<ReduceToNumberOfSmells; i++){
-		    //int id = generator.nextInt(searchResults.size());
-	    	reduced.add(searchResults.get(i));
-	    }
-	    return reduced;
+		long seed = 7811019;
+
+		Random generator = new Random(seed);
+		List<JessInput> reduced = new ArrayList<JessInput>();
+
+		for (int i = 0; i < ReduceToNumberOfSmells; i++) {
+			int id = generator.nextInt(searchResults.size());
+			JessInput selected = searchResults.get(id);
+			
+			while (reduced.contains(selected)) {
+				id = generator.nextInt(searchResults.size());
+				selected = searchResults.get(id);
+			}
+
+			reduced.add(selected);
+		}    return reduced;
 	}
 	
 }
