@@ -143,7 +143,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			double UCB1;
 			MonteCarloState mcs = (MonteCarloState) r.getToState();
 			double avgValue = 0;
-			if (mcs == null){
+			if (mcs == null) {
 				return s;
 			}
 			if (mcs.getN() == 0) {
@@ -181,19 +181,13 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			while (!end) {
 				iteration++;
 				long currTime = System.currentTimeMillis();
-
 				if ((currTime - startTime) > MaxTimeInMilisec) {
 					end = true;
 				}
 				while (!isLeafNode(curentState)) {
 					moveAgent();
-					// printCurentState();
 				}
-
 				if (curentState.getFitness() > bestState.getFitness()) {
-					// System.out.println("new best at " +
-					// curentState.getDepth() + " fit " +
-					// curentState.getFitness());
 					bestState = curentState;
 				}
 				if (curentState.getN() == 0) {
@@ -260,19 +254,17 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 	}
 
 	public class Lock {
-
 		private boolean isLocked = false;
-
 		public synchronized void lock() throws InterruptedException {
 			while (isLocked) {
 				wait();
 			}
 			isLocked = true;
 		}
-
 		public synchronized void unlock() {
 			isLocked = false;
 			notify();
 		}
 	}
+	
 }

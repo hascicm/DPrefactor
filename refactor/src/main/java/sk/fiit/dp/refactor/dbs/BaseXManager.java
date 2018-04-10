@@ -124,7 +124,8 @@ public class BaseXManager {
 
 	public String retrieveRepairedCourceCode(String refCode) {
 		String repairedCode = "";
-		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refCode + "R')) return (db:output(fn:concat(\"!!!RESULTDELIMITER!!!&#10;\",$node)))";
+		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refCode
+				+ "R')) return (db:output(fn:concat(\"!!!RESULTDELIMITER!!!&#10;\",$node)))";
 		try {
 			XQResultSequence result = expression.executeQuery(querry);
 			while (result.next()) {
@@ -134,12 +135,14 @@ public class BaseXManager {
 			Logger.getLogger("BaseX").log(Level.SEVERE, "repaired code retrieval failed", e);
 		}
 		System.out.println("!!!" + repairedCode);
-		return repairedCode.substring(repairedCode.indexOf('\n')+1).replaceAll("!!!RESULTDELIMITER!!!", "\n\n///////////////////////ďalšia časť opravy///////////////////////\n");
+		return repairedCode.substring(repairedCode.indexOf('\n') + 1).replaceAll("!!!RESULTDELIMITER!!!",
+				"\n\n///////////////////////ďalšia časť opravy///////////////////////\n");
 	}
 
 	public String retrieveSmellySourceCode(String refcode) {
 		String sourceCode = "";
-		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refcode + "')) return (db:output(fn:concat(\"!!!RESULTDELIMITER!!!&#10;\",$node)))";
+		String querry = "for $node in xquery:eval(fn:concat(\"//\", '" + refcode
+				+ "')) return (db:output(fn:concat(\"!!!RESULTDELIMITER!!!&#10;\",$node)))";
 		try {
 			XQResultSequence result = expression.executeQuery(querry);
 			while (result.next()) {
@@ -148,7 +151,8 @@ public class BaseXManager {
 		} catch (XQException e) {
 			Logger.getLogger("BaseX").log(Level.SEVERE, "source code retrieval failed", e);
 		}
-		return sourceCode.substring(sourceCode.indexOf('\n')+1).replaceAll("!!!RESULTDELIMITER!!!", "\n\n///////////////////////ďalšia časť opravy///////////////////////\n");
+		return sourceCode.substring(sourceCode.indexOf('\n') + 1).replaceAll("!!!RESULTDELIMITER!!!",
+				"\n\n///////////////////////ďalšia časť pachu///////////////////////\n");
 	}
 
 	/**

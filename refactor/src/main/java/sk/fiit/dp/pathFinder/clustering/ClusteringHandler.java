@@ -22,14 +22,7 @@ public class ClusteringHandler {
 		
 		Logger.getLogger("clutering logger").log(Level.INFO, "initializing clusters");
 		List<Cluster> clusters = ClusteringHelperClass.initializeClusters(dataProvider.getRootState());
-		
-//		int i = 1;
-//		for (Cluster c : clusters) {
-//			System.out.println("----- cluster " + i + " ------");
-//			c.print();
-//			i++;
-//		}
-		
+				
 		Logger.getLogger("clutering logger").log(Level.INFO, "merging nested smells");
 		clusters = ClusteringHelperClass.mergeNestedSmells(clusters);
 
@@ -52,9 +45,7 @@ public class ClusteringHandler {
 
 		List<State> result = new ArrayList<State>();
 
-	//	System.out.println("--------------- clustering result " + x.size() + " ---------------");
 		for (Cluster c : x) {
-	//		c.print();
 			State act = new State();
 			act.setSmells(c.getSmellOccurrences());
 			result.add(act);

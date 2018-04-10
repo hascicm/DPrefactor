@@ -374,7 +374,6 @@ public class PostgreManager {
 		if (id != 0)
 			result += createComment(
 					"\n//EXPLANATION possible repairs :" + getPossibleRepairForSmellbySmellId(id) + "\n");
-
 		return result;
 	}
 

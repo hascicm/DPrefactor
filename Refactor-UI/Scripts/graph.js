@@ -145,7 +145,7 @@
         var fixedSmellKey = json.repair.code + (stateCounter -1 );
         let description = "";
         description += "názov orpavy : " + json.repair.repair + "\n";   
-        if (json.repair.description!=null){
+        if (json.repair.description!=null && !json.repair.description.includes("This is general repair for all pattern")){
           description += "popis        : " + json.repair.description + "\n";
         }
         description += "určené pre   : " + json.repair.code + "\n";

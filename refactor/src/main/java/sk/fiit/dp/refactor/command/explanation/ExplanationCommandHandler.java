@@ -1,7 +1,5 @@
 package sk.fiit.dp.refactor.command.explanation;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +10,6 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
-
-import com.google.common.io.Files;
 
 import sk.fiit.dp.refactor.command.ConversionCommandHandler;
 import sk.fiit.dp.refactor.command.GitCommandHandler;
@@ -148,7 +144,6 @@ public class ExplanationCommandHandler {
 			//String withoutXMLTags = removeXMLTags(source);
 			record.setCodeBeforeRepair(formatSourceCodeString(source));
 		}
-
 	}
 
 	private String removeXMLTags(String code) {

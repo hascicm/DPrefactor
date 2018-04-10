@@ -203,7 +203,6 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 
 		private void calculatePheromoneForAnt() {
 			int calculatedPheromone = (int) (getFinalState().getFitness() / pheromoneCalculatioCoeficient);
-			// System.out.println(calculatedPheromone);
 			if (calculatedPheromone < minPheromone) {
 				setPheromone(minPheromone);
 			} else if (calculatedPheromone > maxPheromone) {

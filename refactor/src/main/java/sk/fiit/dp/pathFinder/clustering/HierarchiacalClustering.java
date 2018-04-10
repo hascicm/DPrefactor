@@ -41,22 +41,16 @@ public class HierarchiacalClustering implements CluseteringMethod {
 	public void executeClustering(List<Cluster> clusters) {
 		clusterList = clusters;
 		int numberOfClusters = clusterList.size();
+		numberOfIdentifiedSmells = 0;
 		for (Cluster c : clusterList) {
-			numberOfIdentifiedSmells = c.getSmellOccurrences().size();
+			numberOfIdentifiedSmells += c.getSmellOccurrences().size();
 		}
-
 		while (numberOfClusters > 1) {
 			NearestClusterPair ncp = findNearestClusters(clusterList);
 			clusterList.remove(ncp.getClusterA());
 			clusterList.remove(ncp.getClusterB());
 			clusterList.add(ncp.mergePair());
 			numberOfClusters--;
-
-			// System.out.println("------------------------");
-			// ncp.getClusterA().print();
-			// ncp.getClusterB().print();
-			// System.out.println("------------------------");
-
 		}
 	}
 
@@ -156,7 +150,6 @@ public class HierarchiacalClustering implements CluseteringMethod {
 			i++;
 		}
 		i--;
-		//TODO test 
 		if (i < 0)
 			i = 0;
 		distance += evaluateNaigborDistance(l1.getLocation().get(i));

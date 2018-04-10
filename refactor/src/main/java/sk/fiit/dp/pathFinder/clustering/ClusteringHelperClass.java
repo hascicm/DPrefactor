@@ -45,6 +45,14 @@ public class ClusteringHelperClass {
 		return clusters;
 	}
 
+	/**
+	 * metóda prejde celý zoznam zhlukov a spojí prvé nájdené vnorené zhluky
+	 * 
+	 * @param clusters
+	 * @param complete
+	 * @return true v prídade že, sa počas celého priebehu nenašli žiadne dva
+	 *         vnorené zhluky, inak false
+	 */
 	private static boolean FindNestedSmells(List<Cluster> clusters, boolean complete) {
 		for (Cluster cx : clusters) {
 			for (Cluster cy : clusters) {
@@ -64,6 +72,14 @@ public class ClusteringHelperClass {
 		return complete;
 	}
 
+	/**
+	 * metóda prechádza inštancie pachov v dvoch zhlukoch a ich polohy a vóla
+	 * metódu na zistenie zhniezdenia ich polôh
+	 * 
+	 * @param cx
+	 * @param cy
+	 * @return
+	 */
 	private static boolean nestedClusters(Cluster cx, Cluster cy) {
 		boolean result = false;
 		for (SmellOccurance x : cx.getSmellOccurrences()) {
@@ -79,6 +95,14 @@ public class ClusteringHelperClass {
 		return result;
 	}
 
+	/**
+	 * porovná dve inštancie objektu location a zistí či majú rovnakú cestu do
+	 * hĺbky ,,trieda,,
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	private static boolean nestedLocation(Location x, Location y) {
 		for (LocationPart i : x.getLocation()) {
 			for (LocationPart j : y.getLocation()) {
@@ -97,6 +121,13 @@ public class ClusteringHelperClass {
 		return false;
 	}
 
+	/**
+	 * metóda vráti objekt cluster vytvorený spojení dvoch objektov tohto typu
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
 	public static Cluster mergeClusters(Cluster a, Cluster b) {
 		Cluster c = new Cluster();
 		c.addAllOccurrences(a.getSmellOccurrences());
