@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +46,10 @@ public class PathFinderCommandHandler {
 
 	private String sonarOutput;
 	private List<SonarIssue> sonarIssues;
+	
+	// evaluation
+	private static final boolean shouldReduce = false;
+	private static final int ReduceToNumberOfSmells = 5 ;
 
 	private PathFinderCommandHandler() {
 	}
@@ -107,9 +112,13 @@ public class PathFinderCommandHandler {
 
 			// NEW pripravenie vyhladavacich skriptov s vysvetlenim
 			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch);
-
+			
 			// 6. Vykona sa vyhladavanie
 			List<JessInput> searchResults = searchCommand.search(search);
+			
+			if (shouldReduce){
+				searchResults = reduceSmellCount(searchResults);
+			}
 
 			// pridaju sa komentare oznacujuce pach
 			explainCommentsHandler.insertSmellRefCodeTags(searchResults);
@@ -205,4 +214,20 @@ public class PathFinderCommandHandler {
 		}
 		return new ArrayList<OptimalPathForCluster>();
 	}
+	
+
+	
+	List<JessInput> reduceSmellCount(List<JessInput> searchResults) {
+		//long seed = 7811019;
+	    //Random generator = new Random(seed);
+	    
+	    List<JessInput> reduced = new ArrayList<JessInput>();
+	    
+	    for (int i= 0 ;i<ReduceToNumberOfSmells; i++){
+		    //int id = generator.nextInt(searchResults.size());
+	    	reduced.add(searchResults.get(i));
+	    }
+	    return reduced;
+	}
+	
 }
