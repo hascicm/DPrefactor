@@ -246,7 +246,6 @@ public class WebController {
 			sonarProps.setLoginPassword(json.getString("sonarPassword"));
 		}
 
-		// TODO
 		List<String> searchMethods = new ArrayList<>();
 		for (int i = 0; i < toSearch.length(); ++i) {
 			searchMethods.add(toSearch.getString(i));

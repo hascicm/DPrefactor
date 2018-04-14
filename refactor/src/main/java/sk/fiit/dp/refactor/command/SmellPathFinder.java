@@ -35,7 +35,9 @@ public class SmellPathFinder {
 			try {
 				String localisationsScript = pgmanager.getSmellLocalisatorScript(ocurence.getRefCode());
 				List<String> path = basex.applyPositionXQuery(localisationsScript, "tag", ocurence.getCode());
+
 				ocurence.setXpathPosition(ProcesOutput(path));
+
 			} catch (SQLException | XQException e) {
 				e.printStackTrace();
 			}
@@ -60,22 +62,22 @@ public class SmellPathFinder {
 
 			}
 		}
-//		System.out.println("smellpathfinder:" + processedPath);
+		// System.out.println("smellpathfinder:" + processedPath);
 		if (processedPath.contains("function")) {
 			processedPath = processedPath.substring(processedPath.lastIndexOf("function"));
-//			System.out.println("smellpathfinder:" + processedPath);
+			// System.out.println("smellpathfinder:" + processedPath);
 		}
 		processedPath = processedPath.replaceAll("[a-z]+/|[a-z]+_[a-z]+/", "");
-//		System.out.println("smellpathfinder:" + processedPath);
+		// System.out.println("smellpathfinder:" + processedPath);
 		if (processedPath.length() > 0) {
 			processedPath = "NODE:" + processedPath;
 		}
 		processedPath = processedPath.replaceAll("/", "::NODE:");
-		if (processedPath.length()>0){
+		if (processedPath.length() > 0) {
 			processedPath += "::";
 		}
-//		System.out.println("smellpathfinder:" + processedPath);
-//		System.out.println("processed path: " + path + processedPath);
+		// System.out.println("smellpathfinder:" + processedPath);
+		// System.out.println("processed path: " + path + processedPath);
 		return path + processedPath;
 	}
 

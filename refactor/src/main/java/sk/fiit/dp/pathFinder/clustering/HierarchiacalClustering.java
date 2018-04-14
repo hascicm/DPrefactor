@@ -1,9 +1,11 @@
 package sk.fiit.dp.pathFinder.clustering;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Random;
 
 import sk.fiit.dp.pathFinder.clustering.model.Cluster;
 import sk.fiit.dp.pathFinder.entities.Location;
@@ -32,7 +34,10 @@ public class HierarchiacalClustering implements CluseteringMethod {
 	private final static int defaultPositionDistance = 5;
 	private final static int defaultDistance = 5;
 
-	private static final double penalisationConstant = 0.5;
+	private static final double penalisationConstant = 1;
+	private static final long randomSeed = 7811019;
+
+	private static Random generator = new Random(randomSeed);
 
 	private List<Cluster> clusterList;
 	private int numberOfIdentifiedSmells;
@@ -47,8 +52,13 @@ public class HierarchiacalClustering implements CluseteringMethod {
 		}
 		while (numberOfClusters > 1) {
 			NearestClusterPair ncp = findNearestClusters(clusterList);
+//			System.out.println("merging size" + ncp.getClusterA().getSmellOccurrences().size() + ":"
+//					+ ncp.getClusterB().getSmellOccurrences().size() + " indexes "
+//					+ clusterList.indexOf(ncp.getClusterA()) + ":" + clusterList.indexOf(ncp.getClusterB())
+//					+ " distance " + calculateDistance(ncp.getClusterA(), ncp.getClusterB()));
 			clusterList.remove(ncp.getClusterA());
 			clusterList.remove(ncp.getClusterB());
+
 			clusterList.add(ncp.mergePair());
 			numberOfClusters--;
 		}
@@ -79,58 +89,64 @@ public class HierarchiacalClustering implements CluseteringMethod {
 
 	private NearestClusterPair findNearestClusters(List<Cluster> clusters) {
 		int currentMin = Integer.MAX_VALUE;
-		int longestLocation = findLongestLocation(clusters);
-		NearestClusterPair currentMinPair = null;
+		List<NearestClusterPair> candidates = new ArrayList<>();
+
 		for (int i = 0; i < clusters.size(); i++) {
 			for (int j = i; j < clusters.size(); j++) {
 				if (clusters.get(i) == clusters.get(j)) {
 					continue;
 				}
-				int distance = calculateDistance(clusters.get(i), clusters.get(j), longestLocation);
-				if (currentMin > distance) {
+//				System.out.print("comparing " + i + ":" + j + " ");
+				int distance = calculateDistance(clusters.get(i), clusters.get(j));
+				if (currentMin >= distance) {
 					currentMin = distance;
-					currentMinPair = new NearestClusterPair(clusters.get(i), clusters.get(j));
+					candidates.add(new NearestClusterPair(clusters.get(i), clusters.get(j), distance));
 				}
 			}
 		}
-		return currentMinPair;
-	}
-
-	private int findLongestLocation(List<Cluster> clusters) {
-		int longest = 0;
-		for (Cluster c : clusters) {
-			for (SmellOccurance so : c.getSmellOccurrences()) {
-				for (Location l : so.getLocations()) {
-					if (l.getLocation().size() > longest)
-						longest = l.getLocation().size();
-				}
+		Iterator<NearestClusterPair> iter = candidates.iterator();
+		while (iter.hasNext()) {
+			NearestClusterPair curr = iter.next();
+			if (curr.getDistance() > currentMin) {
+				iter.remove();
 			}
 		}
-		return 0;
+
+		return candidates.get(generator.nextInt(candidates.size()));
 	}
 
-	private int calculateDistance(Cluster cluster, Cluster cluster2, int longestLocation) {
-		int clusterSize = cluster.getSmellOccurrences().size() + cluster2.getSmellOccurrences().size();
+	private int calculateDistance(Cluster cluster, Cluster cluster2) {
 
 		int minDistance = Integer.MAX_VALUE;
 		int distance = Integer.MAX_VALUE;
 		for (SmellOccurance c1 : cluster.getSmellOccurrences()) {
 			for (SmellOccurance c2 : cluster2.getSmellOccurrences()) {
-				distance = calculateDistanceBetweenSmells(c1, c2, longestLocation);
+				distance = calculateDistanceBetweenSmells(c1, c2);
 				if (distance < minDistance)
 					minDistance = distance;
 			}
 		}
-		distance = (int) Math.round(minDistance * calculateSizePenalization(clusterSize));
-		return minDistance;
+
+		int clusterSize = cluster.getSmellOccurrences().size() + cluster2.getSmellOccurrences().size();
+		int PenalizedDistance = (int) Math.round(minDistance * calculateSizePenalization(clusterSize));
+
+//		System.out.println(" size " + clusterSize + "distance " + minDistance + " penalisation "
+//				+ calculateSizePenalization(clusterSize) + minDistance + " altered " + PenalizedDistance);
+		return PenalizedDistance;
 	}
 
-	private int calculateDistanceBetweenSmells(SmellOccurance c1, SmellOccurance c2, int longestLocation) {
+	private double calculateSizePenalization(int clusterSize) {
+//		System.out.println(clusterSize + " / " + numberOfIdentifiedSmells + " * " + penalisationConstant + " = "
+//				+ (((float) clusterSize / (float) numberOfIdentifiedSmells) * penalisationConstant));
+		return (((float) clusterSize / (float) numberOfIdentifiedSmells) * penalisationConstant);
+	}
+
+	private int calculateDistanceBetweenSmells(SmellOccurance c1, SmellOccurance c2) {
 		int minDinstance = Integer.MAX_VALUE;
 		int distance = Integer.MAX_VALUE;
 		for (Location l1 : c1.getLocations()) {
 			for (Location l2 : c2.getLocations()) {
-				distance = calculateDistanceBetweenLocations(l1, l2, longestLocation);
+				distance = calculateDistanceBetweenLocations(l1, l2);
 				if (distance < minDinstance) {
 					minDinstance = distance;
 				}
@@ -139,7 +155,7 @@ public class HierarchiacalClustering implements CluseteringMethod {
 		return distance;
 	}
 
-	private int calculateDistanceBetweenLocations(Location l1, Location l2, int longestLocation) {
+	private int calculateDistanceBetweenLocations(Location l1, Location l2) {
 		int distance = 0;
 
 		int shorter = l1.getLocation().size();
@@ -222,17 +238,19 @@ public class HierarchiacalClustering implements CluseteringMethod {
 		return false;
 	}
 
-	private double calculateSizePenalization(int clusterSize) {
-		return clusterSize / numberOfIdentifiedSmells * penalisationConstant;
-	}
-
 	private class NearestClusterPair {
 		private Cluster a;
 		private Cluster b;
+		private int distance;
 
-		public NearestClusterPair(Cluster a, Cluster b) {
+		public NearestClusterPair(Cluster a, Cluster b, int distance) {
 			this.a = a;
 			this.b = b;
+			this.distance = distance;
+		}
+
+		public int getDistance() {
+			return distance;
 		}
 
 		public Cluster getClusterA() {

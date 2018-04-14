@@ -8,7 +8,6 @@ import java.util.List;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State.MonteCarloState;
-import sk.fiit.dp.pathFinder.usecases.AntColonyPathSearchMultithreded.Lock;
 
 public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
@@ -40,7 +39,8 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		this.rootState.setT(0);
 		StateProcessor.calculateFitnessForMonteCarlo(this.rootState, 0);
 		bestState = this.rootState;
-
+		System.out.println(bestState);
+		
 		MonteCarloAgent curent;
 
 		for (int i = 0; i < numOfThreads; i++) {

@@ -17,7 +17,6 @@
 
             })
           });
-      // define the node template for non-groups
       myDiagram.nodeTemplate =
       $(go.Node, "Auto",
         $(go.Shape, "Rectangle",
@@ -25,11 +24,8 @@
           new go.Binding("fill", "color")),
         $(go.TextBlock,
           { margin: 7, font: "Bold 14px Sans-Serif" },
-            //the text, color, and key are all bound to the same property in the node data
             new go.Binding("text", "text")),
         {
-
-          // TODO detail Inspector
           click: function(e, obj) { 
             console.log("Clicked " +  obj.data.desc);
             setDescriptionToTextarea(obj.data.desc);
@@ -51,23 +47,18 @@
           segmentOrientation: go.Link.OrientUpright },
           new go.Binding("text", "text")),
         {
-          // TODO detail Inspector
           click: function(e, obj) {
             setDescriptionToTextarea(obj.data.detail);
            console.log("Clicked " +  obj.data.detail); 
          }
        }
        );
-      // define the group template
       myDiagram.groupTemplate =
       $(go.Group, "Auto",
-          { // define the group's internal layout
+          { 
           layout: $(go.TreeLayout,
             { angle: 90, arrangement: go.TreeLayout.ArrangementHorizontal, isRealtime: false }),
-            // the group begins unexpanded;
-            // upon expansion, a Diagram Listener will generate contents for the group
             isSubGraphExpanded: true,
-            // when a group is expanded, if it contains no parts, generate a subGraph inside of it
           },
           $(go.Shape, "Rectangle",
             { fill: "white", stroke: "gray", strokeWidth: 2 },
@@ -77,19 +68,15 @@
             { defaultAlignment: go.Spot.Left, margin: 4 },
             $(go.Panel, "Horizontal",
               { defaultAlignment: go.Spot.Top },
-              // the SubGraphExpanderButton is a panel that functions as a button to expand or collapse the subGraph
-              //$("SubGraphExpanderButton"),
               $(go.TextBlock,
                 { font: "Bold 18px Sans-Serif", margin: 4 },
                 new go.Binding("text", "text")
                 )
               ),
-            // create a placeholder to represent the area where the contents of the group are
             $(go.Placeholder,
               { padding: new go.Margin(0, 10) })
-          )  // end Vertical Panel
-        );  // end Group
-      // generate the initial model
+          )  
+        );  
 
     }
 

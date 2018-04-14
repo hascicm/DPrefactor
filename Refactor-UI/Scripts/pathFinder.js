@@ -149,7 +149,7 @@ function pathFinderResultsPreviousCluster(){
 
 		})
 		getClusterInfo(currentPathfinderCluster);		
-
+		hidePathfinderResultGraph();
 	})
 
 }
@@ -180,7 +180,7 @@ function pathFinderResultsNextCluster(){
 
 		})
 		getClusterInfo(currentPathfinderCluster);
-
+		hidePathfinderResultGraph();
 	})
 
 }
@@ -271,8 +271,8 @@ function getAndSetSmellOccPosition(soid,redrawGraph){
 
 			})
 			document.getElementById("pathFinderResultsSmellPosition").value = pos;
-			if (redrawGraph)
-				getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
+// TODO			if (redrawGraph)
+//				getGraphData(currentPathfinderCluster, currentPathfinderrRepairCount);
 
 	})
 }
@@ -350,6 +350,7 @@ function PathFinderAnalysisDetail(i){
 
 	currentAnalysis = i;
 
+	hidePathfinderResultGraph();
 //	document.getElementById("pathFinderResultsPreviousCluster").disabled = true;
 //	document.getElementById("pathFinderResultsNextCluster").disabled = true;
 
@@ -400,6 +401,12 @@ function expandPathfinderResultGraph() {
     	$("#expandPathfinderResultGraphButton").html("zobraziť");
 
     }
+}
+
+function hidePathfinderResultGraph(){
+	    var x = document.getElementById("pathFinderResultGraphDiv");
+    	x.style.display = "none";
+    	$("#pathFinderResultSmellTableToggle").html("zobraziť");
 }
 
 
