@@ -2,6 +2,7 @@ package sk.fiit.dp.pathFinder.usecases;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -144,10 +145,9 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 		public void run() {
 			while (!end) {
 				if (iterations > maxNonupdatingIterations
-						|| (System.currentTimeMillis() - startTime) > MaxTimeInMilisec
-				) {
+						|| (System.currentTimeMillis() - startTime) > MaxTimeInMilisec) {
 					end = true;
-					dataProtectionlock.unlock();
+					//dataProtectionlock.unlock();
 				}
 				if (finalState == null) {
 					makeAntMove();
@@ -163,16 +163,13 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 		}
 
 		public void makeAntMove() {
-			try {
-				dataProtectionlock.lock();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			dataProtectionlock.lock(currentState);
 			expandCurrentState(currentState);
 			StateProcessor.initializeState(currentState, minPheromone);
-			dataProtectionlock.unlock();
+			dataProtectionlock.unlock(currentState);
 
 			if (!currentState.getRelations().isEmpty()) {
+				dataProtectionlock.checkLock(currentState);
 				Relation nextRelation = rouletteWheel(getCurrentState().getRelations());
 
 				if (isLowProbability(nextRelation.getToState())) {
@@ -273,23 +270,33 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 	}
 
 	public class Lock {
+		private HashSet<State> lockedStates = new HashSet<>();
 
-		private boolean isLocked = false;
+		public synchronized void lock(State s) {
 
-		public synchronized void lock() throws InterruptedException {
-			while (isLocked) {
-				wait();
+			while (lockedStates.contains(s)) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-			isLocked = true;
+			lockedStates.add(s);
 		}
 
-		public synchronized void unlock() {
-			isLocked = false;
-			notify();
-			if (end){
-				return;
+		public synchronized void checkLock(State s) {
+			while (lockedStates.contains(s)) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
+		}
 
+		public synchronized void unlock(State s) {
+			lockedStates.remove(s);
+			notifyAll();
 		}
 	}
 

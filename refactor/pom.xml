@@ -99,13 +99,19 @@
 			<artifactId>guava</artifactId>
 			<version>19.0</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/core -->
-<dependency>
-    <groupId>org.eclipse.jdt</groupId>
-    <artifactId>core</artifactId>
-    <version>3.3.0-v_771</version>
-</dependency>
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>core</artifactId>
+			<version>3.3.0-v_771</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.5</version>
+		</dependency>
 	</dependencies>
 
 </project>

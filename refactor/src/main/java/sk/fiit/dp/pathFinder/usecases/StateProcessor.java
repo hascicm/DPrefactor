@@ -268,7 +268,7 @@ public class StateProcessor {
 	}
 
 	public static void calculateFitnessForMonteCarlo(State state, long rootSmellsWeight) {
-		int fitness = 0;
+		double fitness = 0;
 		float fit = 0;
 		for (SmellOccurance smellOccurance : state.getSmells()) {
 			fitness += smellOccurance.getSmell().getWeight() * 2;
@@ -277,12 +277,12 @@ public class StateProcessor {
 			fitness = 1;
 		}
 		fit = 1 / (float) fitness;
-		fitness = ((int) (fit * 10000));
+		fitness = (fit * 10000);
 
 		State currentState = state;
 		while (currentState.getSourceRelation() != null) {
 			fitness -= (currentState.getSourceRelation().getUsedRepair()
-					.getWeight(currentState.getSourceRelation().getFixedSmellOccurance().getSmell()) * 5);
+					.getWeight(currentState.getSourceRelation().getFixedSmellOccurance().getSmell()) * 1);
 			currentState = currentState.getSourceRelation().getFromState();
 		}
 		state.setFitness(fitness);

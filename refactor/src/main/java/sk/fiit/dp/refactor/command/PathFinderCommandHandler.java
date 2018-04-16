@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -46,10 +47,10 @@ public class PathFinderCommandHandler {
 
 	private String sonarOutput;
 	private List<SonarIssue> sonarIssues;
-	
+
 	// evaluation
-	private static final boolean shouldReduce = false;
-	private static final int ReduceToNumberOfSmells = 5 ;
+	public static boolean shouldReduce = true;
+	public static int ReduceToNumberOfSmells = 35;
 
 	private PathFinderCommandHandler() {
 	}
@@ -91,10 +92,10 @@ public class PathFinderCommandHandler {
 				sonarHandler.analyzeProject(id, gitCommand.getRepoDirectory());
 				sonarOutput = sonarHandler.getIssues(id);
 				sonarHandler.deleteProject(id);
-				
+
 				sonarIssues = SonarIssuesProcessor.convertSonarOutput(sonarOutput);
 				SonarIssuesProcessor.addSonarIssuesToCode(gitCommand.getRepoDirectory(), sonarIssues);
-				
+
 			}
 			// SONAR
 
@@ -112,17 +113,17 @@ public class PathFinderCommandHandler {
 
 			// NEW pripravenie vyhladavacich skriptov s vysvetlenim
 			List<SearchObject> search = searchCommand.prepareSearchScripts(toSearch);
-			
+
 			// 6. Vykona sa vyhladavanie
 			List<JessInput> searchResults = searchCommand.search(search);
-			
-			if (shouldReduce){
+
+			if (shouldReduce) {
 				searchResults = reduceSmellCount(searchResults);
 			}
 
 			// pridaju sa komentare oznacujuce pach
 			explainCommentsHandler.insertSmellRefCodeTags(searchResults);
-			
+
 			// vlozia sa znacky pre vizualizaiu
 			explainCommentsHandler.insertVisualisationMarker(searchResults);
 
@@ -133,6 +134,14 @@ public class PathFinderCommandHandler {
 
 			// NEW identifikuju sa polohy pachov
 			smellPathFinder.findPathsToSmells(searchResults);
+
+			// check for incomplete occurrences 
+			for (Iterator<JessInput> iter = searchResults.listIterator(); iter.hasNext();) {
+				JessInput curr = iter.next();
+				if (curr.getXpatPosition() == null || curr.getXpatPosition().isEmpty()) {
+					iter.remove();
+				}
+			}
 
 			// System.out.println("------------SEARCH--------------------------");
 			//
@@ -161,21 +170,15 @@ public class PathFinderCommandHandler {
 			// 10. Vykona sa push search branch na git
 			gitCommand.pushBranch(searchBranch, name, password);
 
-			// TODO explanation
-			// if (createRepairRecord) {
-			// explainCommand.createRepairRecord(repo, searchResults);
-			// }
-
 			// 18. Vymaze sa docasna BaseX databaza
-			baseX.cleanDatabase(id);
+			// baseX.cleanDatabase(id);
 
 			// 19. Odstrani sa lokalna git kopia
 			gitCommand.deleteLocalDirectory();
 
 			List<State> rootStates;
 
-			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky
-			// (clustering)
+			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky (clustering)
 			if (clusteringEnabled) {
 				Logger.getLogger("pathfinder").log(Level.INFO, "clustering enabled and starting");
 				rootStates = ClusteringHandler.executeClustering(searchResults);
@@ -214,9 +217,7 @@ public class PathFinderCommandHandler {
 		}
 		return new ArrayList<OptimalPathForCluster>();
 	}
-	
 
-	
 	List<JessInput> reduceSmellCount(List<JessInput> searchResults) {
 		long seed = 7811019;
 
@@ -226,14 +227,15 @@ public class PathFinderCommandHandler {
 		for (int i = 0; i < ReduceToNumberOfSmells; i++) {
 			int id = generator.nextInt(searchResults.size());
 			JessInput selected = searchResults.get(id);
-			
+
 			while (reduced.contains(selected)) {
 				id = generator.nextInt(searchResults.size());
 				selected = searchResults.get(id);
 			}
 
 			reduced.add(selected);
-		}    return reduced;
+		}
+		return reduced;
 	}
-	
+
 }

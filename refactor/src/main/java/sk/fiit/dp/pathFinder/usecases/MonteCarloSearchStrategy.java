@@ -3,7 +3,10 @@ package sk.fiit.dp.pathFinder.usecases;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Currency;
+import java.util.HashSet;
 import java.util.List;
+
+import javax.security.auth.callback.ChoiceCallback;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
@@ -11,9 +14,9 @@ import sk.fiit.dp.pathFinder.entities.stateSpace.State.MonteCarloState;
 
 public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
-	private static final int numOfThreads = 50;
+	private static final int numOfThreads = 5;
 	private static final double constant = 50;
-	private static final long MaxTimeInMilisec = 10000;
+	private static final long MaxTimeInMilisec = 20000;
 
 	private List<MonteCarloAgent> agents;
 	private MonteCarloState bestState;
@@ -38,9 +41,10 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		this.rootState.setN(0);
 		this.rootState.setT(0);
 		StateProcessor.calculateFitnessForMonteCarlo(this.rootState, 0);
-		bestState = this.rootState;
-		System.out.println(bestState);
-		
+		this.rootState.setFitness(0);
+		// bestState = this.rootState;
+		// System.out.println(bestState);
+
 		MonteCarloAgent curent;
 
 		for (int i = 0; i < numOfThreads; i++) {
@@ -66,6 +70,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			}
 			Collections.reverse(results);
 		}
+		System.out.println(bestState.getFitness());
 
 		System.out.println("");
 		System.out.println("RESULT");
@@ -137,7 +142,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 	public MonteCarloState UCB1(MonteCarloState s) {
 		MonteCarloState result = null;
 		double maxUCB1 = Double.MIN_VALUE;
-
+		// System.out.println("ucb");
 		for (Relation r : s.getRelations()) {
 
 			double UCB1;
@@ -148,10 +153,14 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			}
 			if (mcs.getN() == 0) {
 				UCB1 = Double.MAX_VALUE;
+				UCB1 = mcs.getFitness();
 			} else {
 				avgValue = mcs.getT() / mcs.getN();
-				UCB1 = avgValue + constant * Math.sqrt((Math.log(rootState.getN()) / mcs.getN()));
+				UCB1 = avgValue;// + constant *
+								// Math.sqrt((Math.log(rootState.getN()) /
+								// mcs.getN()));
 			}
+			// System.out.println(UCB1);
 			if (maxUCB1 < UCB1 && !isLowProbability(mcs)) {
 				maxUCB1 = UCB1;
 				result = mcs;
@@ -181,26 +190,26 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			while (!end) {
 				iteration++;
 				long currTime = System.currentTimeMillis();
-				if ((currTime - startTime) > MaxTimeInMilisec) {
-					end = true;
-				}
+
+				dataProtectionlock.checkLock(curentState);
 				while (!isLeafNode(curentState)) {
 					moveAgent();
 				}
-				if (curentState.getFitness() > bestState.getFitness()) {
+
+				if ((bestState != null && bestState.getSmells().isEmpty())
+						|| (currTime - startTime) > MaxTimeInMilisec) {
+					end = true;
+				}
+				if (bestState == null || curentState.getFitness() > bestState.getFitness()) {
 					bestState = curentState;
+
 				}
 				if (curentState.getN() == 0) {
 					rollout();
 				} else {
-					try {
-						dataProtectionlock.lock();
-						expandCurrentState(curentState);
-						dataProtectionlock.unlock();
-
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					dataProtectionlock.lock(curentState);
+					expandCurrentState(curentState);
+					dataProtectionlock.unlock(curentState);
 					moveAgentToFirstChild();
 					rollout();
 				}
@@ -208,6 +217,9 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		}
 
 		private boolean isLeafNode(State state) {
+			if (state == null) {
+				System.out.println("state is null");
+			}
 			if (state.getRelations() == null || state.getRelations().isEmpty()) {
 				return true;
 			}
@@ -215,6 +227,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		}
 
 		private void moveAgent() {
+			dataProtectionlock.checkLock(curentState);
 			curentState = UCB1(curentState);
 		}
 
@@ -222,6 +235,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			if (!curentState.getRelations().isEmpty() && curentState.getRelations().get(0) != null) {
 				curentState = (MonteCarloState) curentState.getRelations().get(0).getToState();
 			}
+			// printCurentState();
 		}
 
 		private void rollout() {
@@ -254,17 +268,34 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 	}
 
 	public class Lock {
-		private boolean isLocked = false;
-		public synchronized void lock() throws InterruptedException {
-			while (isLocked) {
-				wait();
+		private HashSet<State> lockedStates = new HashSet<>();
+
+		public synchronized void lock(State s) {
+
+			while (lockedStates.contains(s)) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-			isLocked = true;
+			lockedStates.add(s);
 		}
-		public synchronized void unlock() {
-			isLocked = false;
-			notify();
+
+		public synchronized void checkLock(State s) {
+			while (lockedStates.contains(s)) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		public synchronized void unlock(State s) {
+			lockedStates.remove(s);
+			notifyAll();
 		}
 	}
-	
+
 }
