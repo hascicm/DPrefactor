@@ -2,11 +2,8 @@ package sk.fiit.dp.pathFinder.usecases;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
-
-import javax.security.auth.callback.ChoiceCallback;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
@@ -142,7 +139,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 	public MonteCarloState UCB1(MonteCarloState s) {
 		MonteCarloState result = null;
 		double maxUCB1 = Double.MIN_VALUE;
-		// System.out.println("ucb");
+
 		for (Relation r : s.getRelations()) {
 
 			double UCB1;
@@ -153,16 +150,43 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			}
 			if (mcs.getN() == 0) {
 				UCB1 = Double.MAX_VALUE;
-				UCB1 = mcs.getFitness();
 			} else {
 				avgValue = mcs.getT() / mcs.getN();
-				UCB1 = avgValue;// + constant *
+				UCB1 = avgValue + constant * Math.sqrt((Math.log(rootState.getN()) / mcs.getN()));
+			}
+			if (maxUCB1 < UCB1 && !isLowProbability(mcs)) {
+				maxUCB1 = UCB1;
+				result = mcs;
+			}
+		}
+
+		return result;
+	}
+	
+	public MonteCarloState avgRewardSelection(MonteCarloState s) {
+		MonteCarloState result = null;
+		double maxReward = Double.MIN_VALUE;
+		// System.out.println("ucb");
+		for (Relation r : s.getRelations()) {
+
+			double reward;
+			MonteCarloState mcs = (MonteCarloState) r.getToState();
+			double avgValue = 0;
+			if (mcs == null) {
+				return s;
+			}
+			if (mcs.getN() == 0) {
+			//	UCB1 = Double.MAX_VALUE;
+				reward = mcs.getFitness();
+			} else {
+				avgValue = mcs.getT() / mcs.getN();
+				reward = avgValue;// + constant *
 								// Math.sqrt((Math.log(rootState.getN()) /
 								// mcs.getN()));
 			}
 			// System.out.println(UCB1);
-			if (maxUCB1 < UCB1 && !isLowProbability(mcs)) {
-				maxUCB1 = UCB1;
+			if (maxReward < reward && !isLowProbability(mcs)) {
+				maxReward = reward;
 				result = mcs;
 			}
 		}
@@ -228,7 +252,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
 		private void moveAgent() {
 			dataProtectionlock.checkLock(curentState);
-			curentState = UCB1(curentState);
+			curentState = avgRewardSelection(curentState);
 		}
 
 		private void moveAgentToFirstChild() {
@@ -268,7 +292,7 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 	}
 
 	public class Lock {
-		private HashSet<State> lockedStates = new HashSet<>();
+		private HashSet<State> lockedStates = new HashSet<State>();
 
 		public synchronized void lock(State s) {
 

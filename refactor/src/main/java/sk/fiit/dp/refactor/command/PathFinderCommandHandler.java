@@ -135,7 +135,7 @@ public class PathFinderCommandHandler {
 			// NEW identifikuju sa polohy pachov
 			smellPathFinder.findPathsToSmells(searchResults);
 
-			// check for incomplete occurrences 
+			// check for incomplete occurrences
 			for (Iterator<JessInput> iter = searchResults.listIterator(); iter.hasNext();) {
 				JessInput curr = iter.next();
 				if (curr.getXpatPosition() == null || curr.getXpatPosition().isEmpty()) {
@@ -171,14 +171,15 @@ public class PathFinderCommandHandler {
 			gitCommand.pushBranch(searchBranch, name, password);
 
 			// 18. Vymaze sa docasna BaseX databaza
-			// baseX.cleanDatabase(id);
+			baseX.cleanDatabase(id);
 
 			// 19. Odstrani sa lokalna git kopia
 			gitCommand.deleteLocalDirectory();
 
 			List<State> rootStates;
 
-			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky (clustering)
+			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky
+			// (clustering)
 			if (clusteringEnabled) {
 				Logger.getLogger("pathfinder").log(Level.INFO, "clustering enabled and starting");
 				rootStates = ClusteringHandler.executeClustering(searchResults);

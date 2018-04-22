@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
-import sun.util.logging.resources.logging;
 
 public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 
@@ -270,7 +269,7 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 	}
 
 	public class Lock {
-		private HashSet<State> lockedStates = new HashSet<>();
+		private HashSet<State> lockedStates = new HashSet<State>();
 
 		public synchronized void lock(State s) {
 
