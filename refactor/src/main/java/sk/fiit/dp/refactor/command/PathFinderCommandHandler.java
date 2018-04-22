@@ -49,7 +49,7 @@ public class PathFinderCommandHandler {
 	private List<SonarIssue> sonarIssues;
 
 	// evaluation
-	public static boolean shouldReduce = true;
+	public static boolean shouldReduce = false;
 	public static int ReduceToNumberOfSmells = 35;
 
 	private PathFinderCommandHandler() {

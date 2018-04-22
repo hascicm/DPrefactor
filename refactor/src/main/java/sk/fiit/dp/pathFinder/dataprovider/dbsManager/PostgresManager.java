@@ -217,6 +217,7 @@ public class PostgresManager {
 	public void addResultRecord(String repo, String name, long timestamp, List<OptimalPathForCluster> results)
 			throws SQLException {
 		Logger.getLogger("pathfinder").log(Level.INFO, "uploading results to DB");
+
 		int analysisID = addAnalysisRecord(repo, name, timestamp);
 		int clusterNumber = 1;
 		for (OptimalPathForCluster cluster : results) {
@@ -257,6 +258,7 @@ public class PostgresManager {
 
 		int repairOrder = 1;
 		for (Relation r : cluster.getOptimalPath()) {
+			int generatedOccName = 1;
 			// insert repair record
 			int smellOccID = repairOrderMap.get(r.getFixedSmellOccurance());
 			int repairID = addRepairSequencePartRecord(clusterID, smellOccID, r.getUsedRepair(), repairOrder);
@@ -265,6 +267,10 @@ public class PostgresManager {
 			// get to state and insert do db
 			State toState = r.getToState();
 			for (SmellOccurance smellOcc : toState.getSmells()) {
+				if (smellOcc.getCode().equals("") || smellOcc.getCode() == null) {
+					smellOcc.setCode("new" + generatedOccName);
+					generatedOccName++;
+				}
 				int id = addRepairSmellOccurenceRecord(smellOcc, repairID);
 				repairOrderMap.put(smellOcc, id);
 			}
@@ -374,7 +380,7 @@ public class PostgresManager {
 
 	public JSONArray getPathFinderResultRecords() {
 		JSONArray result = new JSONArray();
-		String querry = "select * from pathfinderanalysis";
+		String querry = "select * from pathfinderanalysis order by time desc";
 		ResultSet rs;
 		try {
 			rs = statement.executeQuery(querry);
@@ -466,7 +472,7 @@ public class PostgresManager {
 				} else {
 					result.put("repair", rs.getString("patterndesc"));
 				}
-				result.put("description",rs.getString("description"));
+				result.put("description", rs.getString("description"));
 				result.put("smell", rs.getString("smell"));
 				result.put("order", rs.getInt("repairorder"));
 				result.put("isdone", rs.getBoolean("isdone"));
@@ -631,7 +637,7 @@ public class PostgresManager {
 		// iterate over all repairs
 		for (int repairNumber = 1; repairNumber <= repairCount; repairNumber++) {
 			state = new JSONObject();
-
+			int newSmellNameGenerator = 1;
 			// process repair
 			JSONObject repair = getPathFinderResultRepair(clusterID, repairNumber);
 			state.put("repair", repair);
@@ -649,7 +655,11 @@ public class PostgresManager {
 					currSmell.put("id", rs.getInt("id")); // smelloccID
 					currSmell.put("name", rs.getString("name"));
 					currSmell.put("description", rs.getString("description"));
+					currSmell.put("refcode", "");
 					currSmell.put("refcode", rs.getString("code"));
+					if (rs.getString("code").equals("")) {
+
+					}
 					currSmell.put("weight", rs.getString("weight"));
 					stateSmells.put(currSmell);
 				}
@@ -665,7 +675,6 @@ public class PostgresManager {
 			state.put("smells", stateSmells);
 			result.put(state);
 		}
-
 
 		return result;
 	}

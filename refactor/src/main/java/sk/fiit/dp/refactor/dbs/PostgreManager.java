@@ -253,7 +253,7 @@ public class PostgreManager {
 	public List<RepairRecord> getRepairRecords() throws SQLException {
 		List<RepairRecord> records = new ArrayList<>();
 
-		String query = "select * from records r join smelltype s on s.id=r.smelltype_id";
+		String query = "select * from records r join smelltype s on s.id=r.smelltype_id order by timestamp desc";
 		ResultSet rs = statement.executeQuery(query);
 		while (rs.next()) {
 			RepairRecord act = new RepairRecord();

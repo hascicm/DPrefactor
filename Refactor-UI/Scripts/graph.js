@@ -198,3 +198,7 @@
     function setDescriptionToTextarea(text){
       $("#pathFinderResultGraphText").val(text);
     }
+
+    function test(){
+      myDiagram.addNodeData("");
+    }

@@ -223,7 +223,6 @@ public class ConversionCommandHandler {
 		// return "";
 	}
 
-	// TODO not working
 	private String formatSourceCode(String code) {
 
 		CodeFormatter codeFormatter = ToolFactory.createCodeFormatter(null);
