@@ -19,13 +19,14 @@ import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 public class Evaluation {
 
 	public static double elapsedTime = 0;
-	final static int numOfTests = 10;
+	final static int numOfTests = 1;
 
 	public static void main(String[] args) {
 		PathFinderCommandHandler pathFinderCommand = PathFinderCommandHandler.getInstance();
-		String repo = "https://github.com/hascicm/DP_Refactor_Search_Space";
-		String gituser = "hascicm";
-		String gitpass = "Swiftims1994";
+		PathFinderCommandHandler.shouldReduce = true;
+		String repo = "https://github.com/hascicm/refactor.git";
+		String gituser = "username";
+		String gitpass = "pass";
 		String searchbranch = "pathfinder_eval";
 		List<String> searchMethods = new ArrayList<String>();
 		// 'CR','MCH','LM','LPL','DC','ECC','LC','LAZC','MAGIC','SS','FE'
@@ -49,19 +50,19 @@ public class Evaluation {
 		List<String> methodToTest = new ArrayList<String>();
 		methodToTest.add("mc");
 		// methodToTest.add("A*");
-		methodToTest.add("bee");
-		methodToTest.add("ant");
+		// methodToTest.add("bee");
+		// methodToTest.add("ant");
 
 		List<Integer> smellCountTOTest = new ArrayList<>();
-		// smellCountTOTest.add(20);
-		smellCountTOTest.add(5);
-		smellCountTOTest.add(10);
-		smellCountTOTest.add(15);
-
 		smellCountTOTest.add(20);
-		smellCountTOTest.add(25);
-		smellCountTOTest.add(30);
-//		smellCountTOTest.add(40);
+		// smellCountTOTest.add(5);
+		// smellCountTOTest.add(10);
+		// smellCountTOTest.add(15);
+		//
+		// smellCountTOTest.add(20);
+		// smellCountTOTest.add(25);
+		// smellCountTOTest.add(30);
+		// smellCountTOTest.add(40);
 
 		List<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
 
