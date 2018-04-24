@@ -242,7 +242,6 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 
 		private boolean isLeafNode(State state) {
 			if (state == null) {
-				System.out.println("state is null");
 			}
 			if (state.getRelations() == null || state.getRelations().isEmpty()) {
 				return true;

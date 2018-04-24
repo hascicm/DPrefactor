@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sun.util.logging.resources.logging;
 
 public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 
@@ -146,7 +147,7 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				if (iterations > maxNonupdatingIterations
 						|| (System.currentTimeMillis() - startTime) > MaxTimeInMilisec) {
 					end = true;
-					//dataProtectionlock.unlock();
+					// dataProtectionlock.unlock();
 				}
 				if (finalState == null) {
 					makeAntMove();
@@ -180,9 +181,10 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				setFinalState(currentState);
 				if (bestState == null || getFinalState().getFitness() > bestState.getFitness()) {
 					bestState = getFinalState();
-					System.out.println("new best state in depth: " + currentState.getDepth() + " fitness:"
-							+ currentState.getFitness() + " newiteration: " + iterations + " "
-							+ currentState.toString());
+					Logger.getGlobal().log(Level.INFO,
+							"new best state in depth: " + currentState.getDepth() + " fitness:"
+									+ currentState.getFitness() + " newiteration: " + iterations + " "
+									+ currentState.toString());
 					iterations = 0;
 				}
 				calculatePheromoneForAnt();

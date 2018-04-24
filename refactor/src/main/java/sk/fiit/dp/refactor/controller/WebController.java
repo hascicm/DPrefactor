@@ -28,7 +28,7 @@ import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 public class WebController {
 
 	private ResourceCommandHandler resourceCommand = ResourceCommandHandler.getInstance();
-	//private RefactorCommandHandler refactorCommand = RefactorCommandHandler.getInstance();
+	private RefactorCommandHandler refactorCommand = RefactorCommandHandler.getInstance();
 	private PathFinderCommandHandler pathFinderCommand = PathFinderCommandHandler.getInstance();
 
 	@GET
@@ -111,23 +111,23 @@ public class WebController {
 	@Path("/getGraphData/{clusterid}/{repairCount}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getGraphData(@PathParam("clusterid") int clusterid, @PathParam("repairCount") int repairCount) {
-		return resourceCommand.getGraphData(clusterid,repairCount);
+		return resourceCommand.getGraphData(clusterid, repairCount);
 	}
-	
+
 	@GET
 	@Path("/PathFinderAnalysisInfo/{analysisid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getPathFinderAnalysisInfo(@PathParam("analysisid") int analysisId){
+	public String getPathFinderAnalysisInfo(@PathParam("analysisid") int analysisId) {
 		return resourceCommand.getPathFinderAnalysisInfo(analysisId);
 	}
 
 	@GET
 	@Path("PathFinderClusterInfo/{clusterid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getPathFinderClusterInfo(@PathParam("clusterid") int clusterId){
+	public String getPathFinderClusterInfo(@PathParam("clusterid") int clusterId) {
 		return resourceCommand.getPathFinderClusterInfo(clusterId);
 	}
-	
+
 	@GET
 	@Path("/getPathFinderRepair/{clusterid}/{repairid}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -136,18 +136,18 @@ public class WebController {
 		String x = resourceCommand.getPathFinderResultRepair(clusterid, repairid);
 		return x;
 	}
-	
+
 	@PUT
 	@Path("/updatePathfinderRepairStatus")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void updatePathfinderRepairStatus(String input){
+	public void updatePathfinderRepairStatus(String input) {
 		resourceCommand.updatePathfinderRepairStatus(new JSONObject(input));
 	}
-	
+
 	@GET
 	@Path("/getSmellOccPosition/{smelloccid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getSmellOccPosition(@PathParam("smelloccid") int smelloccid){
+	public String getSmellOccPosition(@PathParam("smelloccid") int smelloccid) {
 		return resourceCommand.getSmellOccPosition(smelloccid);
 	}
 
@@ -224,46 +224,46 @@ public class WebController {
 		return response.toString();
 	}
 
-//	@PUT
-//	@Path("/execute/")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public String execute(String input) {
-//
-//		JSONObject json = new JSONObject(input);
-//		JSONArray toSearch = json.getJSONArray("searchCodes");
-//		JSONArray toRepair = json.getJSONArray("repairCodes");
-//		boolean explanationToSearch = json.getBoolean("explanationSearch");
-//		boolean createrepairrecord = json.getBoolean("createrepairrecord");
-//		String gituser = json.getString("name");
-//		String gitpass = json.getString("password");
-//
-//		SonarProperties sonarProps = new SonarProperties();
-//		sonarProps.setSonarEnabled(json.getBoolean("isSonarEnabled"));
-//		if (sonarProps.isSonarEnabled()) {
-//			sonarProps.setHostName(json.getString("sonarHost"));
-//			sonarProps.setLoginName(json.getString("sonarLogin"));
-//			sonarProps.setLoginPassword(json.getString("sonarPassword"));
-//		}
-//
-//		List<String> searchMethods = new ArrayList<>();
-//		for (int i = 0; i < toSearch.length(); ++i) {
-//			searchMethods.add(toSearch.getString(i));
-//		}
-//
-//		List<String> allowedRefactoring = new ArrayList<>();
-//		for (int i = 0; i < toRepair.length(); ++i) {
-//			allowedRefactoring.add(toRepair.getString(i));
-//		}
-//
-//		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser, gitpass,
-//				json.getString("searchBranch"), json.getString("repairBranch"), searchMethods, allowedRefactoring,
-//				explanationToSearch, createrepairrecord, sonarProps);
-//
-//		JSONObject response = new JSONObject();
-//		for (String key : results.keySet()) {
-//			response.put(key, results.get(key));
-//		}
-//		return response.toString();
-//	}
+	@PUT
+	@Path("/execute/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String execute(String input) {
+
+		JSONObject json = new JSONObject(input);
+		JSONArray toSearch = json.getJSONArray("searchCodes");
+		JSONArray toRepair = json.getJSONArray("repairCodes");
+		boolean explanationToSearch = json.getBoolean("explanationSearch");
+		boolean createrepairrecord = json.getBoolean("createrepairrecord");
+		String gituser = json.getString("name");
+		String gitpass = json.getString("password");
+
+		SonarProperties sonarProps = new SonarProperties();
+		sonarProps.setSonarEnabled(json.getBoolean("isSonarEnabled"));
+		if (sonarProps.isSonarEnabled()) {
+			sonarProps.setHostName(json.getString("sonarHost"));
+			sonarProps.setLoginName(json.getString("sonarLogin"));
+			sonarProps.setLoginPassword(json.getString("sonarPassword"));
+		}
+
+		List<String> searchMethods = new ArrayList<>();
+		for (int i = 0; i < toSearch.length(); ++i) {
+			searchMethods.add(toSearch.getString(i));
+		}
+
+		List<String> allowedRefactoring = new ArrayList<>();
+		for (int i = 0; i < toRepair.length(); ++i) {
+			allowedRefactoring.add(toRepair.getString(i));
+		}
+
+		Map<String, Integer> results = refactorCommand.executeRefactoring(json.getString("repo"), gituser, gitpass,
+				json.getString("searchBranch"), json.getString("repairBranch"), searchMethods, allowedRefactoring,
+				explanationToSearch, createrepairrecord, sonarProps);
+
+		JSONObject response = new JSONObject();
+		for (String key : results.keySet()) {
+			response.put(key, results.get(key));
+		}
+		return response.toString();
+	}
 }
