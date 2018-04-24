@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.relationProcessing;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 

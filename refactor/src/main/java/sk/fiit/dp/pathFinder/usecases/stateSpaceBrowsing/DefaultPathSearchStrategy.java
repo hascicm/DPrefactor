@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +11,8 @@ import sk.fiit.dp.pathFinder.entities.LocationPart;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
+import sk.fiit.dp.pathFinder.usecases.stateProcessing.StateProcessor;
 
 
 public class DefaultPathSearchStrategy extends PathSearchStrategy{

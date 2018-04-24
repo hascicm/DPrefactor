@@ -1,9 +1,12 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.pathFinder.usecases.patternDetection.PatternDetector;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
+import sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing.BeePathSearchStrategy.Bee;
 
 public class MABC extends BeePathSearchStrategy implements Runnable {
 

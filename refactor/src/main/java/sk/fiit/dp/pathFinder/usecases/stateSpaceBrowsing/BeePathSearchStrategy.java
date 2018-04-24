@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
 
 public class BeePathSearchStrategy extends PathSearchStrategy {
 	

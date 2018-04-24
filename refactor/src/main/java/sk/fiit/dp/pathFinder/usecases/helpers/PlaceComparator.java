@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.helpers;
 
 import java.util.ArrayList;
 import java.util.List;

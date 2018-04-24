@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
+import sk.fiit.dp.pathFinder.usecases.stateProcessing.StateProcessor;
 import sun.util.logging.resources.logging;
 
 public class AntColonyPathSearchMultithreded extends PathSearchStrategy {

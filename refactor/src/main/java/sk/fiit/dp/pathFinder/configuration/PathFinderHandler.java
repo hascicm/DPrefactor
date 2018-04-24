@@ -3,8 +3,8 @@ package sk.fiit.dp.pathFinder.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import sk.fiit.dp.pathFinder.RefactorProcessOptimizer;
 import sk.fiit.dp.pathFinder.entities.OptimalPathForCluster;
-import sk.fiit.dp.pathFinder.entities.RefactorProcessOptimizer;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 

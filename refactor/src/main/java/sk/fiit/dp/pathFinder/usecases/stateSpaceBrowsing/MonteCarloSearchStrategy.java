@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +8,8 @@ import java.util.List;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State.MonteCarloState;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
+import sk.fiit.dp.pathFinder.usecases.stateProcessing.StateProcessor;
 
 public class MonteCarloSearchStrategy extends PathSearchStrategy {
 

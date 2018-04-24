@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,6 +7,8 @@ import java.util.Random;
 
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
+import sk.fiit.dp.pathFinder.usecases.stateProcessing.StateProcessor;
 
 @Deprecated
 public class AntColonyPathSearch extends PathSearchStrategy {

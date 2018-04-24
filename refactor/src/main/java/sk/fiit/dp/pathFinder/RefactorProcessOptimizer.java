@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.entities;
+package sk.fiit.dp.pathFinder;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -11,14 +11,14 @@ import sk.fiit.dp.pathFinder.dataprovider.DatabaseDataProvider;
 import sk.fiit.dp.pathFinder.entities.stateSpace.Relation;
 import sk.fiit.dp.pathFinder.entities.stateSpace.SmellOccurance;
 import sk.fiit.dp.pathFinder.entities.stateSpace.State;
-import sk.fiit.dp.pathFinder.usecases.AntColonyPathSearchMultithreded;
-import sk.fiit.dp.pathFinder.usecases.BeePathSearchStrategy;
-import sk.fiit.dp.pathFinder.usecases.DefaultPathSearchStrategy;
-import sk.fiit.dp.pathFinder.usecases.MinMaxProbabilityCalculationStrategy;
-import sk.fiit.dp.pathFinder.usecases.MonteCarloSearchStrategy;
-import sk.fiit.dp.pathFinder.usecases.PathSearchStrategy;
-import sk.fiit.dp.pathFinder.usecases.PatternDetector;
-import sk.fiit.dp.pathFinder.usecases.RelationCreator;
+import sk.fiit.dp.pathFinder.usecases.patternDetection.PatternDetector;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.MinMaxProbabilityCalculationStrategy;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
+import sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing.AntColonyPathSearchMultithreded;
+import sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing.BeePathSearchStrategy;
+import sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing.DefaultPathSearchStrategy;
+import sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing.MonteCarloSearchStrategy;
+import sk.fiit.dp.pathFinder.usecases.stateSpaceBrowsing.PathSearchStrategy;
 import sk.fiit.dp.refactor.controller.Evaluation;
 
 public class RefactorProcessOptimizer {

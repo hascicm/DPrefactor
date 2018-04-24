@@ -1,4 +1,4 @@
-package sk.fiit.dp.pathFinder.usecases;
+package sk.fiit.dp.pathFinder.usecases.relationProcessing;
 
 import java.util.ArrayList;
 import java.util.HashMap;

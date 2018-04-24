@@ -1,7 +1,7 @@
 package sk.fiit.dp.pathFinder.entities.stateSpace;
 
 import sk.fiit.dp.pathFinder.entities.Repair;
-import sk.fiit.dp.pathFinder.usecases.ProbabilityCalculationStrategy;
+import sk.fiit.dp.pathFinder.usecases.relationProcessing.ProbabilityCalculationStrategy;
 
 public class Relation {
 	
