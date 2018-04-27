@@ -35,7 +35,7 @@ public class StateProcessor {
 			if (rel instanceof Relation) {
 				resultState = applyBasicRepair(baseState, repair, smellOccurance);
 
-				// TODO preprobit na repair.applyOnState() s vyuzitim override
+				
 				if (repair instanceof DependencyRepair) {
 					applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
 				}
@@ -61,7 +61,7 @@ public class StateProcessor {
 			if (rel instanceof Relation) {
 				resultState = applyBasicRepairMonteCarlo(baseState, repair, smellOccurance);
 
-				// TODO preprobit na repair.applyOnState() s vyuzitim override
+				
 				if (repair instanceof DependencyRepair) {
 					applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
 				}
@@ -83,17 +83,12 @@ public class StateProcessor {
 
 		smellOccuranceList.remove(smellOccurance);
 
-		/*
-		 * for (SmellOccurance so : baseState.getSmells()) { if (so !=
-		 * smellOccurance) { smellOccuranceList.add(so); } }
-		 */
-
 		resultState.setSmells(smellOccuranceList);
 
 		return resultState;
 	}
 
-	// for the simply repair without dependency just remove smell occurance
+	// for the simply repair without dependency just remove smell occurrence
 	private static State applyBasicRepairMonteCarlo(State baseState, Repair repair, SmellOccurance smellOccurance) {
 
 		State resultState = State.getMonteCarloStateInstance();
@@ -101,11 +96,6 @@ public class StateProcessor {
 		List<SmellOccurance> smellOccuranceList = new ArrayList<SmellOccurance>(baseState.getSmells());
 
 		smellOccuranceList.remove(smellOccurance);
-
-		/*
-		 * for (SmellOccurance so : baseState.getSmells()) { if (so !=
-		 * smellOccurance) { smellOccuranceList.add(so); } }
-		 */
 
 		resultState.setSmells(smellOccuranceList);
 		return resultState;
@@ -159,18 +149,7 @@ public class StateProcessor {
 				if (dep.getPlaceType() == DependencyPlaceType.INTERNAL) {
 					SmellOccurance tempSmellOccurance = isOnSameLocation(state, smellOccurance, dep.getSmell(),
 							dep.getActionField());
-					/*
-					 * boolean isSolved = false;
-					 * 
-					 * for (SmellOccurance smellOccurance : state.getSmells()) {
-					 * if (smellOccurance.getSmell() == dep.getSmell()) {
-					 * 
-					 * tempSmellOccurance = smellOccurance; isSolved = true;
-					 * break; } }
-					 * 
-					 * if (isSolved) {
-					 * state.getSmells().remove(tempSmellOccurance); }
-					 */
+					
 					if (tempSmellOccurance != null) {
 						state.getSmells().remove(tempSmellOccurance);
 					}
@@ -178,7 +157,7 @@ public class StateProcessor {
 				}
 
 				if (dep.getPlaceType() == DependencyPlaceType.EXTERNAL) {
-					// TODO!!!!????
+					// Nothing to do... :(
 				}
 
 			}
@@ -217,35 +196,9 @@ public class StateProcessor {
 
 		fitness -= state.getDepth();
 
-		/*
-		 * if(state.getSourceRelation() != null){ fitness *=
-		 * state.getSourceRelation().getProbability(); }
-		 */
-
 		// fitness = (state.getDepth());
 		state.setFitness(fitness);
 	}
-
-	/*
-	 * public static void calculateFitness(State state){
-	 * 
-	 * int fitness = 0;
-	 * 
-	 * for(SmellOccurance smellOccurance : state.getSmells()){ fitness +=
-	 * smellOccurance.getSmell().getWeight(); }
-	 * 
-	 * fitness *= 10; fitness = (int) Math.pow(fitness, 3.0);
-	 * 
-	 * fitness += state.getDepth();
-	 * 
-	 * State currentState = state; while(currentState.getSourceRelation() !=
-	 * null){ fitness +=
-	 * currentState.getSourceRelation().getUsedRepair().getWeight(currentState.
-	 * getSourceRelation().getFixedSmellOccurance().getSmell()); currentState =
-	 * currentState.getSourceRelation().getFromState(); }
-	 * 
-	 * state.setFitness(fitness); }
-	 */
 
 	public static void calculateFitnessForAnts(State state) {
 		int fitness = 0;

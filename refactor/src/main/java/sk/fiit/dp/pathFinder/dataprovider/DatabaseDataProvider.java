@@ -86,6 +86,7 @@ public class DatabaseDataProvider implements DataProvider {
 		this.root.setSmells(smellOccurances);
 	}
 
+	//It was used for testing purpose...
 	private void initRoot() {
 
 		List<SmellOccurance> smellOccurances = new ArrayList<SmellOccurance>();

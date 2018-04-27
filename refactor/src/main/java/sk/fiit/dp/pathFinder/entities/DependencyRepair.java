@@ -5,7 +5,6 @@ import java.util.List;
 
 public class DependencyRepair extends Repair {
 	
-	//private Map<DependencyType, List<SmellType>> dependencies;
 	private List<Dependency> dependencies; 
 	
 	public DependencyRepair(String name) {

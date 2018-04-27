@@ -62,25 +62,15 @@ public class RefactorProcessOptimizer {
 	}
 
 	public void findRefactoringPath(State rootState) {
+		//For multiagent A*
 		// MultiAgent ma = new MultiAgent();
-		// ma.findPath(this.dataProvider.getRootState(),
-		// this.pathSearchStrategy);
-
-		// System.out.println(this.dataProvider.getRootState());
-		// DEBUG
-		/*
-		 * for(int i = 0; i< 6; i++){
-		 * this.getDataProvider().getRootState().getSmells().remove(0); }
-		 * for(int i = 0; i< 4; i++){
-		 * this.getDataProvider().getRootState().getSmells().remove(1); }
-		 */
-		// DEBGU
-
+		
 		Long startTime = System.currentTimeMillis();
 		optimalPath = this.pathSearchStrategy.findPath(rootState, 0);
 		System.out.println("");
 		System.out.println("Time: ");
 		System.out.println(((startTime - System.currentTimeMillis()) / 1000.0));
+		
 		// TODO delete after evalution
 		Evaluation.setResultIme((System.currentTimeMillis() - startTime) / 1000.0);
 	}

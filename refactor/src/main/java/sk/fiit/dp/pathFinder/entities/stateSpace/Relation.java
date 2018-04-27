@@ -44,16 +44,7 @@ public class Relation {
 		this.usedRepair = usedRepair;
 	}
 	
-	public void calculateProbability(ProbabilityCalculationStrategy calculationStrategy){
-		
-		/*double probability = this.usedRepair.calculateProbability();
-		
-		if(this.getFromState().getSourceRelation() == null){
-			this.probability = probability;
-		}else{
-			this.probability = probability * this.getFromState().getSourceRelation().probability;
-		}*/
-		
+	public void calculateProbability(ProbabilityCalculationStrategy calculationStrategy){		
 		this.probability = calculationStrategy.calculateProbability(this);
 	}
 	

@@ -89,7 +89,6 @@ public class RelationCreator {
 	}
 	
 	
-	//TODO - fuzzy logic for dependencies
 	/*
 	 * This method makes the combination of dependencies. 
 	 * 
@@ -146,13 +145,6 @@ public class RelationCreator {
         }
     }
 	
-	/*private static void calculateProbabilityForRelations(List<Relation> rels){
-		
-		for(Relation rel : rels){
-			rel.calculateProbability();
-		}
-		
-	}*/
 	
 	private void initRepairMap(List<SmellType> smellTypes, List<Repair> repairs) {
 		

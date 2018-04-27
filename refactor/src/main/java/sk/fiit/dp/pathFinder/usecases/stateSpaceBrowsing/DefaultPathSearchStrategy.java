@@ -42,8 +42,8 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		
 		Collections.reverse(results);
 			
-		//DEBUG
-		System.out.println("");
+		//DEBUG - for the result output
+		/*System.out.println("");
 		System.out.println("RESULT");
 		for(Relation r : results){
 			System.out.println("-------------");
@@ -53,7 +53,7 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 			currentState = r.getToState();
 			System.out.println("S_" + currentState.getId()+ " [ Fitness: " + currentState.getFitness() + ", NumOfSmells: " +currentState.getSmells().size() + ", Depth: " + currentState.getDepth() + "] " + currentState);
 		}
-		System.out.println(currentState);
+		System.out.println(currentState);*/
 		//DEBUG		
 		return results;
 	}
@@ -67,9 +67,7 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		
 		Relation currentRelation = null;
 		State currentState = null;
-		
-		
-		
+				
 		while(!this.queue.isEmpty()){
 					
 			//get next state for visiting
@@ -97,14 +95,13 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 			}
 			
 			//DEBUG
-				if(this.localMaximum.getSmells().size() == 0){
+				/*if(this.localMaximum.getSmells().size() == 0){
 					break;
-				}
+				}*/
 			//DEBUG
 			
 		}
-		//System.out.println(count);
-		//System.out.println(lastStateId);
+		
 	}	
 
 	protected void init(State rootState, int depth) {
@@ -118,9 +115,7 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		this.visitedStates.add(StateProcessor.createHash(rootState));
 		this.localMaximum = rootState;
 		
-		//DEBUG
-			//printAllRelation(rootState);
-		//DEBUG
+		
 		
 	}
 		
@@ -132,13 +127,11 @@ public class DefaultPathSearchStrategy extends PathSearchStrategy{
 		
 		//add just created relations to queue
 		this.addRelationsToQueue(currentState.getRelations());
-		
-		//DEBUG
-		//printAllRelation(currentState);
-		//DEBUG
-		
+			
 	}
 	
+	
+	//Output for debugging
 	protected static void printAllRelation(State s){
 		System.out.println();
 		System.out.println("NEXT EXPAND:");

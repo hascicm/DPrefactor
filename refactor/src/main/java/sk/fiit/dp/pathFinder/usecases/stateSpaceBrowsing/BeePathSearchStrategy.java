@@ -18,7 +18,7 @@ import sk.fiit.dp.pathFinder.usecases.relationProcessing.RelationCreator;
 public class BeePathSearchStrategy extends PathSearchStrategy {
 	
 	private static int NUM_ITER = 300;
-	private static int NUM_BEES = 80; 
+	private static int NUM_BEES = 80; // the number of bees must be divisible by 8
 	private static int NUM_EMPLOYED_BEES = 40;
 	private static int NUM_ONLOOKER_BEES = 40;
 	private static int SCOUT_MAX_DEPTH = 15;
