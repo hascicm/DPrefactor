@@ -2,6 +2,8 @@ package sk.fiit.dp.refactor.helper;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
@@ -20,8 +22,7 @@ public class JsonFileWriter {
 			file.flush();
 		
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.getGlobal().log(Level.SEVERE, "writeJsonToFile", e1);
 		}
 	}
 }

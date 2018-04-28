@@ -51,7 +51,9 @@ public class PathFinderCommandHandler {
 	// evaluation
 	public static boolean shouldReduce = false;
 	public static int ReduceToNumberOfSmells = 35;
-
+	public static double elapsedTime;
+	
+	
 	private PathFinderCommandHandler() {
 	}
 
@@ -85,7 +87,6 @@ public class PathFinderCommandHandler {
 			// 1. Vytvori lokalnu kopiu Git repozitara
 			gitCommand.cloneRepository(repo, name, password, id);
 
-			// TODO
 			// SONAR
 			if (sonarProps.isSonarEnabled()) {
 				sonarHandler.setSonarProps(sonarProps);
@@ -177,7 +178,10 @@ public class PathFinderCommandHandler {
 			gitCommand.deleteLocalDirectory();
 
 			List<State> rootStates;
+			
+			Long startTime = System.currentTimeMillis();
 
+			
 			// vykona sa rozdelenie stavoveho priestoru na mensie zhluky
 			// (clustering)
 			if (clusteringEnabled) {
@@ -192,8 +196,10 @@ public class PathFinderCommandHandler {
 			// vykoná sa hľadanie optimálnej cesty
 			List<OptimalPathForCluster> results = PathFinderHandler.executePathFinder(rootStates, method);
 
+			elapsedTime = (startTime - System.currentTimeMillis()) / 1000.0;
+			
 			// zaznam o analyze sa nahra do databazy
-			PostgresManager.getInstance().addResultRecord(repo, name, timeGenerator.getTime(), results);
+			//PostgresManager.getInstance().addResultRecord(repo, name, timeGenerator.getTime(), results);
 
 			// for (OptimalPathResult current : results) {
 			// System.out.println("------------------CLUSTER----------------");

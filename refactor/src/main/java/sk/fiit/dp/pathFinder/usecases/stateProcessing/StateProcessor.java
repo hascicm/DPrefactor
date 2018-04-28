@@ -35,7 +35,6 @@ public class StateProcessor {
 			if (rel instanceof Relation) {
 				resultState = applyBasicRepair(baseState, repair, smellOccurance);
 
-				
 				if (repair instanceof DependencyRepair) {
 					applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
 				}
@@ -61,7 +60,6 @@ public class StateProcessor {
 			if (rel instanceof Relation) {
 				resultState = applyBasicRepairMonteCarlo(baseState, repair, smellOccurance);
 
-				
 				if (repair instanceof DependencyRepair) {
 					applyDependencies(resultState, (DependencyRepair) repair, smellOccurance);
 				}
@@ -149,7 +147,7 @@ public class StateProcessor {
 				if (dep.getPlaceType() == DependencyPlaceType.INTERNAL) {
 					SmellOccurance tempSmellOccurance = isOnSameLocation(state, smellOccurance, dep.getSmell(),
 							dep.getActionField());
-					
+
 					if (tempSmellOccurance != null) {
 						state.getSmells().remove(tempSmellOccurance);
 					}

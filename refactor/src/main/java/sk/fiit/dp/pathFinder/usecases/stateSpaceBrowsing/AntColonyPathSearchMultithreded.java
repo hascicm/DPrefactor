@@ -149,7 +149,6 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				if (iterations > maxNonupdatingIterations
 						|| (System.currentTimeMillis() - startTime) > MaxTimeInMilisec) {
 					end = true;
-					// dataProtectionlock.unlock();
 				}
 				if (finalState == null) {
 					makeAntMove();
@@ -203,8 +202,7 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 		}
 
 		private int calculatePheromoneForRelation(Relation relation) {
-			// System.out.println(relation.getPheromoneTrail() +" " +
-			// getPheromone() + " " +pheromoneEvaporationPerCrossing);
+
 
 			int calculatedPheromone = relation.getPheromoneTrail() + getPheromone() - pheromoneEvaporationPerCrossing;
 			if (calculatedPheromone < minPheromone) {
@@ -212,9 +210,6 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 			} else if (calculatedPheromone > maxPheromone) {
 				calculatedPheromone = maxPheromone;
 			}
-			// System.out.println(calculatedPheromone);
-			// System.out.println("feromone trail after evaporation" +
-			// calculatedPheromone);
 			return calculatedPheromone;
 		}
 
@@ -228,19 +223,6 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				setPheromone(calculatedPheromone);
 			}
 		}
-
-		// private void evaporatePheromoneFromTrails(HashSet<Relation>
-		// relations) {
-		// for (Relation r : relations) {
-		// int calculatedPheromone = r.getPheromoneTrail() -
-		// pheromoneEvaporationPerCrossing;
-		// if (calculatedPheromone < minPheromone) {
-		// r.setPheromoneTrail(minPheromone);
-		// } else {
-		// r.setPheromoneTrail(calculatedPheromone);
-		// }
-		// }
-		// }
 
 		private void reinitializeAnt(State rootState) {
 			finalState = null;

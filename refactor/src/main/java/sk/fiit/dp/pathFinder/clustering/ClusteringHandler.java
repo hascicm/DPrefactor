@@ -32,7 +32,6 @@ public class ClusteringHandler {
 			c.setClusterDepth(0);
 			numberOfSmells += c.getSmellOccurrences().size();
 		}
-		System.out.println(numberOfSmells);
 		CluseteringMethod cm = new HierarchiacalClustering();
 		Logger.getLogger("clutering logger").log(Level.INFO, "execution started");
 		cm.executeClustering(clusters);
@@ -43,11 +42,10 @@ public class ClusteringHandler {
 		} else if (desiredClusterCount > numberOfSmells) {
 			desiredClusterCount = numberOfSmells;
 		}
-		System.out.println(desiredClusterCount);
 		List<Cluster> x = cm.getResult(desiredClusterCount);
 
 		List<State> result = new ArrayList<State>();
-		
+
 		for (Cluster c : x) {
 			State act = new State();
 			act.setSmells(c.getSmellOccurrences());

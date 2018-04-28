@@ -41,8 +41,6 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 		this.rootState.setT(0);
 		StateProcessor.calculateFitnessForMonteCarlo(this.rootState, 0);
 		this.rootState.setFitness(0);
-		// bestState = this.rootState;
-		// System.out.println(bestState);
 
 		MonteCarloAgent curent;
 
@@ -134,7 +132,6 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			if (rel.getToState().getFitness() < 0) {
 				rel.getToState().setFitness(1);
 			}
-			// rel.getToState().setFitness(10);
 		}
 	}
 
@@ -178,15 +175,11 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 				return s;
 			}
 			if (mcs.getN() == 0) {
-			//	UCB1 = Double.MAX_VALUE;
 				reward = mcs.getFitness();
 			} else {
 				avgValue = mcs.getT() / mcs.getN();
-				reward = avgValue;// + constant *
-								// Math.sqrt((Math.log(rootState.getN()) /
-								// mcs.getN()));
+				reward = avgValue;
 			}
-			// System.out.println(UCB1);
 			if (maxReward < reward && !isLowProbability(mcs)) {
 				maxReward = reward;
 				result = mcs;
@@ -260,7 +253,6 @@ public class MonteCarloSearchStrategy extends PathSearchStrategy {
 			if (!curentState.getRelations().isEmpty() && curentState.getRelations().get(0) != null) {
 				curentState = (MonteCarloState) curentState.getRelations().get(0).getToState();
 			}
-			// printCurentState();
 		}
 
 		private void rollout() {

@@ -19,14 +19,14 @@ import sk.fiit.dp.refactor.command.sonarQube.SonarProperties;
 public class Evaluation {
 
 	public static double elapsedTime = 0;
-	final static int numOfTests = 1;
+	final static int numOfTests = 10;
 
 	public static void main(String[] args) {
 		PathFinderCommandHandler pathFinderCommand = PathFinderCommandHandler.getInstance();
 		PathFinderCommandHandler.shouldReduce = true;
-		String repo = "https://github.com/hascicm/refactor.git";
-		String gituser = "username";
-		String gitpass = "pass";
+		String repo = "https://github.com/hascicm/DP_Refactor_Search_Space";
+		String gituser = "hascicm";
+		String gitpass = "Swiftims1994";
 		String searchbranch = "pathfinder_eval";
 		List<String> searchMethods = new ArrayList<String>();
 		// 'CR','MCH','LM','LPL','DC','ECC','LC','LAZC','MAGIC','SS','FE'
@@ -43,79 +43,74 @@ public class Evaluation {
 		searchMethods.add("FE");
 
 		boolean explanationToSearch = false;
-		boolean clusteringEnabled = false;
+
+		List<Boolean> clusteringToTest = new ArrayList<Boolean>();
+		clusteringToTest.add(true);
+		clusteringToTest.add(false);
+
 		SonarProperties sonarProps = new SonarProperties();
 		sonarProps.setSonarEnabled(false);
 
 		List<String> methodToTest = new ArrayList<String>();
-		methodToTest.add("mc");
+		//methodToTest.add("mc");
 		// methodToTest.add("A*");
 		// methodToTest.add("bee");
-		// methodToTest.add("ant");
+		methodToTest.add("ant");
 
 		List<Integer> smellCountTOTest = new ArrayList<>();
-		smellCountTOTest.add(20);
-		// smellCountTOTest.add(5);
-		// smellCountTOTest.add(10);
-		// smellCountTOTest.add(15);
-		//
 		// smellCountTOTest.add(20);
-		// smellCountTOTest.add(25);
-		// smellCountTOTest.add(30);
-		// smellCountTOTest.add(40);
+		// smellCountTOTest.add(5);
+		 smellCountTOTest.add(10);
+		 smellCountTOTest.add(15);
+		 smellCountTOTest.add(20);
+		 smellCountTOTest.add(25);
+		 smellCountTOTest.add(30);
+//		smellCountTOTest.add(40);
 
 		List<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+		for (boolean clustering : clusteringToTest) {
 
-		for (String method : methodToTest) {
+			for (String method : methodToTest) {
 
-			for (Integer smellCount : smellCountTOTest) {
-				PathFinderCommandHandler.ReduceToNumberOfSmells = smellCount;
+				for (Integer smellCount : smellCountTOTest) {
+					PathFinderCommandHandler.ReduceToNumberOfSmells = smellCount;
 
-				for (int testNumber = 1; testNumber <= numOfTests; testNumber++) {
-					State finalState = null;
-					ArrayList<String> currResult;
-					List<OptimalPathForCluster> result = pathFinderCommand.executePathFinder(repo, gituser, gitpass,
-							searchbranch, searchMethods, explanationToSearch, clusteringEnabled, sonarProps, method);
-					for (OptimalPathForCluster r : result) {
-						if (r != null && !r.getOptimalPath().isEmpty()) {
-							finalState = r.getOptimalPath().get(r.getOptimalPath().size() - 1).getToState();
-							System.out.println("method: " + method + "\tsmellcount: "
-									+ PathFinderCommandHandler.ReduceToNumberOfSmells + "\ttestnumber: " + testNumber
-									+ "\ttime:" + elapsedTime + "\t finalstate: " + finalState.toString());
+					for (int testNumber = 1; testNumber <= numOfTests; testNumber++) {
+						State finalState = null;
+						ArrayList<String> currResult;
+						List<OptimalPathForCluster> result = pathFinderCommand.executePathFinder(repo, gituser, gitpass,
+								searchbranch, searchMethods, explanationToSearch, clustering, sonarProps, method);
+						for (OptimalPathForCluster r : result) {
+							if (r != null && !r.getOptimalPath().isEmpty()) {
+								finalState = r.getOptimalPath().get(r.getOptimalPath().size() - 1).getToState();
+								System.out.println("method: " + method + "\tsmellcount: "
+										+ PathFinderCommandHandler.ReduceToNumberOfSmells +"\tclustering:" + clustering +"\ttestnumber: "
+										+ testNumber + "\ttime:" + elapsedTime + "\t finalstate: "
+										+ finalState.toString());
+							}
+							
+							elapsedTime = PathFinderCommandHandler.elapsedTime;
+							currResult = new ArrayList<>();
+
+							currResult.add(method);
+							currResult.add("" + PathFinderCommandHandler.ReduceToNumberOfSmells);
+							currResult.add("" + testNumber);
+							currResult.add("" + clustering);
+							currResult.add("" + elapsedTime);
+							if (r != null && !r.getOptimalPath().isEmpty()) {
+								currResult.add("" + finalState.getFitness());
+								currResult.add("" + finalState.getDepth());
+								currResult.add("" + finalState.getSmells().size());
+								currResult.add(finalState.toString());
+							}
+							results.add(currResult);
+
 						}
-						currResult = new ArrayList<>();
-						// currResult.add("method: " + method);
-						// currResult.add("smellcount: " +
-						// PathFinderCommandHandler.ReduceToNumberOfSmells);
-						// currResult.add("testnumber: " + testNumber);
-						// currResult.add("time: " + elapsedTime);
-						// currResult.add("Fitness: " +
-						// finalState.getFitness());
-						// currResult.add("Depth: " +
-						// finalState.getDepth());
-						// currResult.add("NumOfSmells: " +
-						// finalState.getSmells().size());
-						// currResult.add("finalstate: " +
-						// finalState.toString());
-
-						currResult.add(method);
-						currResult.add("" + PathFinderCommandHandler.ReduceToNumberOfSmells);
-						currResult.add("" + testNumber);
-						currResult.add("" + elapsedTime);
-						if (r != null && !r.getOptimalPath().isEmpty()) {
-							currResult.add("" + finalState.getFitness());
-							currResult.add("" + finalState.getDepth());
-							currResult.add("" + finalState.getSmells().size());
-							currResult.add(finalState.toString());
-						}
-						results.add(currResult);
-
 					}
 				}
+				// change method
 			}
-			// change method
 		}
-		// TODO refatorprocessoptimalizer delete eval commant
 
 		try
 
@@ -143,7 +138,7 @@ public class Evaluation {
 		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(SAMPLE_CSV_FILE));
 
 				CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("method", "smellcount",
-						"testnumber", "time", "Fitness", "Depth", "NumOfSmells", "finalstate"));) {
+						"testnumber", "clustering", "time", "Fitness", "Depth", "NumOfSmells", "finalstate"));) {
 
 			for (ArrayList<String> r : results) {
 				csvPrinter.printRecord(Arrays.asList(r.toArray()));

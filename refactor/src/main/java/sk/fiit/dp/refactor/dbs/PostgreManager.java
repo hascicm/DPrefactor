@@ -281,7 +281,6 @@ public class PostgreManager {
 		rs.next();
 		act.setId(rs.getInt("id"));
 		act.setGitRepository(rs.getString("gitreponame"));
-		// TODO process path
 		List<Location> locationObjects = LocationProcessor.processLocationString(rs.getString("path"));
 		act.setLocationJSON(createLocationJSON(locationObjects));
 		act.setPath(rs.getString("path"));

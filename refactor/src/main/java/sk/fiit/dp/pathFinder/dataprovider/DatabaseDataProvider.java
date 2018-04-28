@@ -273,7 +273,6 @@ public class DatabaseDataProvider implements DataProvider {
 		Pattern p1 = new Pattern(patternDesc);
 		p1.setActionField(LocationPartType.NODE);
 		p1.setUsedRepair(new PatternRepair(patternDesc, 95, 0));
-		// TODO parser add this to parser
 		PatternSmellUse psu1 = new PatternSmellUse();
 		psu1.setMain(true);
 		psu1.setSmellType(this.getSmellTypes().get(29));

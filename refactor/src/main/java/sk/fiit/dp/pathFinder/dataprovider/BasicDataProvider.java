@@ -75,7 +75,6 @@ public class BasicDataProvider implements DataProvider {
 		this.smells.add(smell_A);
 		this.smells.add(smell_B);
 
-		// TODO - check if it works correctly
 		/*
 		 * List<SmellType> badClassContent = new ArrayList<SmellType>();
 		 * badClassContent.add(smell_largeClass);

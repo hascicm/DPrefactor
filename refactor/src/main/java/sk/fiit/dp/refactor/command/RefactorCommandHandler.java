@@ -80,7 +80,6 @@ public class RefactorCommandHandler {
 			// 1. Vytvori lokalnu kopiu Git repozitara
 			gitCommand.cloneRepository(repo, name, password, id);
 
-			// TODO
 			// SONAR
 			if (sonarProps.isSonarEnabled()) {
 				sonarHandler.setSonarProps(sonarProps);
@@ -153,23 +152,12 @@ public class RefactorCommandHandler {
 			// 12. Pravidlovy stroj rozhodne o pouzitom refaktorovani
 			List<JessOutput> requiredRefactoring = ruleCommand.run(searchResults);
 
-			// System.out.println("---------JESS-----------------------------");
-			//
-			// for (JessOutput o : requiredRefactoring) {
-			// System.out.println("tags: " + o.getTag());
-			// System.out.println("method: " + o.getRefactoringMethod());
-			// }
-			// System.out.println("--------------------------------------");
-
 			// 13. Vykona sa refaktoring
-			System.out.println("---------REFACTOR-----------------------------");
 			applyRefactoring(requiredRefactoring, allowedRefactoring);
 
-			// TODO explanation
 			if (createRepairRecord) {
 				explainCommand.processJessListenerOutput();
 				explainCommand.getRepairedSourceCode(searchResults);
-			//	explainCommand.printrecords();
 				explainCommand.pushRecordsToPostgres();
 
 			}

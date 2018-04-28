@@ -71,8 +71,6 @@ public class RefactorProcessOptimizer {
 		System.out.println("Time: ");
 		System.out.println(((startTime - System.currentTimeMillis()) / 1000.0));
 		
-		// TODO delete after evalution
-		Evaluation.setResultIme((System.currentTimeMillis() - startTime) / 1000.0);
 	}
 
 	public void setPathSearchStrategy(PathSearchStrategy pathSearchStrategy) {

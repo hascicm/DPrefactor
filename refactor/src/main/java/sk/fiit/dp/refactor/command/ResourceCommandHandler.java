@@ -10,8 +10,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.eclipsesource.json.JsonObject;
-
 import sk.fiit.dp.pathFinder.dataprovider.dbsManager.PostgresManager;
 import sk.fiit.dp.refactor.dbs.PostgreManager;
 import sk.fiit.dp.refactor.helper.Resources;
@@ -83,7 +81,6 @@ public class ResourceCommandHandler {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println(methods.toString());
 		return methods.toString();
 	}
 
@@ -134,7 +131,6 @@ public class ResourceCommandHandler {
 			e.printStackTrace();
 		}
 		result = r.asJson();
-		System.out.println(result.toString());
 		return result.toString();
 	}
 

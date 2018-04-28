@@ -52,10 +52,6 @@ public class HierarchiacalClustering implements CluseteringMethod {
 		}
 		while (numberOfClusters > 1) {
 			NearestClusterPair ncp = findNearestClusters(clusterList);
-//			System.out.println("merging size" + ncp.getClusterA().getSmellOccurrences().size() + ":"
-//					+ ncp.getClusterB().getSmellOccurrences().size() + " indexes "
-//					+ clusterList.indexOf(ncp.getClusterA()) + ":" + clusterList.indexOf(ncp.getClusterB())
-//					+ " distance " + calculateDistance(ncp.getClusterA(), ncp.getClusterB()));
 			clusterList.remove(ncp.getClusterA());
 			clusterList.remove(ncp.getClusterB());
 
@@ -96,7 +92,6 @@ public class HierarchiacalClustering implements CluseteringMethod {
 				if (clusters.get(i) == clusters.get(j)) {
 					continue;
 				}
-//				System.out.print("comparing " + i + ":" + j + " ");
 				int distance = calculateDistance(clusters.get(i), clusters.get(j));
 				if (currentMin >= distance) {
 					currentMin = distance;
@@ -130,14 +125,11 @@ public class HierarchiacalClustering implements CluseteringMethod {
 		int clusterSize = cluster.getSmellOccurrences().size() + cluster2.getSmellOccurrences().size();
 		int PenalizedDistance = (int) Math.round(minDistance * calculateSizePenalization(clusterSize));
 
-//		System.out.println(" size " + clusterSize + "distance " + minDistance + " penalisation "
-//				+ calculateSizePenalization(clusterSize) + minDistance + " altered " + PenalizedDistance);
+
 		return PenalizedDistance;
 	}
 
 	private double calculateSizePenalization(int clusterSize) {
-//		System.out.println(clusterSize + " / " + numberOfIdentifiedSmells + " * " + penalisationConstant + " = "
-//				+ (((float) clusterSize / (float) numberOfIdentifiedSmells) * penalisationConstant));
 		return (((float) clusterSize / (float) numberOfIdentifiedSmells) * penalisationConstant);
 	}
 
