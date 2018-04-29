@@ -72,7 +72,8 @@ function pathFinder(){
 	document.getElementById("SmellDatabase").hidden = true;
 	document.getElementById("records").hidden = true;
 	document.getElementById("recordDetail").hidden = true;
-	document.getElementById("pathFinderResults").hidden = true;    
+	document.getElementById("pathFinderResults").hidden = true;
+	document.getElementById("smellView").hidden = true; 
 	buttonSelection("javascript:pathFinder();");
 	buttonSelectionSubnav("javascript:pathFinder();");
 
