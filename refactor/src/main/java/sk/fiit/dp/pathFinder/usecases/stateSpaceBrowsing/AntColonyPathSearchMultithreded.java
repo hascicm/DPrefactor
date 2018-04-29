@@ -276,7 +276,7 @@ public class AntColonyPathSearchMultithreded extends PathSearchStrategy {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			}
+			} 
 		}
 
 		public synchronized void unlock(State s) {
