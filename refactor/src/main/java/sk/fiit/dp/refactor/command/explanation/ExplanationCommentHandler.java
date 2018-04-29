@@ -87,15 +87,15 @@ public class ExplanationCommentHandler {
 					smelltype = currSmell.getName();
 				}
 			}
-			String marker = "//SMELL: #SmellType(" + smelltype + ")\n";
+			String marker = "//SMELL: #SmellType(" + smelltype + ")";
 			insertCommentBeforeSmell(curr.getCode(), marker);
 		}
 	}
 
 	public void insertSmellRefCodeTags(List<JessInput> searchResults) {
 		for (JessInput curr : searchResults) {
-			insertCommentBeforeSmell(curr.getCode(), "// begining of smell with identificator: " + curr.getCode());
-			insertCommentAfterSmell(curr.getCode(),  "// end of smell with identificator: " + curr.getCode());
+			insertCommentBeforeSmell(curr.getCode(), "//begining of smell with identificator: " + curr.getCode());
+			insertCommentAfterSmell(curr.getCode(),  "//end of smell with identificator: " + curr.getCode());
 		}
 	}
 }
