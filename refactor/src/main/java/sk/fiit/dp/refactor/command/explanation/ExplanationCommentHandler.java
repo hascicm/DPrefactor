@@ -52,7 +52,7 @@ public class ExplanationCommentHandler {
 	}
 
 	public void insertCommentAfterSmell(String smellCode, String comment) {
-		String queryPart = " <comment type = \"line\">" + comment + " </comment>";
+		String queryPart = " <comment type = \"line\">\n" + comment + " </comment>";
 
 		String query = " for $node in xquery:eval(fn:concat(\"//\", '" + smellCode
 				+ "')) return ( insert node element {xs:QName('" + smellCode + "AfterComment')} {" + queryPart
@@ -65,7 +65,7 @@ public class ExplanationCommentHandler {
 	}
 
 	public void insertCommentBeforeSmell(String smellCode, String comment) {
-		String queryPart = " <comment type = \"line\">" + comment + " </comment>";
+		String queryPart = " <comment type = \"line\">" + comment + " \n</comment>";
 
 		String query = "for $node in xquery:eval(fn:concat(\"//\", '" + smellCode
 				+ "')) return ( insert node element {xs:QName('" + smellCode + "BeforeComment')} {" + queryPart
