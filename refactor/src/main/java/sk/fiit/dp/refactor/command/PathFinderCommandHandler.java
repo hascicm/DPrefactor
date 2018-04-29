@@ -199,7 +199,7 @@ public class PathFinderCommandHandler {
 			elapsedTime = (startTime - System.currentTimeMillis()) / 1000.0;
 			
 			// zaznam o analyze sa nahra do databazy
-			//PostgresManager.getInstance().addResultRecord(repo, name, timeGenerator.getTime(), results);
+			PostgresManager.getInstance().addResultRecord(repo, name, timeGenerator.getTime(), results);
 
 			// for (OptimalPathResult current : results) {
 			// System.out.println("------------------CLUSTER----------------");
