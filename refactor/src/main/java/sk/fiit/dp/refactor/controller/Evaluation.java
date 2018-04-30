@@ -25,8 +25,8 @@ public class Evaluation {
 		PathFinderCommandHandler pathFinderCommand = PathFinderCommandHandler.getInstance();
 		PathFinderCommandHandler.shouldReduce = true;
 		String repo = "https://github.com/hascicm/DP_Refactor_Search_Space";
-		String gituser = "hascicm";
-		String gitpass = "pass";
+		String gituser = "username";
+		String gitpass = "password";
 		String searchbranch = "pathfinder_eval";
 		List<String> searchMethods = new ArrayList<String>();
 		// 'CR','MCH','LM','LPL','DC','ECC','LC','LAZC','MAGIC','SS','FE'
