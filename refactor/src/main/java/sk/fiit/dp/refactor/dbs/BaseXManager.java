@@ -134,7 +134,6 @@ public class BaseXManager {
 		} catch (XQException e) {
 			Logger.getLogger("BaseX").log(Level.SEVERE, "repaired code retrieval failed", e);
 		}
-		System.out.println("!!!" + repairedCode);
 		return repairedCode.substring(repairedCode.indexOf('\n') + 1).replaceAll("!!!RESULTDELIMITER!!!",
 				"\n\n///////////////////////ďalšia časť opravy///////////////////////\n");
 	}

@@ -407,7 +407,7 @@ function expandPathfinderResultGraph() {
 function hidePathfinderResultGraph(){
 	    var x = document.getElementById("pathFinderResultGraphDiv");
     	x.style.display = "none";
-    	$("#pathFinderResultSmellTableToggle").html("zobraziť");
+    	$("#expandPathfinderResultGraphButton").html("zobraziť");
 }
 
 
